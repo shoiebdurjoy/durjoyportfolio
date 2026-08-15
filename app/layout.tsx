@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import CustomCursor from "@/src/components/ui/CustomCursor";
 import Preloader from "@/src/components/ui/Preloader";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
 
@@ -49,7 +48,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col font-sans selection:bg-[#F59E0B] selection:text-[#06080B]">
         <Preloader />
-        <CustomCursor />
         <SmoothScroll>
           {children}
         </SmoothScroll>
