@@ -12,8 +12,17 @@ import VideoSection from '@/src/components/VideoSection';
 import GitHubSection from '@/src/components/GitHubSection';
 import ContactSection from '@/src/components/ContactSection';
 import LiveHUD from '@/src/components/ui/LiveHUD';
+import MobileHero from '@/src/components/hero/MobileHero';
 export default function Home() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check immediately on client mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Global shortcut: Cmd/Ctrl + K
   useEffect(() => {
@@ -43,7 +52,7 @@ export default function Home() {
 
       <main className="w-full">
         {/* 1. Hero: Interactive BUILD ↔ CUT (B&W to Full Color) */}
-        <HeroSplit />
+        {isMobile ? <MobileHero /> : <HeroSplit />}
 
         {/* 2. About & Statistics Cards */}
         <AboutSection />
