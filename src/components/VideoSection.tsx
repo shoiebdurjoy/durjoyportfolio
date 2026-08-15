@@ -118,7 +118,7 @@ export default function VideoSection() {
           initial={{ opacity: 0, y: 15 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="flex justify-center"
+          className="flex justify-center mt-12 md:mt-24"
         >
           <a
             href="https://www.behance.net/shoiebdurjoy9"
