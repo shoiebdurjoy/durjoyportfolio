@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Preloader from "@/src/components/ui/Preloader";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
-import CustomCursor from "@/src/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Md Shoieb Hossain — BUILD ↔ CUT | Software Engineer & Video Editor",
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col font-sans selection:bg-[#F59E0B] selection:text-[#06080B]">
-        <CustomCursor />
         <Preloader />
         <SmoothScroll>
           {children}
