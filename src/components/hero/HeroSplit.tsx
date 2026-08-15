@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import ScrambleText from '@/src/components/ui/ScrambleText';
 
 export default function HeroSplit() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -272,7 +273,8 @@ export default function HeroSplit() {
       >
         <div className="text-center select-none">
           <h1 className="font-serif text-[clamp(6rem,18vw,16rem)] font-black leading-[0.82] tracking-[-0.04em] uppercase text-center whitespace-nowrap">
-            <motion.span
+            <ScrambleText
+              text="SHOIEB"
               className="block"
               style={{
                 color: useTransform(
@@ -281,10 +283,9 @@ export default function HeroSplit() {
                   ['rgba(245, 158, 11, 0.05)', 'rgba(248, 250, 252, 0.07)', 'rgba(0, 242, 195, 0.05)']
                 ),
               }}
-            >
-              Shoieb
-            </motion.span>
-            <motion.span
+            />
+            <ScrambleText
+              text="DURJOY"
               className="block -mt-[0.06em]"
               style={{
                 color: useTransform(
@@ -293,9 +294,7 @@ export default function HeroSplit() {
                   ['rgba(245, 158, 11, 0.07)', 'rgba(248, 250, 252, 0.09)', 'rgba(0, 242, 195, 0.07)']
                 ),
               }}
-            >
-              Durjoy
-            </motion.span>
+            />
           </h1>
         </div>
       </motion.div>

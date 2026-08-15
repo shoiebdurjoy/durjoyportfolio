@@ -11,7 +11,7 @@ import ThesisSection from '@/src/components/ThesisSection';
 import VideoSection from '@/src/components/VideoSection';
 import GitHubSection from '@/src/components/GitHubSection';
 import ContactSection from '@/src/components/ContactSection';
-
+import LiveHUD from '@/src/components/ui/LiveHUD';
 export default function Home() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
@@ -31,6 +31,9 @@ export default function Home() {
     <div className="min-h-screen bg-[#07090C] text-[#EDEAE3] selection:bg-[#F59E0B] selection:text-[#07090C] overflow-x-hidden">
       {/* Fixed Navigation Bar */}
       <Navigation onCommandPaletteOpen={() => setIsCommandPaletteOpen(true)} />
+
+      {/* Premium Live HUD Overlay */}
+      <LiveHUD />
 
       {/* Global Command Palette */}
       <CommandPalette
