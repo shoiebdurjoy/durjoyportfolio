@@ -23,7 +23,7 @@ export default function CustomCursor() {
     const updateMousePosition = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
+      setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -56,12 +56,12 @@ export default function CustomCursor() {
       document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
       document.body.style.cursor = 'auto';
     };
-  }, [cursorX, cursorY, isVisible]);
+  }, [cursorX, cursorY]);
 
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 w-3 h-3 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+        className="fixed top-0 left-0 w-3 h-3 bg-[#F59E0B] rounded-full pointer-events-none z-[9999]"
         style={{
           x: smoothX,
           y: smoothY,
