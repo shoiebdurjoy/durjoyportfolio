@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
 
 export type TechItem = {
@@ -22,17 +22,20 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
   const runnerRef = useRef<Matter.Runner | null>(null);
   
   const itemMapRef = useRef<Map<number, { item: TechItem, width: number, height: number }>>(new Map());
+  const [engineReady, setEngineReady] = useState(false);
 
   useEffect(() => {
     if (!sceneRef.current) return;
     const currentScene = sceneRef.current;
-    const width = currentScene.clientWidth;
+    
+    // Ensure we have a valid width to prevent 0,0 squishing
+    const width = currentScene.clientWidth > 0 ? currentScene.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 64 : 1000);
     const height = 600; 
 
-    // 1. Setup Engine & Gravity (Restored to original snappy physics)
+    // 1. Setup Engine & Gravity
     const engine = Matter.Engine.create();
     engineRef.current = engine;
-    engine.gravity.y = 0.5; // Restored original gravity
+    engine.gravity.y = 0.5;
 
     // 2. Setup Canvas Renderer
     const render = Matter.Render.create({
@@ -43,12 +46,12 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
         height,
         wireframes: false,
         background: 'transparent',
-        pixelRatio: window.devicePixelRatio,
+        pixelRatio: window.devicePixelRatio || 1,
       }
     });
     renderRef.current = render;
 
-    // 3. Create Walls, Floor, and Invisible Shelves
+    // 3. Create Walls & Floor
     const CATEGORY_PILL = 0x0001;
     const CATEGORY_WALL = 0x0002;
 
@@ -69,20 +72,18 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
 
     Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
-    // 4. Create Tech Pills (Structured Brick-Like Initial State)
+    // 4. Create Tech Pills (Structured Brick-Like Initial State, Suspended in Sky)
     const bodies: Matter.Body[] = [];
     const shuffledItems = [...items].sort(() => Math.random() - 0.5);
 
-    // Pre-calculate pill dimensions
     const pillData = shuffledItems.map(item => {
       const textWidth = item.name.length * 8 + 40; 
       const pillWidth = Math.max(120, textWidth);
       return { item, pillWidth, pillHeight: 44 };
     });
 
-    // Build rows from bottom to top
-    const gap = 4; // Tiny gap for natural resting
-    const maxRowWidth = width * 0.85; // 85% of canvas width
+    const maxRowWidth = width * 0.85; 
+    const gap = 4; 
     const rows: (typeof pillData)[] = [];
     let currentRow: typeof pillData = [];
     let currentRowWidth = 0;
@@ -100,17 +101,16 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
       rows.push(currentRow);
     }
 
-    // Start Y near the bottom so they rest perfectly on the ground
-    let currentY = height - 25; // 22 (half height) + 3px tolerance
+    let targetY = height - 25; 
 
-    // Reverse rows so we build from the bottom up
     rows.reverse().forEach((row) => {
       const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
-      let currentX = (width - rowTotalWidth) / 2; // Center the row
+      let currentX = (width - rowTotalWidth) / 2; 
 
       row.forEach((data) => {
         const x = currentX + (data.pillWidth / 2);
-        const y = currentY - 800; // Suspend high in the sky!
+        // Suspend high in the sky directly above their target position
+        const y = targetY - 1200; 
 
         const isCreative = data.item.category === 'creative';
         const isAI = data.item.category === 'ai';
@@ -119,7 +119,7 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
         const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
           restitution: 0.6,
           friction: 0.1,
-          isStatic: true, // Start static so they don't fall until visible
+          isStatic: true, // IMPORTANT: Suspended mid-air
           chamfer: { radius: data.pillHeight / 2 },
           collisionFilter: {
             category: CATEGORY_PILL
@@ -137,22 +137,22 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
         currentX += data.pillWidth + gap;
       });
 
-      // Move Y up for the next row
-      currentY -= (44 + gap);
+      targetY -= (44 + gap);
     });
 
+    // Add them immediately, they are static so they will just float unseen
     Matter.Composite.add(engine.world, bodies);
 
-    // 5. Mouse Interaction (Restored original stiffness)
+    // 5. Mouse Interaction
     const mouse = Matter.Mouse.create(render.canvas);
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
-        stiffness: 0.2, // Restored original snappy grab stiffness
+        stiffness: 0.2, 
         render: { visible: false }
       },
       collisionFilter: {
-        mask: CATEGORY_PILL // Only grab pills, never shelves
+        mask: CATEGORY_PILL 
       }
     });
     Matter.Composite.add(engine.world, mouseConstraint);
@@ -181,7 +181,7 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
       document.body.style.cursor = 'crosshair';
     });
 
-    // 6. Custom HD Renderer just for Text and Dot overlay
+    // 6. Custom HD Renderer
     Matter.Events.on(render, 'afterRender', () => {
       const context = render.context;
       
@@ -198,13 +198,11 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
         context.translate(body.position.x, body.position.y);
         context.rotate(body.angle);
 
-        // Draw Indicator Dot
         context.beginPath();
         context.arc(-width / 2 + 18, 0, 3.5, 0, 2 * Math.PI);
         context.fillStyle = accentColor;
         context.fill();
 
-        // Draw Text
         context.font = '500 12px "JetBrains Mono", monospace';
         context.fillStyle = 'rgba(237, 234, 227, 0.9)';
         context.textAlign = 'left';
@@ -220,6 +218,8 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
     runnerRef.current = runner;
     Matter.Render.run(render);
     Matter.Runner.run(runner, engine);
+    
+    setEngineReady(true);
 
     const handleResize = () => {
       if (!currentScene) return;
@@ -247,19 +247,29 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
 
   // Drop animation when scrolled into view
   useEffect(() => {
-    if (!isVisible || !engineRef.current) return;
+    if (!isVisible || !engineReady || !engineRef.current) return;
     
     const engine = engineRef.current;
-    // Get only the pills
     const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
     
-    // Drop them row by row with a slight stagger for a beautiful cascading build effect
+    // Using a ref to prevent dropping multiple times
+    const timeouts: NodeJS.Timeout[] = [];
+    
     pills.forEach((body, index) => {
-      setTimeout(() => {
-        Matter.Body.setStatic(body, false);
-      }, index * 20); // 20ms stagger per pill
+      if (body.isStatic) {
+        const timeout = setTimeout(() => {
+          Matter.Body.setStatic(body, false);
+          // Small nudge to ensure it wakes up and falls
+          Matter.Body.setVelocity(body, { x: 0, y: 0.1 });
+        }, index * 25); 
+        timeouts.push(timeout);
+      }
     });
-  }, [isVisible]);
+
+    return () => {
+      timeouts.forEach(t => clearTimeout(t));
+    };
+  }, [isVisible, engineReady]);
 
   return (
     <div className="relative w-full rounded-2xl border border-[rgba(237,234,227,0.06)] bg-[#07090C] shadow-2xl overflow-hidden group">
