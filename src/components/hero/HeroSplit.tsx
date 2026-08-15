@@ -271,7 +271,7 @@ export default function HeroSplit() {
         }}
       >
         <div className="text-center select-none">
-          <h1 className="font-serif text-[clamp(4.5rem,14vw,12rem)] font-black leading-[0.82] tracking-[-0.04em] uppercase text-center whitespace-nowrap">
+          <h1 className="font-serif text-[clamp(6rem,18vw,16rem)] font-black leading-[0.82] tracking-[-0.04em] uppercase text-center whitespace-nowrap">
             <motion.span
               className="block"
               style={{
