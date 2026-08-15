@@ -17,8 +17,7 @@ export default function CustomCursor() {
   const smoothY = useSpring(cursorY, springConfig);
 
   useEffect(() => {
-    // Hide native cursor globally on mount
-    document.body.style.cursor = 'none';
+    // We want the native cursor to remain visible globally
 
     const updateMousePosition = (e: MouseEvent) => {
       cursorX.set(e.clientX);
@@ -54,7 +53,6 @@ export default function CustomCursor() {
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
       document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
-      document.body.style.cursor = 'auto';
     };
   }, [cursorX, cursorY]);
 
@@ -67,7 +65,7 @@ export default function CustomCursor() {
           y: smoothY,
           marginLeft: '-6px',
           marginTop: '-6px',
-          opacity: isVisible ? 1 : 0,
+          opacity: isVisible && isHovering ? 1 : 0,
         }}
         animate={{
           scale: isHovering ? 4 : 1,
