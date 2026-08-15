@@ -126,7 +126,7 @@ export default function AboutSection() {
               {
                 label: 'Academic Standing',
                 value: 'BRAC CS \'27',
-                detail: 'B.S. in Computer Science · CGPA 3.00 · Focus on backend architecture & machine learning.',
+                detail: 'B.S. in Computer Science · Focus on backend architecture & machine learning.',
                 tag: 'Engineering',
                 color: 'text-[#00F2C3]',
                 border: 'border-[#00F2C3]/20',

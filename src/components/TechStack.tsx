@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import MagneticButton from '@/src/components/ui/MagneticButton';
 
 type TechItem = {
   name: string;
@@ -86,30 +87,31 @@ function MarqueeRow({
           const isAI = tech.category === 'ai';
 
           return (
-            <div
-              key={`${tech.name}-${idx}`}
-              onMouseEnter={() => onHoverItem(tech)}
-              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-[#0D1117]/90 text-[12px] font-mono cursor-pointer transition-all duration-200 select-none shrink-0 ${
-                isCreative
-                  ? 'border-[rgba(232,133,74,0.2)] hover:border-[#E8854A] hover:bg-[#E8854A]/10 hover:shadow-[0_0_15px_rgba(232,133,74,0.25)] text-[#EDEAE3]'
-                  : isAI
-                  ? 'border-[rgba(245,158,11,0.25)] hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 hover:shadow-[0_0_15px_rgba(245,158,11,0.25)] text-[#EDEAE3]'
-                  : 'border-[rgba(34,211,174,0.2)] hover:border-[#22D3AE] hover:bg-[#22D3AE]/10 hover:shadow-[0_0_15px_rgba(34,211,174,0.25)] text-[#EDEAE3]'
-              }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
+            <MagneticButton key={`${tech.name}-${idx}`} strength={10}>
+              <div
+                onMouseEnter={() => onHoverItem(tech)}
+                className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-[#0D1117]/90 text-[12px] font-mono cursor-pointer transition-all duration-200 select-none shrink-0 ${
                   isCreative
-                    ? 'bg-[#E8854A]'
+                    ? 'border-[rgba(232,133,74,0.2)] hover:border-[#E8854A] hover:bg-[#E8854A]/10 hover:shadow-[0_0_15px_rgba(232,133,74,0.25)] text-[#EDEAE3]'
                     : isAI
-                    ? 'bg-[#F59E0B]'
-                    : 'bg-[#22D3AE]'
+                    ? 'border-[rgba(245,158,11,0.25)] hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 hover:shadow-[0_0_15px_rgba(245,158,11,0.25)] text-[#EDEAE3]'
+                    : 'border-[rgba(34,211,174,0.2)] hover:border-[#22D3AE] hover:bg-[#22D3AE]/10 hover:shadow-[0_0_15px_rgba(34,211,174,0.25)] text-[#EDEAE3]'
                 }`}
-              />
-              <span className="font-medium text-[#EDEAE3] group-hover:text-white">
-                {tech.name}
-              </span>
-            </div>
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    isCreative
+                      ? 'bg-[#E8854A]'
+                      : isAI
+                      ? 'bg-[#F59E0B]'
+                      : 'bg-[#22D3AE]'
+                  }`}
+                />
+                <span className="font-medium text-[#EDEAE3] group-hover:text-white">
+                  {tech.name}
+                </span>
+              </div>
+            </MagneticButton>
           );
         })}
       </motion.div>
@@ -164,11 +166,26 @@ export default function TechStack() {
       </div>
 
       {/* Marquee Rows */}
-      <div className="space-y-3.5 relative z-10 max-w-[100vw]">
-        <MarqueeRow items={row1} direction="left" speed={40} onHoverItem={setActiveTech} />
-        <MarqueeRow items={row2} direction="right" speed={45} onHoverItem={setActiveTech} />
-        <MarqueeRow items={row3} direction="left" speed={38} onHoverItem={setActiveTech} />
-      </div>
+      <motion.div
+        className="space-y-3.5 relative z-10 max-w-[100vw]"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-80px' }}
+        variants={{
+          visible: { transition: { staggerChildren: 0.15 } },
+          hidden: {},
+        }}
+      >
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row1} direction="left" speed={40} onHoverItem={setActiveTech} />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row2} direction="right" speed={45} onHoverItem={setActiveTech} />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row3} direction="left" speed={38} onHoverItem={setActiveTech} />
+        </motion.div>
+      </motion.div>
 
       {/* Interactive Tooltip Context Box */}
       <div className="max-w-6xl mx-auto px-6 md:px-12 mt-8 min-h-[44px]">

@@ -27,6 +27,9 @@ const commands: Command[] = [
   { id: 'lowkeybd', label: 'LowKeyBD', group: 'Projects', icon: '◆', keywords: 'next nest typescript' },
   { id: 'thesis', label: 'Bangla Emotion Recognition', group: 'Projects', icon: '◆', keywords: 'pytorch thesis ml' },
   { id: 'gamecritic', label: 'Game-Critic', group: 'Projects', icon: '◆', keywords: 'game review' },
+  // Quick Actions
+  { id: 'hire', label: 'Hire Me', group: 'Quick Actions', icon: '⚡', action: () => { document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' }); } },
+  { id: 'source', label: 'View Source Code', group: 'Quick Actions', icon: '💻', url: 'https://github.com/shoiebdurjoy' },
   // External
   { id: 'github', label: 'GitHub Profile', group: 'External', icon: '↗', url: 'https://github.com/shoiebdurjoy' },
   { id: 'linkedin', label: 'LinkedIn', group: 'External', icon: '↗', url: 'https://www.linkedin.com/in/shoieb-durjoy-01a942234/' },

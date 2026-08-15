@@ -8,43 +8,39 @@ type VideoProject = {
   id: string;
   title: string;
   category: string;
-  agency: string;
-  role: string;
-  tools: string[];
-  description: string;
-  youtubeId?: string;
+  behanceId: string;
 };
 
 const videoProjects: VideoProject[] = [
   {
-    id: 'commercial-campaign',
-    title: 'Brand Commercial & Social Campaigns',
-    category: 'Commercial // High-Velocity',
-    agency: 'Think Big Brand (Agency)',
-    role: 'Lead Video Editor & Motion Designer',
-    tools: ['Premiere Pro', 'After Effects', 'DaVinci Resolve', 'Sound Design'],
-    description:
-      'High-impact commercial edits for international brand releases. Multi-track audio spatialization, kinetic typography, and seamless temporal pacing.',
+    id: 'project-1',
+    title: 'Showcase Reel 01',
+    category: 'Commercial Cut',
+    behanceId: '254329919',
   },
   {
-    id: 'documentary-narrative',
-    title: 'Narrative Storytelling & Documentary Cuts',
-    category: 'Documentary // Long-Form',
-    agency: 'Think Big Brand (Agency)',
-    role: 'Colorist & Video Editor',
-    tools: ['DaVinci Resolve', 'Premiere Pro', '4K Color Master'],
-    description:
-      'Pacing-driven documentary storytelling focusing on interview cadence, atmospheric score balancing, and cinematic color correction.',
+    id: 'project-2',
+    title: 'Showcase Reel 02',
+    category: 'Motion Design',
+    behanceId: '246267417',
   },
   {
-    id: 'motion-shorts',
-    title: 'High-Retention Short-Form Reels & Hooks',
-    category: 'Short-Form // Motion Graphics',
-    agency: 'Agency Client Channels',
-    role: 'Motion Designer & Editor',
-    tools: ['After Effects', 'Premiere Pro', 'CapCut', 'Photoshop'],
-    description:
-      'Dynamic short-form visual content engineered for high audience retention, speed ramps, and custom sound design layers.',
+    id: 'project-3',
+    title: 'Showcase Reel 03',
+    category: 'Documentary',
+    behanceId: '208647901',
+  },
+  {
+    id: 'project-4',
+    title: 'Showcase Reel 04',
+    category: 'Brand Campaign',
+    behanceId: '237032839',
+  },
+  {
+    id: 'project-5',
+    title: 'Showcase Reel 05',
+    category: 'Short-Form Hook',
+    behanceId: '254329497',
   },
 ];
 
@@ -62,7 +58,7 @@ export default function VideoSection() {
       {/* Sunset Amber Glow */}
       <div className="absolute top-1/3 right-1/4 w-[700px] h-[700px] rounded-full bg-[#EA580C]/[0.035] blur-[170px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -80,117 +76,108 @@ export default function VideoSection() {
               <span className="text-[#F59E0B] italic font-normal">Becomes Story.</span>
             </h2>
           </div>
-          <div className="font-mono text-[12px] text-[#F8FAFC]/50 text-right space-y-1">
-            <div className="text-[#F59E0B] font-bold">THINK BIG BRAND AGENCY</div>
-            <div>3+ Years Professional Experience</div>
+          <div className="font-mono text-[12px] text-[#F8FAFC]/50 md:text-right space-y-1">
+            <div className="text-[#F59E0B] font-bold">PROFESSIONAL SHOWCASE</div>
+            <div>3+ Years Editing Experience</div>
           </div>
         </motion.div>
 
         {/* Cinematic Preview Player Frame */}
-        <div className="rounded-xl border border-[#F59E0B]/30 bg-[#0C1017] overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.08)] mb-8">
-          <div className="relative aspect-video bg-[#06080B] flex flex-col items-center justify-center p-8 text-center border-b border-[rgba(248,250,252,0.08)] overflow-hidden">
-            {activeVideo.youtubeId ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${activeVideo.youtubeId}`}
-                title={activeVideo.title}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="space-y-4 max-w-lg relative z-10">
-                <div className="w-16 h-16 rounded-full border-2 border-[#F59E0B] bg-[#F59E0B]/10 flex items-center justify-center text-[#F59E0B] text-2xl mx-auto shadow-[0_0_25px_rgba(245,158,11,0.35)]">
-                  ▶
-                </div>
-                <div>
-                  <div className="font-mono text-[11px] uppercase tracking-[2px] text-[#F59E0B] font-bold">
-                    {activeVideo.category}
-                  </div>
-                  <h3 className="font-serif text-2xl md:text-3xl font-black text-[#F8FAFC] mt-1">
-                    {activeVideo.title}
-                  </h3>
-                </div>
-                <p className="font-sans text-[14px] text-[#F8FAFC]/70 leading-[1.7]">
-                  {activeVideo.description}
-                </p>
-                <div className="inline-block px-3 py-1 rounded bg-[#111722] border border-[#F59E0B]/30 font-mono text-[10px] text-[#F59E0B]">
-                  [ Cinema Player Ready — YouTube Links integrate directly here ]
-                </div>
-              </div>
-            )}
-
-            {/* Sprocket Guides */}
-            <div className="absolute top-2 left-4 right-4 flex justify-between opacity-20 pointer-events-none">
-              {Array.from({ length: 18 }).map((_, i) => (
-                <span key={i} className="w-2 h-1 bg-[#F59E0B] rounded-[0.5px]" />
-              ))}
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="rounded-xl border border-[#F59E0B]/30 bg-[#0C1017] overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.08)] mb-8 max-w-4xl mx-auto"
+        >
+          <div className="relative w-full aspect-[4/3] sm:aspect-video bg-[#06080B] flex flex-col items-center justify-center border-b border-[rgba(248,250,252,0.08)] overflow-hidden">
+            <iframe
+              key={activeVideo.behanceId} // Force re-render on change
+              src={`https://www.behance.net/embed/project/${activeVideo.behanceId}?ilo0=1`}
+              className="w-full h-full absolute inset-0 border-0"
+              allowFullScreen
+              loading="lazy"
+              allow="clipboard-write"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
           </div>
 
           {/* Active Video Telemetry Bar */}
-          <div className="p-6 md:p-8 bg-[#0C1017] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="p-4 md:p-6 bg-[#0C1017] flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
               <div className="font-mono text-[12px] text-[#F59E0B] font-bold">
-                {activeVideo.agency} — {activeVideo.role}
+                {activeVideo.category} — {activeVideo.title}
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
-                {activeVideo.tools.map((tool) => (
-                  <span
-                    key={tool}
-                    className="font-mono text-[11px] px-2.5 py-0.5 rounded bg-[#111722] border border-[rgba(248,250,252,0.08)] text-[#F8FAFC]"
-                  >
-                    {tool}
-                  </span>
-                ))}
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#111722] border border-[rgba(248,250,252,0.08)] text-[#F8FAFC]">Premiere Pro</span>
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#111722] border border-[rgba(248,250,252,0.08)] text-[#F8FAFC]">After Effects</span>
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#111722] border border-[rgba(248,250,252,0.08)] text-[#F8FAFC]">Color Grading</span>
               </div>
             </div>
 
-            <div className="font-mono text-[11px] text-[#F8FAFC]/40 text-right">
-              TIMECODE: 01:24:18:09 · 23.976 FPS · 4K PRORES
+            <div className="font-mono text-[10px] text-[#F8FAFC]/40 md:text-right">
+              STATUS: ONLINE<br />
+              SOURCE: BEHANCE NETWORK
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Video Reel Selectors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-4xl mx-auto mb-16"
+        >
           {videoProjects.map((video, idx) => {
             const isSelected = activeVideo.id === video.id;
             return (
               <TiltCard
                 key={video.id}
                 intensity={8}
-                className={`p-6 rounded-xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
                   isSelected
-                    ? 'border-[#F59E0B] bg-[#0C1017] shadow-[0_0_25px_rgba(245,158,11,0.15)]'
-                    : 'border-[rgba(248,250,252,0.08)] bg-[#0C1017]/60 hover:border-[rgba(248,250,252,0.2)]'
+                    ? 'border-[#F59E0B] bg-[#0C1017] shadow-[0_0_20px_rgba(245,158,11,0.15)]'
+                    : 'border-[rgba(248,250,252,0.08)] bg-[#0C1017]/60 hover:border-[#F59E0B]/50'
                 }`}
               >
                 <div 
                   onClick={() => setActiveVideo(video)} 
                   className="absolute inset-0 z-20"
                 />
-                <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#F59E0B] font-bold">
-                    Reel 0{idx + 1}
+                <div className="relative z-10 flex flex-col items-center justify-center text-center h-full">
+                  <span className="font-mono text-[9px] uppercase tracking-[1px] text-[#F59E0B] font-bold mb-1">
+                    Project 0{idx + 1}
                   </span>
                   {isSelected && (
-                    <span className="font-mono text-[9px] px-2 py-0.5 rounded bg-[#F59E0B]/20 text-[#F59E0B] font-bold">
+                    <span className="font-mono text-[8px] px-1.5 py-0.5 rounded bg-[#F59E0B]/20 text-[#F59E0B] font-bold mt-1">
                       PLAYING
                     </span>
                   )}
                 </div>
-                <h4 className="font-serif text-lg font-bold text-[#F8FAFC] mb-1">
-                  {video.title}
-                </h4>
-                <div className="font-mono text-[11px] text-[#F8FAFC]/40">
-                  {video.agency}
-                </div>
-                </div>
               </TiltCard>
             );
           })}
-        </div>
+        </motion.div>
+
+        {/* Full Portfolio Link */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="flex justify-center"
+        >
+          <a
+            href="https://www.behance.net/shoiebdurjoy9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 px-6 py-3 rounded-full border border-[rgba(248,250,252,0.1)] bg-[#0C1017] hover:border-[#F59E0B] hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300"
+          >
+            <span className="w-2 h-2 rounded-full bg-[#F59E0B] group-hover:shadow-[0_0_8px_#F59E0B] transition-shadow" />
+            <span className="font-mono text-[11px] uppercase tracking-[2px] text-[#F8FAFC] group-hover:text-[#F59E0B] transition-colors font-bold">
+              View Full Behance Portfolio ↗
+            </span>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
