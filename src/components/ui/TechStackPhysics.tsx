@@ -64,7 +64,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const ground = Matter.Bodies.rectangle(width / 2, height + 50, width * 2, 100, wallOptions);
     const leftWall = Matter.Bodies.rectangle(-50, height / 2, 100, height * 2, wallOptions);
     const rightWall = Matter.Bodies.rectangle(width + 50, height / 2, 100, height * 2, wallOptions);
-    const ceiling = Matter.Bodies.rectangle(width / 2, -1000, width * 2, 100, wallOptions); 
+    const ceiling = Matter.Bodies.rectangle(width / 2, -5000, width * 2, 100, wallOptions); 
 
     Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
@@ -75,7 +75,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     shuffledItems.forEach((item, index) => {
       // Stagger start positions across the width and high above
       const x = (width * 0.1) + (Math.random() * (width * 0.8));
-      const y = -100 - (index * 80); 
+      const y = -100 - (index * 40); 
       
       const textWidth = item.name.length * 8 + 40; 
       const pillWidth = Math.max(120, textWidth);
