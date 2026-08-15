@@ -55,17 +55,7 @@ export default function LiveHUD() {
         </div>
       </motion.div>
 
-      {/* Top Left: REC / Video Editor Motif */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 1 }}
-        className="absolute top-24 left-6 md:top-32 md:left-8 flex items-center gap-2 font-mono text-[10px] tracking-[3px] text-[#EA580C] uppercase font-bold"
-      >
-        <span className="w-2 h-2 rounded-full bg-[#EA580C] animate-ping" />
-        <span>REC</span>
-      </motion.div>
-      
+
       {/* Cinematic Frame Borders (subtle) */}
       <div className="absolute inset-0 border-[1px] border-[rgba(248,250,252,0.03)] m-4 md:m-6 pointer-events-none rounded-xl" />
     </div>
