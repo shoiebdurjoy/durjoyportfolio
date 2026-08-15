@@ -9,7 +9,11 @@ type NavigationProps = {
 
 const NAV_LINKS = [
   { label: 'About', href: '#about' },
+  { label: 'Stack', href: '#stack' },
   { label: 'Work', href: '#work' },
+  { label: 'Thesis', href: '#thesis' },
+  { label: 'Video', href: '#cutting-room' },
+  { label: 'GitHub', href: '#github' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -45,53 +49,58 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           scrolled
-            ? 'bg-[rgba(7,9,12,0.85)] backdrop-blur-xl border-b border-[rgba(237,234,227,0.04)]'
+            ? 'bg-[#07090C]/90 backdrop-blur-xl border-b border-[rgba(237,234,227,0.06)]'
             : 'bg-transparent'
         }`}
       >
         {/* Progress bar */}
         <div
-          className="absolute top-0 left-0 h-[1.5px] bg-[#22D3AE]/60 z-50 transition-all duration-100"
+          className="absolute top-0 left-0 h-[1.5px] bg-[#F59E0B] z-50 transition-all duration-100"
           style={{ width: `${scrollProgress}%` }}
         />
 
-        <div className="h-14 md:h-16 flex items-center justify-between px-6 md:px-10 max-w-[1400px] mx-auto">
+        <div className="h-14 md:h-16 flex items-center justify-between px-6 md:px-12 max-w-7xl mx-auto">
           {/* Logo */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-baseline gap-0.5 select-none"
+            className="flex items-baseline gap-1 select-none group cursor-pointer"
           >
-            <span className="font-serif text-lg tracking-tight text-[#EDEAE3]">DURJOY</span>
-            <span className="font-mono text-[11px] text-[#EDEAE3]/25">.dev</span>
+            <span className="font-serif text-lg tracking-tight text-[#EDEAE3] group-hover:text-[#F59E0B] transition-colors">
+              DURJOY
+            </span>
+            <span className="font-mono text-[10px] text-[#EDEAE3]/30 tracking-wider">.dev</span>
           </button>
 
-          {/* Desktop nav — clean, minimal */}
-          <div className="hidden md:flex items-center gap-8">
-            <nav className="flex gap-7">
-              {NAV_LINKS.map(link => (
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-7">
+            <nav className="flex gap-6">
+              {NAV_LINKS.map((link) => (
                 <button
                   key={link.label}
                   onClick={() => handleLinkClick(link.href)}
-                  className="font-mono text-[11px] uppercase tracking-[2px] text-[#EDEAE3]/40 hover:text-[#EDEAE3]/80 transition-colors duration-200"
+                  className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#EDEAE3]/50 hover:text-[#EDEAE3] transition-colors cursor-pointer"
                 >
                   {link.label}
                 </button>
               ))}
             </nav>
 
-            {/* Cmd+K */}
+            {/* Cmd+K trigger */}
             <button
               onClick={onCommandPaletteOpen}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[rgba(237,234,227,0.08)] hover:border-[rgba(237,234,227,0.15)] transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-1.5 rounded border border-[rgba(237,234,227,0.1)] hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/[0.05] transition-all cursor-pointer"
               aria-label="Open command palette"
             >
-              <span className="font-mono text-[10px] text-[#EDEAE3]/30">⌘K</span>
+              <span className="font-mono text-[10px] text-[#EDEAE3]/40">Search</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-[#131920] border border-[rgba(237,234,227,0.1)] font-mono text-[9px] text-[#F59E0B]">
+                ⌘K
+              </kbd>
             </button>
           </div>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] z-50"
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] z-50 cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -102,7 +111,7 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
         </div>
       </header>
 
-      {/* Mobile overlay */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -110,29 +119,29 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-30 bg-[#07090C]/95 backdrop-blur-lg flex flex-col items-center justify-center"
+            className="fixed inset-0 z-30 bg-[#07090C]/98 backdrop-blur-xl flex flex-col items-center justify-center p-6"
           >
-            <nav className="flex flex-col items-center gap-8">
+            <nav className="flex flex-col items-center gap-6">
               {NAV_LINKS.map((link, i) => (
                 <motion.button
                   key={link.label}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 + i * 0.06, duration: 0.4 }}
+                  transition={{ delay: 0.04 + i * 0.04, duration: 0.3 }}
                   onClick={() => handleLinkClick(link.href)}
-                  className="font-serif text-3xl text-[#EDEAE3] hover:text-[#22D3AE] transition-colors"
+                  className="font-serif text-3xl text-[#EDEAE3] hover:text-[#F59E0B] transition-colors"
                 >
                   {link.label}
                 </motion.button>
               ))}
               <motion.button
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.4 }}
+                transition={{ delay: 0.35, duration: 0.3 }}
                 onClick={() => { setMobileMenuOpen(false); onCommandPaletteOpen(); }}
-                className="mt-4 font-mono text-sm text-[#EDEAE3]/40 border border-[rgba(237,234,227,0.1)] px-5 py-2 rounded-md"
+                className="mt-4 font-mono text-xs text-[#F59E0B] border border-[#F59E0B]/30 px-6 py-2.5 rounded-full bg-[#F59E0B]/10"
               >
-                Search ⌘K
+                Search Commands (⌘K)
               </motion.button>
             </nav>
           </motion.div>
