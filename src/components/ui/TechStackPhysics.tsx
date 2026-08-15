@@ -68,40 +68,75 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
 
     Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
-    // 4. Create Tech Pills (Restored original physics settings)
+    // 4. Create Tech Pills (Structured Brick-Like Initial State)
     const bodies: Matter.Body[] = [];
     const shuffledItems = [...items].sort(() => Math.random() - 0.5);
 
-    shuffledItems.forEach((item, index) => {
-      // Stagger start positions across the width and high above
-      const x = (width * 0.1) + (Math.random() * (width * 0.8));
-      const y = -100 - (index * 40); 
-      
+    // Pre-calculate pill dimensions
+    const pillData = shuffledItems.map(item => {
       const textWidth = item.name.length * 8 + 40; 
       const pillWidth = Math.max(120, textWidth);
-      const pillHeight = 44;
+      return { item, pillWidth, pillHeight: 44 };
+    });
 
-      const isCreative = item.category === 'creative';
-      const isAI = item.category === 'ai';
-      const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+    // Build rows from bottom to top
+    const gap = 4; // Tiny gap for natural resting
+    const maxRowWidth = width * 0.85; // 85% of canvas width
+    const rows: (typeof pillData)[] = [];
+    let currentRow: typeof pillData = [];
+    let currentRowWidth = 0;
 
-      const body = Matter.Bodies.rectangle(x, y, pillWidth, pillHeight, {
-        restitution: 0.6, // Restored bounciness
-        friction: 0.1,    // Restored friction
-        chamfer: { radius: pillHeight / 2 },
-        collisionFilter: {
-          category: CATEGORY_PILL
-        },
-        render: {
-          // Native rendering is highly optimized and prevents lag
-          fillStyle: '#111822',
-          strokeStyle: accentColor,
-          lineWidth: 1
-        }
+    pillData.forEach(data => {
+      if (currentRowWidth + data.pillWidth + gap > maxRowWidth && currentRow.length > 0) {
+        rows.push(currentRow);
+        currentRow = [];
+        currentRowWidth = 0;
+      }
+      currentRow.push(data);
+      currentRowWidth += data.pillWidth + gap;
+    });
+    if (currentRow.length > 0) {
+      rows.push(currentRow);
+    }
+
+    // Start Y near the bottom so they rest perfectly on the ground
+    let currentY = height - 25; // 22 (half height) + 3px tolerance
+
+    // Reverse rows so we build from the bottom up
+    rows.reverse().forEach((row) => {
+      const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
+      let currentX = (width - rowTotalWidth) / 2; // Center the row
+
+      row.forEach((data) => {
+        const x = currentX + (data.pillWidth / 2);
+        const y = currentY;
+
+        const isCreative = data.item.category === 'creative';
+        const isAI = data.item.category === 'ai';
+        const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+
+        const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
+          restitution: 0.6,
+          friction: 0.1,
+          chamfer: { radius: data.pillHeight / 2 },
+          collisionFilter: {
+            category: CATEGORY_PILL
+          },
+          render: {
+            fillStyle: '#111822',
+            strokeStyle: accentColor,
+            lineWidth: 1
+          }
+        });
+        
+        itemMapRef.current.set(body.id, { item: data.item, width: data.pillWidth, height: data.pillHeight });
+        bodies.push(body);
+
+        currentX += data.pillWidth + gap;
       });
-      
-      itemMapRef.current.set(body.id, { item, width: pillWidth, height: pillHeight });
-      bodies.push(body);
+
+      // Move Y up for the next row
+      currentY -= (44 + gap);
     });
 
     Matter.Composite.add(engine.world, bodies);
