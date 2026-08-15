@@ -2,67 +2,122 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import TechStackPhysics from '@/src/components/ui/TechStackPhysics';
+import MagneticButton from '@/src/components/ui/MagneticButton';
 
-export type TechItem = {
+type TechItem = {
   name: string;
   category: 'languages' | 'frameworks' | 'systems' | 'ai' | 'creative';
   context: string;
 };
 
-const allItems: TechItem[] = [
-  // ENGINEERING / DEVELOPMENT
+const row1: TechItem[] = [
   { name: 'Python', category: 'languages', context: 'Used in AI pipelines, thesis research, and FastAPI/Flask backends' },
-  { name: 'JavaScript', category: 'languages', context: 'Core language for frontend interactivity and web platforms' },
   { name: 'TypeScript', category: 'languages', context: 'Primary language for DurjoyAI, LowKeyBD, and web platforms' },
-  { name: 'C++', category: 'languages', context: 'Academic foundation for algorithms and data structures at BRAC University' },
-  { name: 'Java', category: 'languages', context: 'Object-oriented programming and enterprise system foundation' },
-  { name: 'SQL', category: 'languages', context: 'Relational database queries and data manipulation' },
-  { name: 'HTML/CSS', category: 'languages', context: 'Semantic structure and styling for modern web applications' },
-  { name: 'Bash', category: 'systems', context: 'Shell scripting for deployment and server automation' },
-  { name: 'Git', category: 'systems', context: 'Version control for collaborative engineering' },
-  { name: 'Linux', category: 'systems', context: 'Server infrastructure and deployment environments' },
-  { name: 'Windows', category: 'systems', context: 'Primary development OS and DurjoyAI target environment' },
-  { name: 'Docker', category: 'systems', context: 'Containerization across DurjoyAI and full-stack environments' },
-  { name: 'Node.js', category: 'frameworks', context: 'JavaScript runtime for scalable backend services' },
-  { name: 'Express', category: 'frameworks', context: 'Minimalist web framework for Node.js APIs' },
-  { name: 'FastAPI', category: 'frameworks', context: 'High-throughput async Python APIs for AI model serving' },
-  { name: 'Flask', category: 'frameworks', context: 'Backend REST API and Socket.IO engine for EMERGON system' },
-  { name: 'NestJS', category: 'frameworks', context: 'Enterprise backend architecture for LowKeyBD REST & WebSocket APIs' },
   { name: 'Next.js', category: 'frameworks', context: 'Full-stack framework for LowKeyBD platform and this portfolio' },
-  { name: 'React', category: 'frameworks', context: 'Component-driven UI development across multiple platforms' },
-  { name: 'Tailwind CSS', category: 'frameworks', context: 'Utility-first styling for rapid, responsive UI development' },
-  { name: 'Prisma', category: 'frameworks', context: 'Next-generation ORM for Node.js and TypeScript' },
-  { name: 'PostgreSQL', category: 'systems', context: 'Primary relational database for EMERGON and LowKeyBD' },
-  { name: 'MySQL', category: 'systems', context: 'Relational database management for legacy projects' },
-  { name: 'MongoDB', category: 'systems', context: 'NoSQL document database for flexible data schemas' },
-  { name: 'Redis', category: 'systems', context: 'In-memory caching and session store for LowKeyBD' },
-  { name: 'MinIO', category: 'systems', context: 'S3-compatible high-performance object storage' },
-  { name: 'Meilisearch', category: 'systems', context: 'Lightning-fast, ultra-relevant search engine integration' },
-  { name: 'WebSockets', category: 'systems', context: 'Real-time bidirectional communication for live events' },
-  { name: 'Socket.IO', category: 'systems', context: 'Real-time bidirectional event dispatch for EMERGON emergency alerts' },
-  { name: 'Turborepo', category: 'systems', context: 'High-performance build system for JavaScript and TypeScript codebases' },
-  { name: 'Vercel', category: 'systems', context: 'Frontend cloud platform for zero-config deployments' },
-  { name: 'Render', category: 'systems', context: 'Cloud application hosting for backend services' },
-  { name: 'AWS', category: 'systems', context: 'Cloud infrastructure and scalable deployment services' },
-  { name: 'Google Maps API', category: 'systems', context: 'Location services and mapping integration for platforms' },
-
-  // AI / ML
   { name: 'PyTorch', category: 'ai', context: 'Deep learning framework for Bangla Multimodal Emotion Recognition thesis' },
-  { name: 'CUDA', category: 'ai', context: 'GPU acceleration for training multimodal thesis models' },
-  { name: 'OpenAI API', category: 'ai', context: 'LLM engine integration and prompt orchestration in DurjoyAI' },
-  { name: 'OpenRouter', category: 'ai', context: 'Unified API routing for access to multiple large language models' },
-  { name: 'Gemini', category: 'ai', context: 'Google\'s multimodal AI models for advanced reasoning tasks' },
-  { name: 'Ollama', category: 'ai', context: 'Local deployment and execution of large language models' },
-  { name: 'Librosa', category: 'ai', context: 'Python package for music and audio analysis in thesis research' },
-  { name: 'Alexa Skills', category: 'ai', context: 'Voice command interface built for DurjoyAI PC control' },
+  { name: 'NestJS', category: 'frameworks', context: 'Enterprise backend architecture for LowKeyBD REST & WebSocket APIs' },
+  { name: 'FastAPI', category: 'frameworks', context: 'High-throughput async Python APIs for AI model serving' },
+  { name: 'C++', category: 'languages', context: 'Academic foundation for algorithms and data structures at BRAC University' },
+];
 
-  // VIDEO / MOTION
+const row2: TechItem[] = [
+  { name: 'Docker', category: 'systems', context: 'Containerization across DurjoyAI and full-stack environments' },
+  { name: 'PostgreSQL', category: 'systems', context: 'Primary relational database for EMERGON and LowKeyBD' },
+  { name: 'Redis', category: 'systems', context: 'In-memory caching and session store for LowKeyBD' },
+  { name: 'Flask', category: 'frameworks', context: 'Backend REST API and Socket.IO engine for EMERGON system' },
+  { name: 'React', category: 'frameworks', context: 'Component-driven UI development across multiple platforms' },
+  { name: 'CUDA', category: 'ai', context: 'GPU acceleration for training multimodal thesis models' },
+  { name: 'Git & Linux', category: 'systems', context: 'Version control, shell scripting, and server infrastructure' },
+];
+
+const row3: TechItem[] = [
   { name: 'Premiere Pro', category: 'creative', context: 'Primary NLE editor for 3+ years at Think Big Brand agency' },
   { name: 'After Effects', category: 'creative', context: 'Motion graphics, visual effects, and typography animation' },
   { name: 'DaVinci Resolve', category: 'creative', context: 'Color grading and post-production delivery' },
+  { name: 'Alexa Skills', category: 'ai', context: 'Voice command interface built for DurjoyAI PC control' },
+  { name: 'OpenAI API', category: 'ai', context: 'LLM engine integration and prompt orchestration in DurjoyAI' },
   { name: 'CapCut', category: 'creative', context: 'High-velocity short-form social content creation' },
+  { name: 'Socket.IO', category: 'systems', context: 'Real-time bidirectional event dispatch for EMERGON emergency alerts' },
 ];
+
+function MarqueeRow({
+  items,
+  direction = 'left',
+  speed = 35,
+  onHoverItem,
+}: {
+  items: TechItem[];
+  direction?: 'left' | 'right';
+  speed?: number;
+  onHoverItem: (item: TechItem | null) => void;
+}) {
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Duplicate list multiple times to create a seamless infinite marquee on ultra-wide screens
+  const displayItems = [...items, ...items, ...items, ...items, ...items, ...items];
+
+  return (
+    <div
+      className="relative flex overflow-hidden py-1.5"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => {
+        setIsPaused(false);
+        onHoverItem(null);
+      }}
+    >
+      <motion.div
+        className="flex gap-3 shrink-0"
+        animate={{
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
+        }}
+        transition={{
+          x: {
+            duration: speed,
+            repeat: Infinity,
+            ease: 'linear',
+            repeatType: 'loop',
+          },
+        }}
+        style={{
+          animationPlayState: isPaused ? 'paused' : 'running',
+        }}
+      >
+        {displayItems.map((tech, idx) => {
+          const isCreative = tech.category === 'creative';
+          const isAI = tech.category === 'ai';
+
+          return (
+            <MagneticButton key={`${tech.name}-${idx}`} strength={10}>
+              <div
+                onMouseEnter={() => onHoverItem(tech)}
+                className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-[#0D1117]/90 text-[12px] font-mono cursor-pointer transition-all duration-200 select-none shrink-0 ${
+                  isCreative
+                    ? 'border-[rgba(232,133,74,0.2)] hover:border-[#E8854A] hover:bg-[#E8854A]/10 hover:shadow-[0_0_15px_rgba(232,133,74,0.25)] text-[#EDEAE3]'
+                    : isAI
+                    ? 'border-[rgba(245,158,11,0.25)] hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 hover:shadow-[0_0_15px_rgba(245,158,11,0.25)] text-[#EDEAE3]'
+                    : 'border-[rgba(34,211,174,0.2)] hover:border-[#22D3AE] hover:bg-[#22D3AE]/10 hover:shadow-[0_0_15px_rgba(34,211,174,0.25)] text-[#EDEAE3]'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    isCreative
+                      ? 'bg-[#E8854A]'
+                      : isAI
+                      ? 'bg-[#F59E0B]'
+                      : 'bg-[#22D3AE]'
+                  }`}
+                />
+                <span className="font-medium text-[#EDEAE3] group-hover:text-white">
+                  {tech.name}
+                </span>
+              </div>
+            </MagneticButton>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
+}
 
 export default function TechStack() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -75,6 +130,10 @@ export default function TechStack() {
       ref={containerRef}
       className="relative py-24 md:py-32 border-t border-[rgba(237,234,227,0.06)] bg-[#07090C] overflow-hidden"
     >
+      {/* Edge Gradient Fades for Smooth Marquee */}
+      <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#07090C] to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#07090C] to-transparent z-10 pointer-events-none" />
+
       <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10 mb-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -85,10 +144,10 @@ export default function TechStack() {
           <div className="flex flex-col items-center">
             <div className="flex items-center justify-center gap-2.5 font-mono text-[11px] tracking-[3px] uppercase text-[#F59E0B] mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
-              Tech Stack // Physics Playground
+              Tech Stack // Applied Engineering
             </div>
             <h2 className="font-serif text-[clamp(2rem,4vw,3.2rem)] font-black uppercase tracking-[-0.02em] leading-[1] text-[#EDEAE3]">
-              Grab and Throw.
+              Tools I actually use.
             </h2>
           </div>
 
@@ -106,14 +165,27 @@ export default function TechStack() {
         </motion.div>
       </div>
 
-      {/* Physics Engine Tech Playground */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
-        <TechStackPhysics 
-          items={allItems} 
-          onHoverItem={setActiveTech} 
-          isVisible={isInView}
-        />
-      </div>
+      {/* Marquee Rows */}
+      <motion.div
+        className="space-y-3.5 relative z-10 max-w-[100vw]"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-80px' }}
+        variants={{
+          visible: { transition: { staggerChildren: 0.15 } },
+          hidden: {},
+        }}
+      >
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row1} direction="left" speed={40} onHoverItem={setActiveTech} />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row2} direction="right" speed={45} onHoverItem={setActiveTech} />
+        </motion.div>
+        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+          <MarqueeRow items={row3} direction="left" speed={38} onHoverItem={setActiveTech} />
+        </motion.div>
+      </motion.div>
 
       {/* Interactive Tooltip Context Box */}
       <div className="max-w-6xl mx-auto px-6 md:px-12 mt-8 min-h-[44px]">
@@ -127,7 +199,7 @@ export default function TechStack() {
                   <span className="text-[#EDEAE3]/80">{activeTech.context}</span>
                 </>
               ) : (
-                'Hover any falling technology pill to see where and how it was used in real projects.'
+                'Hover any technology pill to see where and how it was used in real projects.'
               )}
             </span>
           </div>
