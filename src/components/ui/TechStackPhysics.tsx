@@ -21,7 +21,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   
-  const itemMapRef = useRef<Map<number, TechItem>>(new Map());
+  const itemMapRef = useRef<Map<number, { item: TechItem, width: number, height: number }>>(new Map());
 
   useEffect(() => {
     if (!sceneRef.current) return;
@@ -101,7 +101,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         }
       });
       
-      itemMapRef.current.set(body.id, item);
+      itemMapRef.current.set(body.id, { item, width: pillWidth, height: pillHeight });
       bodies.push(body);
     });
 
@@ -127,8 +127,8 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       const found = Matter.Query.point(bodies, event.mouse.position);
       if (found.length > 0) {
         document.body.style.cursor = 'grab';
-        const item = itemMapRef.current.get(found[0].id);
-        if (item) onHoverItem(item);
+        const data = itemMapRef.current.get(found[0].id);
+        if (data) onHoverItem(data.item);
       } else {
         document.body.style.cursor = 'crosshair';
         onHoverItem(null);
@@ -151,16 +151,13 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       const context = render.context;
       
       bodies.forEach((body) => {
-        const item = itemMapRef.current.get(body.id);
-        if (!item) return;
+        const data = itemMapRef.current.get(body.id);
+        if (!data) return;
 
+        const { item, width, height } = data;
         const isCreative = item.category === 'creative';
         const isAI = item.category === 'ai';
         const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
-        const isHovered = document.body.style.cursor === 'grab' || document.body.style.cursor === 'grabbing'; // Rough hover check, better to track specific body
-        
-        const width = body.bounds.max.x - body.bounds.min.x;
-        const height = body.bounds.max.y - body.bounds.min.y;
 
         context.save();
         context.translate(body.position.x, body.position.y);
