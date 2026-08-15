@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import MagneticButton from '@/src/components/ui/MagneticButton';
 
 export default function ContactSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,49 +51,55 @@ export default function ContactSection() {
 
           {/* Big Interactive Email Link Button */}
           <div className="pt-8">
-            <button
-              onClick={copyEmail}
-              className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#0C1017] border border-[#F59E0B]/40 hover:border-[#F59E0B] hover:shadow-[0_0_35px_rgba(245,158,11,0.25)] transition-all cursor-pointer"
-            >
-              <span className="font-mono text-base md:text-lg font-bold text-[#F8FAFC] group-hover:text-[#F59E0B] transition-colors">
-                {email}
-              </span>
-              <span className="px-2.5 py-1 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 font-mono text-[10px] text-[#F59E0B] font-bold">
-                {copied ? '✓ COPIED!' : 'CLICK TO COPY'}
-              </span>
-            </button>
+            <MagneticButton strength={40}>
+              <button
+                onClick={copyEmail}
+                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#0C1017] border border-[#F59E0B]/40 hover:border-[#F59E0B] hover:shadow-[0_0_35px_rgba(245,158,11,0.25)] transition-all cursor-pointer"
+              >
+                <span className="font-mono text-base md:text-lg font-bold text-[#F8FAFC] group-hover:text-[#F59E0B] transition-colors">
+                  {email}
+                </span>
+                <span className="px-2.5 py-1 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 font-mono text-[10px] text-[#F59E0B] font-bold">
+                  {copied ? '✓ COPIED!' : 'CLICK TO COPY'}
+                </span>
+              </button>
+            </MagneticButton>
           </div>
         </motion.div>
 
         {/* Social Connection Channels */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-24">
-          <a
-            href="https://github.com/shoiebdurjoy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-6 rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017]/80 hover:border-[#00F2C3] hover:shadow-[0_0_25px_rgba(0,242,195,0.12)] transition-all text-center group block"
-          >
-            <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#00F2C3] mb-1">
-              Code Repositories
-            </div>
-            <div className="font-sans text-base font-bold text-[#F8FAFC] group-hover:text-white">
-              GitHub // @shoiebdurjoy
-            </div>
-          </a>
+          <MagneticButton className="block" strength={15}>
+            <a
+              href="https://github.com/shoiebdurjoy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full p-6 rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017]/80 hover:border-[#00F2C3] hover:shadow-[0_0_25px_rgba(0,242,195,0.12)] transition-all text-center group block"
+            >
+              <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#00F2C3] mb-1">
+                Code Repositories
+              </div>
+              <div className="font-sans text-base font-bold text-[#F8FAFC] group-hover:text-white">
+                GitHub // @shoiebdurjoy
+              </div>
+            </a>
+          </MagneticButton>
 
-          <a
-            href="https://www.linkedin.com/in/shoieb-durjoy-01a942234/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-6 rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017]/80 hover:border-[#EA580C] hover:shadow-[0_0_25px_rgba(234,88,12,0.12)] transition-all text-center group block"
-          >
-            <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#EA580C] mb-1">
-              Professional Network
-            </div>
-            <div className="font-sans text-base font-bold text-[#F8FAFC] group-hover:text-white">
-              LinkedIn // Md Shoieb Hossain
-            </div>
-          </a>
+          <MagneticButton className="block" strength={15}>
+            <a
+              href="https://www.linkedin.com/in/shoieb-durjoy-01a942234/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full p-6 rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017]/80 hover:border-[#EA580C] hover:shadow-[0_0_25px_rgba(234,88,12,0.12)] transition-all text-center group block"
+            >
+              <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#EA580C] mb-1">
+                Professional Network
+              </div>
+              <div className="font-sans text-base font-bold text-[#F8FAFC] group-hover:text-white">
+                LinkedIn // Md Shoieb Hossain
+              </div>
+            </a>
+          </MagneticButton>
         </div>
 
         {/* Luxury Editorial Footer */}

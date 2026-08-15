@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MagneticButton from '@/src/components/ui/MagneticButton';
 
 type NavigationProps = {
   onCommandPaletteOpen: () => void;
@@ -61,41 +62,46 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
 
         <div className="h-14 md:h-16 flex items-center justify-between px-6 md:px-12 max-w-7xl mx-auto">
           {/* Logo */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-baseline gap-1 select-none group cursor-pointer"
-          >
-            <span className="font-serif text-lg tracking-tight text-[#EDEAE3] group-hover:text-[#F59E0B] transition-colors">
-              DURJOY
-            </span>
-            <span className="font-mono text-[10px] text-[#EDEAE3]/30 tracking-wider">.dev</span>
-          </button>
+          <MagneticButton strength={15}>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex items-baseline gap-1 select-none group cursor-pointer"
+            >
+              <span className="font-serif text-lg tracking-tight text-[#EDEAE3] group-hover:text-[#F59E0B] transition-colors">
+                DURJOY
+              </span>
+              <span className="font-mono text-[10px] text-[#EDEAE3]/30 tracking-wider">.dev</span>
+            </button>
+          </MagneticButton>
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-7">
             <nav className="flex gap-6">
               {NAV_LINKS.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={() => handleLinkClick(link.href)}
-                  className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#EDEAE3]/50 hover:text-[#EDEAE3] transition-colors cursor-pointer"
-                >
-                  {link.label}
-                </button>
+                <MagneticButton key={link.label} strength={20}>
+                  <button
+                    onClick={() => handleLinkClick(link.href)}
+                    className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#EDEAE3]/50 hover:text-[#EDEAE3] transition-colors cursor-pointer block py-2"
+                  >
+                    {link.label}
+                  </button>
+                </MagneticButton>
               ))}
             </nav>
 
             {/* Cmd+K trigger */}
-            <button
-              onClick={onCommandPaletteOpen}
-              className="flex items-center gap-2 px-3 py-1.5 rounded border border-[rgba(237,234,227,0.1)] hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/[0.05] transition-all cursor-pointer"
-              aria-label="Open command palette"
-            >
-              <span className="font-mono text-[10px] text-[#EDEAE3]/40">Search</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-[#131920] border border-[rgba(237,234,227,0.1)] font-mono text-[9px] text-[#F59E0B]">
-                ⌘K
-              </kbd>
-            </button>
+            <MagneticButton strength={30}>
+              <button
+                onClick={onCommandPaletteOpen}
+                className="flex items-center gap-2 px-3 py-1.5 rounded border border-[rgba(237,234,227,0.1)] hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/[0.05] transition-all cursor-pointer"
+                aria-label="Open command palette"
+              >
+                <span className="font-mono text-[10px] text-[#EDEAE3]/40">Search</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-[#131920] border border-[rgba(237,234,227,0.1)] font-mono text-[9px] text-[#F59E0B]">
+                  ⌘K
+                </kbd>
+              </button>
+            </MagneticButton>
           </div>
 
           {/* Mobile hamburger */}

@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import ProjectModal, { type ProjectDetails } from './ProjectModal';
+import TiltCard from '@/src/components/ui/TiltCard';
 
 const featuredProject: ProjectDetails = {
   id: 'durjoyai',
@@ -155,9 +156,10 @@ export default function ProjectsSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="p-8 md:p-12 rounded-xl bg-[#0C1017] border border-[#F59E0B]/30 hover:border-[#F59E0B] shadow-[0_0_35px_rgba(245,158,11,0.08)] hover:shadow-[0_0_50px_rgba(245,158,11,0.18)] transition-all duration-500 mb-12"
+          className="mb-12"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <TiltCard intensity={5} className="p-8 md:p-12 rounded-xl bg-[#0C1017] border border-[#F59E0B]/30 hover:border-[#F59E0B] shadow-[0_0_35px_rgba(245,158,11,0.08)] hover:shadow-[0_0_50px_rgba(245,158,11,0.18)] transition-all duration-500 relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             {/* Left Info */}
             <div className="lg:col-span-7 space-y-5">
               <div className="flex items-center gap-3">
@@ -241,6 +243,7 @@ export default function ProjectsSection() {
               </div>
             </div>
           </div>
+          </TiltCard>
         </motion.div>
 
         {/* 2. SECONDARY PROJECTS — ELEGANT EDITORIAL ROWS */}
@@ -251,9 +254,9 @@ export default function ProjectsSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className="p-6 md:p-8 rounded-xl bg-[#0C1017]/80 border border-[rgba(248,250,252,0.08)] hover:border-[#00F2C3]/40 hover:bg-[#0C1017] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
             >
-              <div className="space-y-2 max-w-xl">
+              <TiltCard intensity={8} className="p-6 md:p-8 rounded-xl bg-[#0C1017]/80 border border-[rgba(248,250,252,0.08)] hover:border-[#00F2C3]/40 hover:bg-[#0C1017] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group relative overflow-hidden">
+                <div className="space-y-2 max-w-xl relative z-10">
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-[11px] text-[#00F2C3] font-bold">0{idx + 2}</span>
                   <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#F8FAFC]/40">
@@ -296,7 +299,8 @@ export default function ProjectsSection() {
                     ↗
                   </a>
                 )}
-              </div>
+                </div>
+              </TiltCard>
             </motion.div>
           ))}
         </div>

@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import TiltCard from '@/src/components/ui/TiltCard';
 
 type VideoProject = {
   id: string;
@@ -155,15 +156,20 @@ export default function VideoSection() {
           {videoProjects.map((video, idx) => {
             const isSelected = activeVideo.id === video.id;
             return (
-              <div
+              <TiltCard
                 key={video.id}
-                onClick={() => setActiveVideo(video)}
-                className={`p-6 rounded-xl border cursor-pointer transition-all duration-300 ${
+                intensity={8}
+                className={`p-6 rounded-xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
                   isSelected
                     ? 'border-[#F59E0B] bg-[#0C1017] shadow-[0_0_25px_rgba(245,158,11,0.15)]'
                     : 'border-[rgba(248,250,252,0.08)] bg-[#0C1017]/60 hover:border-[rgba(248,250,252,0.2)]'
                 }`}
               >
+                <div 
+                  onClick={() => setActiveVideo(video)} 
+                  className="absolute inset-0 z-20"
+                />
+                <div className="relative z-10">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#F59E0B] font-bold">
                     Reel 0{idx + 1}
@@ -180,7 +186,8 @@ export default function VideoSection() {
                 <div className="font-mono text-[11px] text-[#F8FAFC]/40">
                   {video.agency}
                 </div>
-              </div>
+                </div>
+              </TiltCard>
             );
           })}
         </div>

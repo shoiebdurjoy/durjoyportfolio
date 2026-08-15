@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import TiltCard from '@/src/components/ui/TiltCard';
 
 const pipelineStages = [
   {
@@ -125,8 +126,8 @@ export default function ThesisSection() {
 
           {/* Active Stage Spotlight Panel */}
           <div className="lg:col-span-7">
-            <div className="p-8 md:p-10 rounded-xl border border-[#00F2C3]/30 bg-[#0C1017] relative overflow-hidden shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[rgba(248,250,252,0.08)] pb-5 mb-6">
+            <TiltCard intensity={5} className="p-8 md:p-10 rounded-xl border border-[#00F2C3]/30 bg-[#0C1017] relative overflow-hidden shadow-2xl">
+              <div className="relative z-10 flex items-center justify-between border-b border-[rgba(248,250,252,0.08)] pb-5 mb-6">
                 <div>
                   <span className="font-mono text-[10px] uppercase tracking-[2px] text-[#00F2C3]">
                     Pipeline Stage {pipelineStages[activeStep].step} / 05
@@ -180,7 +181,7 @@ export default function ThesisSection() {
                   </button>
                 </div>
               </div>
-            </div>
+            </TiltCard>
           </div>
         </div>
       </div>

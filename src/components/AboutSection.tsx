@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import TiltCard from '@/src/components/ui/TiltCard';
 
 export default function AboutSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +73,18 @@ export default function AboutSection() {
             className="lg:col-span-6 space-y-6"
           >
             <h3 className="font-serif text-2xl md:text-3xl font-bold leading-[1.3] text-[#F8FAFC]">
-              Most developers think purely in logic. Most filmmakers think purely in feeling. I operate at the intersection of both.
+              {"Most developers think purely in logic. Most filmmakers think purely in feeling. I operate at the intersection of both.".split(" ").map((word, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block mr-[0.25em]"
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: i * 0.03 + 0.1 }}
+                >
+                  {word}
+                </motion.span>
+              ))}
             </h3>
 
             <p className="font-sans text-[15px] md:text-[16px] leading-[1.8] text-[#F8FAFC]/70">
@@ -136,27 +148,28 @@ export default function AboutSection() {
                 border: 'border-[#00F2C3]/20',
               },
             ].map((card, i) => (
-              <div
-                key={card.label}
-                className={`p-5 rounded-lg bg-[#0C1017]/80 border ${card.border} hover:border-[#F59E0B]/50 transition-all duration-300 flex items-start justify-between gap-4`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#F8FAFC]/40">
-                      {card.label}
-                    </span>
-                    <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 bg-[#F8FAFC]/[0.06] rounded text-[#F8FAFC]/60">
-                      {card.tag}
-                    </span>
+              <TiltCard key={card.label} intensity={5}>
+                <div
+                  className={`p-5 rounded-lg bg-[#0C1017]/80 border ${card.border} hover:border-[#F59E0B]/50 transition-all duration-300 flex items-start justify-between gap-4 relative overflow-hidden`}
+                >
+                  <div className="space-y-1 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#F8FAFC]/40">
+                        {card.label}
+                      </span>
+                      <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 bg-[#F8FAFC]/[0.06] rounded text-[#F8FAFC]/60">
+                        {card.tag}
+                      </span>
+                    </div>
+                    <p className="font-sans text-[13px] text-[#F8FAFC]/70 leading-[1.5]">
+                      {card.detail}
+                    </p>
                   </div>
-                  <p className="font-sans text-[13px] text-[#F8FAFC]/70 leading-[1.5]">
-                    {card.detail}
-                  </p>
+                  <div className={`font-mono text-2xl font-black ${card.color} shrink-0 relative z-10`}>
+                    {card.value}
+                  </div>
                 </div>
-                <div className={`font-mono text-2xl font-black ${card.color} shrink-0`}>
-                  {card.value}
-                </div>
-              </div>
+              </TiltCard>
             ))}
           </motion.div>
         </div>
