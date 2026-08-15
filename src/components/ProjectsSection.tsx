@@ -140,7 +140,7 @@ export default function ProjectsSection() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#00F2C3]" />
               02 // Proof of Craft
             </div>
-            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[0.95] text-[#F8FAFC]">
+            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[1.05] text-[#F8FAFC]">
               Selected Systems &<br />
               <span className="text-[#00F2C3] italic font-normal">Architectures.</span>
             </h2>

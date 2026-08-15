@@ -38,7 +38,7 @@ export default function ContactSection() {
             06 // Initiate Contact
           </div>
 
-          <h2 className="font-serif text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[0.92] tracking-tight text-[#F8FAFC] mb-6">
+          <h2 className="font-serif text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[1.05] tracking-tight text-[#F8FAFC] mb-6">
             Build Systems.<br />
             <span className="text-[#F59E0B] italic font-normal">Cut Stories.</span><br />
             Or Both.

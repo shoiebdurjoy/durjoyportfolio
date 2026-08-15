@@ -74,7 +74,7 @@ export default function VideoSection() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
               04 // The Cutting Room
             </div>
-            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[0.95] text-[#F8FAFC]">
+            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[1.05] text-[#F8FAFC]">
               Where Footage<br />
               <span className="text-[#F59E0B] italic font-normal">Becomes Story.</span>
             </h2>

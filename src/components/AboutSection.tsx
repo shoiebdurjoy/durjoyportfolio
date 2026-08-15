@@ -38,7 +38,7 @@ export default function AboutSection() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
               01 // The Philosophy
             </div>
-            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[0.95] text-[#F8FAFC]">
+            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[1.05] text-[#F8FAFC]">
               Engineering the Engine.<br />
               <span className="text-[#F59E0B] italic font-normal">Editing the Emotion.</span>
             </h2>
