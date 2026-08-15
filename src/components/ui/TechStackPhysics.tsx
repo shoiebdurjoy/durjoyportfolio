@@ -55,7 +55,10 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       isStatic: true, 
       render: { visible: false },
       friction: 0.5,
-      restitution: 0.2 
+      restitution: 0.2,
+      collisionFilter: {
+        category: 0x0002 // Wall category
+      }
     };
     
     const ground = Matter.Bodies.rectangle(width / 2, height + 50, width * 2, 100, wallOptions);
@@ -90,6 +93,9 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         friction: 0.05,
         frictionAir: 0.015, // Air resistance adds to the premium feel
         chamfer: { radius: pillHeight / 2 }, // Rounded collision box
+        collisionFilter: {
+          category: 0x0001 // Pill category
+        },
         render: {
           visible: false // We will custom draw it in afterRender
         }
@@ -108,6 +114,9 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       constraint: {
         stiffness: 0.1,
         render: { visible: false }
+      },
+      collisionFilter: {
+        mask: 0x0001 // Mouse only interacts with Pill category
       }
     });
     Matter.Composite.add(engine.world, mouseConstraint);
