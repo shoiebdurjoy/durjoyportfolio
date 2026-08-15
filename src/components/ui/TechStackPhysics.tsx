@@ -74,74 +74,8 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
 
     // 4. Create Tech Pills (Structured Brick-Like Initial State, Suspended in Sky)
     const bodies: Matter.Body[] = [];
-    const shuffledItems = [...items].sort(() => Math.random() - 0.5);
-
-    const pillData = shuffledItems.map(item => {
-      const textWidth = item.name.length * 8 + 40; 
-      const pillWidth = Math.max(120, textWidth);
-      return { item, pillWidth, pillHeight: 44 };
-    });
-
-    const maxRowWidth = width * 0.85; 
-    const gap = 4; 
-    const rows: (typeof pillData)[] = [];
-    let currentRow: typeof pillData = [];
-    let currentRowWidth = 0;
-
-    pillData.forEach(data => {
-      if (currentRowWidth + data.pillWidth + gap > maxRowWidth && currentRow.length > 0) {
-        rows.push(currentRow);
-        currentRow = [];
-        currentRowWidth = 0;
-      }
-      currentRow.push(data);
-      currentRowWidth += data.pillWidth + gap;
-    });
-    if (currentRow.length > 0) {
-      rows.push(currentRow);
-    }
-
-    let targetY = height - 25; 
-
-    rows.reverse().forEach((row) => {
-      const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
-      let currentX = (width - rowTotalWidth) / 2; 
-
-      row.forEach((data) => {
-        const x = currentX + (data.pillWidth / 2);
-        // Suspend high in the sky directly above their target position
-        const y = targetY - 1200; 
-
-        const isCreative = data.item.category === 'creative';
-        const isAI = data.item.category === 'ai';
-        const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
-
-        const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
-          restitution: 0.6,
-          friction: 0.1,
-          isStatic: true, // IMPORTANT: Suspended mid-air
-          chamfer: { radius: data.pillHeight / 2 },
-          collisionFilter: {
-            category: CATEGORY_PILL
-          },
-          render: {
-            fillStyle: '#111822',
-            strokeStyle: accentColor,
-            lineWidth: 1
-          }
-        });
-        
-        itemMapRef.current.set(body.id, { item: data.item, width: data.pillWidth, height: data.pillHeight });
-        bodies.push(body);
-
-        currentX += data.pillWidth + gap;
-      });
-
-      targetY -= (44 + gap);
-    });
-
-    // Add them immediately, they are static so they will just float unseen
-    Matter.Composite.add(engine.world, bodies);
+    // 4. We do NOT create the pills here anymore. They are created on scroll.
+    setEngineReady(true);
 
     // 5. Mouse Interaction
     const mouse = Matter.Mouse.create(render.canvas);
@@ -159,7 +93,9 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
     render.mouse = mouse;
     
     Matter.Events.on(mouseConstraint, 'mousemove', (event) => {
-      const found = Matter.Query.point(bodies, event.mouse.position);
+      // Find all pills in the world (they are dynamically added later)
+      const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
+      const found = Matter.Query.point(pills, event.mouse.position);
       if (found.length > 0) {
         document.body.style.cursor = 'grab';
         const data = itemMapRef.current.get(found[0].id);
@@ -171,7 +107,8 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
     });
 
     Matter.Events.on(mouseConstraint, 'mousedown', () => {
-      const found = Matter.Query.point(bodies, mouse.position);
+      const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
+      const found = Matter.Query.point(pills, mouse.position);
       if (found.length > 0) {
         document.body.style.cursor = 'grabbing';
       }
@@ -181,11 +118,11 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
       document.body.style.cursor = 'crosshair';
     });
 
-    // 6. Custom HD Renderer
     Matter.Events.on(render, 'afterRender', () => {
       const context = render.context;
+      const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
       
-      bodies.forEach((body) => {
+      pills.forEach((body) => {
         const data = itemMapRef.current.get(body.id);
         if (!data) return;
 
@@ -219,7 +156,7 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
     Matter.Render.run(render);
     Matter.Runner.run(runner, engine);
     
-    setEngineReady(true);
+    // Engine ready set above
 
     const handleResize = () => {
       if (!currentScene) return;
@@ -246,30 +183,97 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
   }, [items, onHoverItem]);
 
   // Drop animation when scrolled into view
+  const hasDroppedRef = useRef(false);
+
   useEffect(() => {
-    if (!isVisible || !engineReady || !engineRef.current) return;
+    if (!isVisible || !engineReady || !engineRef.current || hasDroppedRef.current) return;
     
+    hasDroppedRef.current = true;
     const engine = engineRef.current;
-    const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
     
-    // Using a ref to prevent dropping multiple times
+    const width = sceneRef.current?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth - 64 : 1000);
+    const height = 600;
+    
+    const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+
+    const pillData = shuffledItems.map(item => {
+      const textWidth = item.name.length * 8 + 40; 
+      const pillWidth = Math.max(120, textWidth);
+      return { item, pillWidth, pillHeight: 44 };
+    });
+
+    const maxRowWidth = width * 0.85; 
+    const gap = 4; 
+    const rows: (typeof pillData)[] = [];
+    let currentRow: typeof pillData = [];
+    let currentRowWidth = 0;
+
+    pillData.forEach(data => {
+      if (currentRowWidth + data.pillWidth + gap > maxRowWidth && currentRow.length > 0) {
+        rows.push(currentRow);
+        currentRow = [];
+        currentRowWidth = 0;
+      }
+      currentRow.push(data);
+      currentRowWidth += data.pillWidth + gap;
+    });
+    if (currentRow.length > 0) {
+      rows.push(currentRow);
+    }
+
+    const bodiesToDrop: { body: Matter.Body, data: typeof pillData[0] }[] = [];
+    // We reverse rows so we build the layout structure from bottom to top...
+    // But when we spawn them dynamically to fall in, we should drop the BOTTOM row FIRST!
+    // So the bottom row falls, then the next row falls on top of it.
+    
+    rows.reverse().forEach((row) => {
+      const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
+      let currentX = (width - rowTotalWidth) / 2; 
+
+      row.forEach((data) => {
+        const x = currentX + (data.pillWidth / 2);
+        // Spawn just above the visible canvas so it falls in naturally
+        const y = -100; 
+
+        const isCreative = data.item.category === 'creative';
+        const isAI = data.item.category === 'ai';
+        const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+
+        const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
+          restitution: 0.6,
+          friction: 0.1,
+          chamfer: { radius: data.pillHeight / 2 },
+          collisionFilter: { category: 0x0001 },
+          render: {
+            fillStyle: '#111822',
+            strokeStyle: accentColor,
+            lineWidth: 1
+          }
+        });
+        
+        itemMapRef.current.set(body.id, { item: data.item, width: data.pillWidth, height: data.pillHeight });
+        bodiesToDrop.push({ body, data });
+
+        currentX += data.pillWidth + gap;
+      });
+    });
+
     const timeouts: NodeJS.Timeout[] = [];
     
-    pills.forEach((body, index) => {
-      if (body.isStatic) {
-        const timeout = setTimeout(() => {
-          Matter.Body.setStatic(body, false);
-          // Small nudge to ensure it wakes up and falls
-          Matter.Body.setVelocity(body, { x: 0, y: 0.1 });
-        }, index * 25); 
-        timeouts.push(timeout);
-      }
+    // Drop them staggered so they build the structure organically
+    bodiesToDrop.forEach((config, index) => {
+      const timeout = setTimeout(() => {
+        if (engineRef.current) {
+           Matter.Composite.add(engineRef.current.world, config.body);
+        }
+      }, index * 40); // 40ms stagger for a beautiful cascading rain effect
+      timeouts.push(timeout);
     });
 
     return () => {
       timeouts.forEach(t => clearTimeout(t));
     };
-  }, [isVisible, engineReady]);
+  }, [isVisible, engineReady, items]);
 
   return (
     <div className="relative w-full rounded-2xl border border-[rgba(237,234,227,0.06)] bg-[#07090C] shadow-2xl overflow-hidden group">
