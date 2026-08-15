@@ -11,7 +11,10 @@ export default function HeroSplit() {
   const [isHoveringHandle, setIsHoveringHandle] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 
-  // Split state (0 to 100)
+  // Split state (0 to 100).
+  // 50 = Center Balanced
+  // 100 = Full BUILD (Left Side)
+  // 0 = Full CUT (Right Side)
   const rawSplit = useMotionValue(50);
   const split = useSpring(rawSplit, { stiffness: 220, damping: 26 });
 
@@ -20,18 +23,25 @@ export default function HeroSplit() {
     target: containerRef,
     offset: ['start start', 'end start'],
   });
-  const photoY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const nameBgY = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const nameFgY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const nameY = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
-  // Derived intensities:
-  // Dragging right (split > 50) reveals more BUILD (left side)
-  // Dragging left (split < 50) reveals more CUT (right side)
-  const devIntensity = useTransform(split, [15, 50, 85], [0, 0.45, 1]);
-  const editIntensity = useTransform(split, [15, 50, 85], [1, 0.45, 0]);
+  // Visual intensities:
+  // Dragging left (split < 50): CUT side expands, BUILD side fades
+  // Dragging right (split > 50): BUILD side expands, CUT side fades
+  const devIntensity = useTransform(split, [20, 50, 80], [0.1, 0.5, 1]);
+  const editIntensity = useTransform(split, [20, 50, 80], [1, 0.5, 0.1]);
 
-  // Demonstration sweep on initial mount to teach interaction without clumsy popups
+  // PHOTO COLOR SHIFT:
+  // BUILD (split >= 80) -> 100% Black & White (grayscale 100%)
+  // CENTER (split = 50) -> 50% Grayscale blend
+  // CUT (split <= 20) -> 0% Grayscale (100% Natural Color)
+  const photoGrayscale = useTransform(split, [20, 50, 80], [0, 45, 100]);
+  const photoContrast = useTransform(split, [20, 50, 80], [105, 110, 120]);
+  const photoBrightness = useTransform(split, [20, 50, 80], [102, 100, 96]);
+
+  // Idle demonstration animation on initial load
   useEffect(() => {
     if (hasInteracted) return;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -42,18 +52,18 @@ export default function HeroSplit() {
     const animate = () => {
       frame++;
       if (frame < 160) {
-        // Smooth sine wave: 50 -> 40 -> 60 -> 50
+        // Smooth sine sweep: 50 -> 40 -> 60 -> 50
         rawSplit.set(50 + Math.sin(frame / 20) * 10);
         raf = requestAnimationFrame(animate);
       } else {
         rawSplit.set(50);
       }
     };
-    const timer = setTimeout(() => { raf = requestAnimationFrame(animate); }, 800);
+    const timer = setTimeout(() => { raf = requestAnimationFrame(animate); }, 900);
     return () => { clearTimeout(timer); cancelAnimationFrame(raf); };
   }, [hasInteracted, rawSplit]);
 
-  // Mouse move handler for smooth dragging & subtle parallax
+  // Mouse move handler
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -63,7 +73,7 @@ export default function HeroSplit() {
 
     if (isDragging.current) {
       let pct = x * 100;
-      rawSplit.set(Math.max(8, Math.min(92, pct)));
+      rawSplit.set(Math.max(10, Math.min(90, pct)));
     }
   }, [rawSplit]);
 
@@ -72,7 +82,7 @@ export default function HeroSplit() {
     setHasInteracted(true);
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
-    rawSplit.set(Math.max(8, Math.min(92, ((e.clientX - rect.left) / rect.width) * 100)));
+    rawSplit.set(Math.max(10, Math.min(90, ((e.clientX - rect.left) / rect.width) * 100)));
   }, [rawSplit]);
 
   useEffect(() => {
@@ -90,21 +100,21 @@ export default function HeroSplit() {
     setHasInteracted(true);
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
-    rawSplit.set(Math.max(8, Math.min(92, ((e.touches[0].clientX - rect.left) / rect.width) * 100)));
+    rawSplit.set(Math.max(10, Math.min(90, ((e.touches[0].clientX - rect.left) / rect.width) * 100)));
   }, [rawSplit]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isDragging.current) return;
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
-    rawSplit.set(Math.max(8, Math.min(92, ((e.touches[0].clientX - rect.left) / rect.width) * 100)));
+    rawSplit.set(Math.max(10, Math.min(90, ((e.touches[0].clientX - rect.left) / rect.width) * 100)));
   }, [rawSplit]);
 
   // Parallax offsets
-  const photoParallaxX = (mousePos.x - 0.5) * -16;
-  const photoParallaxY = (mousePos.y - 0.5) * -12;
-  const nameParallaxX = (mousePos.x - 0.5) * 14;
-  const nameParallaxY = (mousePos.y - 0.5) * 8;
+  const photoParallaxX = (mousePos.x - 0.5) * -12;
+  const photoParallaxY = (mousePos.y - 0.5) * -8;
+  const nameParallaxX = (mousePos.x - 0.5) * 10;
+  const nameParallaxY = (mousePos.y - 0.5) * 6;
 
   return (
     <motion.section
@@ -116,188 +126,190 @@ export default function HeroSplit() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       style={{ opacity: heroOpacity }}
-      aria-label="Interactive Hero: Drag the luminous spine to explore BUILD and CUT environments"
+      aria-label="Interactive Hero: Explore Software Engineering (BUILD - Monochrome) and Video Editing (CUT - Full Color)"
     >
       {/* ====================================================================
-          1. ATMOSPHERIC BACKGROUNDS & RADIANCE
+          1. ATMOSPHERIC LIGHTING LAYERS
           ==================================================================== */}
-      {/* Deep neutral base */}
+      {/* Deep dark base */}
       <div className="absolute inset-0 bg-[#07090C]" />
 
-      {/* BUILD Side Ambient Teal Glow */}
+      {/* BUILD Left Atmosphere (Teal / Cool tone) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         style={{
-          opacity: useTransform(devIntensity, [0, 1], [0.15, 0.9]),
-          background: 'radial-gradient(circle 900px at 15% 45%, rgba(34, 211, 174, 0.16) 0%, rgba(10, 30, 26, 0.05) 55%, transparent 80%)',
+          opacity: useTransform(devIntensity, [0, 1], [0.1, 0.85]),
+          background: 'radial-gradient(circle 800px at 15% 50%, rgba(34, 211, 174, 0.14) 0%, rgba(8, 24, 20, 0.04) 55%, transparent 80%)',
         }}
       />
 
-      {/* CUT Side Ambient Amber/Orange Glow */}
+      {/* CUT Right Atmosphere (Amber / Warm tone) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         style={{
-          opacity: useTransform(editIntensity, [0, 1], [0.15, 0.9]),
-          background: 'radial-gradient(circle 900px at 85% 45%, rgba(232, 133, 74, 0.16) 0%, rgba(30, 20, 14, 0.05) 55%, transparent 80%)',
+          opacity: useTransform(editIntensity, [0, 1], [0.1, 0.85]),
+          background: 'radial-gradient(circle 800px at 85% 50%, rgba(232, 133, 74, 0.14) 0%, rgba(28, 18, 12, 0.04) 55%, transparent 80%)',
         }}
       />
 
-      {/* Center Gold Heart Radiance */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#F59E0B]/[0.035] blur-[140px] pointer-events-none" />
-
-      {/* Outer Vignette for Cinematic Focus */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 85% 85% at 50% 50%, transparent 40%, #07090C 95%)',
-        }}
-      />
+      {/* Center Gold Glow Core */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#F59E0B]/[0.025] blur-[130px] pointer-events-none" />
 
       {/* ====================================================================
-          2. DYNAMICALLY REVEALED TECHNICAL SYSTEM (BUILD SIDE)
+          2. LEFT SIDE (BUILD) — REAL ENGINEERING INFORMATION
+          Reveals dynamically as the user moves toward BUILD
           ==================================================================== */}
       <motion.div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{ opacity: useTransform(devIntensity, [0, 0.25, 1], [0.04, 0.35, 1]) }}
+        className="absolute inset-y-0 left-0 w-full md:w-[42%] flex flex-col justify-center px-6 md:px-12 pointer-events-none z-[4]"
+        style={{ opacity: useTransform(devIntensity, [0.1, 0.45, 1], [0.15, 0.55, 1]) }}
       >
-        {/* Subtle Cyber Grid */}
-        <div
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(34, 211, 174, 0.25) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(34, 211, 174, 0.25) 1px, transparent 1px)
-            `,
-            backgroundSize: '64px 64px',
-            maskImage: 'radial-gradient(circle at 20% 45%, black 35%, transparent 75%)',
-          }}
-        />
+        <div className="max-w-md space-y-4">
+          {/* Header */}
+          <div>
+            <div className="flex items-center gap-2 font-mono text-[11px] tracking-[3px] text-[#22D3AE] font-bold uppercase mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3AE] shadow-[0_0_6px_#22D3AE]" />
+              01 — BUILD
+            </div>
+            <h2 className="font-serif text-[clamp(1.5rem,3vw,2.5rem)] font-black leading-[1.05] tracking-[-0.01em] text-[#EDEAE3] uppercase">
+              Software & AI
+            </h2>
+            <p className="font-sans text-[13px] text-[#EDEAE3]/50 mt-1 leading-[1.5]">
+              Computer Science student at BRAC University building backend architectures, intelligent agents, and scalable systems.
+            </p>
+          </div>
 
-        {/* Top Left Header & Mode */}
-        <div className="absolute top-[22%] left-[4%] md:left-[7%] font-mono text-[11px] space-y-1 text-[#22D3AE]">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#22D3AE] shadow-[0_0_8px_#22D3AE] animate-pulse" />
-            <span className="tracking-[3px] font-bold text-[#22D3AE]">01 // BUILD_SYSTEM</span>
+          {/* Real Skills & Technologies */}
+          <div className="border-t border-[#22D3AE]/15 pt-3 space-y-2">
+            <div className="font-mono text-[10px] tracking-[2px] text-[#22D3AE]/70 uppercase font-semibold">
+              Core Technologies
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {['TypeScript', 'Python', 'PyTorch', 'Next.js', 'NestJS', 'Docker', 'PostgreSQL', 'FastAPI', 'Redis'].map(tech => (
+                <span
+                  key={tech}
+                  className="font-mono text-[10px] px-2 py-0.5 border border-[#22D3AE]/20 bg-[#22D3AE]/[0.04] text-[#EDEAE3]/80 rounded-[2px]"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="text-[10px] text-[#EDEAE3]/40 tracking-[1.5px] pl-4">
-            ARCHITECTURE: MODULAR_AI · BRAIN_0
-          </div>
-          <div className="text-[10px] text-[#EDEAE3]/30 tracking-[1.5px] pl-4">
-            CORE_STACK: [TS, PYTHON, PYTORCH, DOCKER, NEXTJS]
-          </div>
-        </div>
 
-        {/* Architecture Node Diagram Sketch */}
-        <div className="absolute bottom-[20%] left-[4%] md:left-[7%] hidden md:block font-mono text-[10px] text-[#22D3AE]/60 space-y-2.5 border-l-2 border-[#22D3AE]/25 pl-4 bg-[#07090C]/40 backdrop-blur-xs py-2 pr-4 rounded-r-md">
-          <div className="text-[#EDEAE3]/40 tracking-[2px] font-semibold text-[9px] uppercase">
-            // ACTIVE DISTRIBUTED PIPELINE
-          </div>
-          <div className="flex items-center gap-2 text-[#EDEAE3]/75">
-            <span className="px-2 py-0.5 border border-[#22D3AE]/40 bg-[#22D3AE]/10 text-[#22D3AE] font-bold rounded-[2px]">USER_VOICE</span>
-            <span className="text-[#22D3AE]">──►</span>
-            <span className="px-2 py-0.5 border border-[#22D3AE]/40 bg-[#22D3AE]/10 text-[#22D3AE] font-bold rounded-[2px]">ALEXA_SKILL</span>
-            <span className="text-[#22D3AE]">──►</span>
-            <span className="px-2 py-0.5 border border-[#22D3AE]/40 bg-[#22D3AE]/10 text-[#22D3AE] font-bold rounded-[2px]">LLM_BRAIN_0</span>
-          </div>
-          <div className="text-[#22D3AE]/50 text-[9px] tracking-[1px]">
-            LATENCY: &lt;14ms · MEMORY_CONTEXT: DOCKER_PERSISTENT
+          {/* Real Projects */}
+          <div className="border-t border-[#22D3AE]/15 pt-3 space-y-1.5">
+            <div className="font-mono text-[10px] tracking-[2px] text-[#22D3AE]/70 uppercase font-semibold">
+              Key Work
+            </div>
+            <div className="font-mono text-[11px] text-[#EDEAE3]/70 space-y-1">
+              <div><span className="text-[#22D3AE] font-bold">DurjoyAI</span> — Alexa + Multi-LLM Modular Assistant</div>
+              <div><span className="text-[#22D3AE] font-bold">LowKeyBD</span> — Next.js + NestJS Scalable Platform</div>
+              <div><span className="text-[#22D3AE] font-bold">EMERGON</span> — Smart Emergency Dispatch Platform</div>
+            </div>
           </div>
         </div>
       </motion.div>
 
       {/* ====================================================================
-          3. DYNAMICALLY REVEALED CINEMATIC SYSTEM (CUT SIDE)
+          3. RIGHT SIDE (CUT) — REAL VIDEO EDITING INFORMATION
+          Reveals dynamically as the user moves toward CUT
           ==================================================================== */}
       <motion.div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{ opacity: useTransform(editIntensity, [0, 0.25, 1], [0.04, 0.35, 1]) }}
+        className="absolute inset-y-0 right-0 w-full md:w-[42%] flex flex-col justify-center px-6 md:px-12 text-right pointer-events-none z-[4]"
+        style={{ opacity: useTransform(editIntensity, [0.1, 0.45, 1], [0.15, 0.55, 1]) }}
       >
-        {/* Subtle Organic Film Grain Overlay */}
-        <div
-          className="absolute inset-0 opacity-20 mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")`,
-            backgroundSize: '120px 120px',
-          }}
-        />
+        <div className="max-w-md ml-auto space-y-4">
+          {/* Header */}
+          <div>
+            <div className="flex items-center gap-2 justify-end font-mono text-[11px] tracking-[3px] text-[#E8854A] font-bold uppercase mb-1">
+              02 — CUT
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E8854A] shadow-[0_0_6px_#E8854A]" />
+            </div>
+            <h2 className="font-serif text-[clamp(1.5rem,3vw,2.5rem)] font-black leading-[1.05] tracking-[-0.01em] text-[#EDEAE3] uppercase">
+              Video & Story
+            </h2>
+            <p className="font-sans text-[13px] text-[#EDEAE3]/50 mt-1 leading-[1.5]">
+              Professional video editor with 3+ years at Think Big Brand. Shaping footage into pacing, rhythm, and visual narrative.
+            </p>
+          </div>
 
-        {/* Top Right Header & Timecode */}
-        <div className="absolute top-[22%] right-[4%] md:right-[7%] text-right font-mono text-[11px] space-y-1 text-[#E8854A]">
-          <div className="flex items-center gap-2 justify-end">
-            <span className="tracking-[3px] font-bold text-[#E8854A]">02 // CUT_TIMELINE</span>
-            <span className="w-2 h-2 rounded-full bg-[#E8854A] shadow-[0_0_8px_#E8854A] animate-pulse" />
+          {/* Real Tools & Software */}
+          <div className="border-t border-[#E8854A]/15 pt-3 space-y-2">
+            <div className="font-mono text-[10px] tracking-[2px] text-[#E8854A]/70 uppercase font-semibold">
+              Post-Production Stack
+            </div>
+            <div className="flex flex-wrap gap-1.5 justify-end">
+              {['Premiere Pro', 'After Effects', 'DaVinci Resolve', 'CapCut', 'Photoshop', 'Motion Design', 'Color Grading'].map(tool => (
+                <span
+                  key={tool}
+                  className="font-mono text-[10px] px-2 py-0.5 border border-[#E8854A]/20 bg-[#E8854A]/[0.04] text-[#EDEAE3]/80 rounded-[2px]"
+                >
+                  {tool}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="text-[10px] text-[#EDEAE3]/40 tracking-[1.5px]">
-            AGENCY: THINK_BIG_BRAND · 3+ YRS
-          </div>
-          <div className="text-[10px] text-[#E8854A]/80 font-bold tracking-[2px]">
-            TC 01:24:18:09 · 23.976 FPS · 4K UHD
-          </div>
-        </div>
 
-        {/* Filmstrip Sprocket Edge Markers */}
-        <div className="absolute top-[20%] bottom-[20%] right-3 hidden md:flex flex-col justify-between opacity-35">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="w-3.5 h-2.5 border border-[#E8854A] rounded-[1px] bg-[#E8854A]/10" />
-          ))}
-        </div>
-
-        {/* Editing Workflow Sequence (Bottom Right) */}
-        <div className="absolute bottom-[20%] right-[4%] md:right-[7%] hidden md:block text-right font-mono text-[10px] text-[#E8854A]/60 space-y-2.5 border-r-2 border-[#E8854A]/25 pr-4 bg-[#07090C]/40 backdrop-blur-xs py-2 pl-4 rounded-l-md">
-          <div className="text-[#EDEAE3]/40 tracking-[2px] font-semibold text-[9px] uppercase">
-            // POST-PRODUCTION WORKFLOW
-          </div>
-          <div className="flex items-center gap-1.5 justify-end text-[#EDEAE3]/75 text-[9px]">
-            <span className="px-1.5 py-0.5 border border-[#E8854A]/30 bg-[#E8854A]/10">SELECTS</span>
-            <span className="text-[#E8854A]">►</span>
-            <span className="px-1.5 py-0.5 border border-[#E8854A]/30 bg-[#E8854A]/10">ASSEMBLY</span>
-            <span className="text-[#E8854A]">►</span>
-            <span className="px-1.5 py-0.5 border border-[#E8854A]/30 bg-[#E8854A]/10">MOTION</span>
-            <span className="text-[#E8854A]">►</span>
-            <span className="px-1.5 py-0.5 border border-[#F59E0B]/50 bg-[#F59E0B]/20 text-[#F59E0B] font-bold">COLOR</span>
-            <span className="text-[#E8854A]">►</span>
-            <span className="px-1.5 py-0.5 border border-[#E8854A]/30 bg-[#E8854A]/10">MASTER</span>
-          </div>
-          <div className="text-[#E8854A]/50 text-[9px] tracking-[1px]">
-            DELIVERABLE: PRORES 4444 XQ · REC.709
+          {/* Real Experience & Deliverables */}
+          <div className="border-t border-[#E8854A]/15 pt-3 space-y-1.5">
+            <div className="font-mono text-[10px] tracking-[2px] text-[#E8854A]/70 uppercase font-semibold">
+              Agency Experience
+            </div>
+            <div className="font-mono text-[11px] text-[#EDEAE3]/70 space-y-1">
+              <div><span className="text-[#E8854A] font-bold">Think Big Brand</span> — International Content Agency</div>
+              <div><span className="text-[#E8854A] font-bold">3+ Years</span> — Long-Form, Shorts, Social Campaigns</div>
+              <div><span className="text-[#E8854A] font-bold">Deliverables</span> — 4K ProRes · Color Mastered · Sound Design</div>
+            </div>
           </div>
         </div>
       </motion.div>
 
       {/* ====================================================================
-          4. LAYER 1: MASSIVE BACKGROUND EDITORIAL TYPOGRAPHY ("MD SHOIEB")
-          Sits behind the head and shoulders with magazine grandeur
+          4. LAYER: GHOST EDITORIAL NAME (BEHIND THE PHOTO)
+          Restored clean, balanced editorial typography
           ==================================================================== */}
       <motion.div
-        className="absolute inset-0 flex items-start justify-center pt-[14vh] md:pt-[12vh] pointer-events-none z-[2]"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]"
         style={{
-          y: nameBgY,
+          y: nameY,
           x: nameParallaxX,
         }}
       >
-        <h1 className="font-serif text-[clamp(4.5rem,14vw,14rem)] font-black leading-[0.8] tracking-[-0.04em] uppercase text-center whitespace-nowrap select-none">
-          <motion.span
-            className="block"
-            style={{
-              color: useTransform(
-                split,
-                [15, 50, 85],
-                ['rgba(34, 211, 174, 0.12)', 'rgba(237, 234, 227, 0.18)', 'rgba(232, 133, 74, 0.12)']
-              ),
-              textShadow: '0 0 40px rgba(245, 158, 11, 0.08)',
-            }}
-          >
-            MD SHOIEB
-          </motion.span>
-        </h1>
+        <div className="text-center select-none">
+          <h1 className="font-serif text-[clamp(4.5rem,13vw,11.5rem)] font-black leading-[0.82] tracking-[-0.04em] uppercase text-center whitespace-nowrap">
+            <motion.span
+              className="block"
+              style={{
+                color: useTransform(
+                  split,
+                  [20, 50, 80],
+                  ['rgba(232, 133, 74, 0.05)', 'rgba(237, 234, 227, 0.06)', 'rgba(34, 211, 174, 0.05)']
+                ),
+              }}
+            >
+              Shoieb
+            </motion.span>
+            <motion.span
+              className="block -mt-[0.06em]"
+              style={{
+                color: useTransform(
+                  split,
+                  [20, 50, 80],
+                  ['rgba(232, 133, 74, 0.07)', 'rgba(237, 234, 227, 0.08)', 'rgba(34, 211, 174, 0.07)']
+                ),
+              }}
+            >
+              Durjoy
+            </motion.span>
+          </h1>
+        </div>
       </motion.div>
 
       {/* ====================================================================
-          5. LAYER 2: THE LARGE PORTRAIT (ATMOSPHERIC HUMAN CENTER)
-          Feather-masked on all sides so it emerges from the dark environment
+          5. LAYER: THE CENTRAL PORTRAIT WITH B&W ↔ COLOR TRANSFORMATION
+          Black & White on BUILD side (Left), Full Natural Color on CUT side (Right)
           ==================================================================== */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none z-[3]"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-[2]"
         style={{ y: photoY }}
       >
         <motion.div
@@ -308,114 +320,115 @@ export default function HeroSplit() {
           }}
         >
           {/* Subtle Ambient Color Glow Behind Subject */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] pointer-events-none">
             <motion.div
-              className="absolute inset-0 rounded-full blur-[100px]"
+              className="absolute inset-0 rounded-full blur-[90px]"
               style={{
                 background: useTransform(
                   split,
-                  [15, 50, 85],
+                  [20, 50, 80],
                   [
-                    'radial-gradient(circle, rgba(232, 133, 74, 0.22) 0%, transparent 65%)',
-                    'radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, transparent 65%)',
-                    'radial-gradient(circle, rgba(34, 211, 174, 0.22) 0%, transparent 65%)',
+                    'radial-gradient(circle, rgba(232, 133, 74, 0.16) 0%, transparent 65%)',
+                    'radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 65%)',
+                    'radial-gradient(circle, rgba(34, 211, 174, 0.16) 0%, transparent 65%)',
                   ]
                 ),
               }}
             />
           </div>
 
-          {/* Portrait Container with Comprehensive Feather Mask */}
-          <div
-            className="relative w-[clamp(300px,42vw,560px)] h-[clamp(400px,65vh,740px)]"
+          {/* Photo Container with Feather Mask (dissolves into dark environment) */}
+          <motion.div
+            className="relative w-[clamp(260px,32vw,440px)] h-[clamp(360px,52vh,620px)]"
             style={{
+              filter: useTransform(
+                [photoGrayscale, photoContrast, photoBrightness],
+                ([g, c, b]) => `grayscale(${g}%) contrast(${c}%) brightness(${b}%)`
+              ),
               maskImage: `
-                radial-gradient(ellipse 85% 80% at 50% 40%, black 45%, transparent 92%),
-                linear-gradient(to bottom, transparent 0%, black 12%, black 65%, transparent 98%)
+                radial-gradient(ellipse 85% 82% at 50% 42%, black 45%, transparent 94%),
+                linear-gradient(to bottom, transparent 0%, black 10%, black 72%, transparent 98%)
               `,
               WebkitMaskImage: `
-                radial-gradient(ellipse 85% 80% at 50% 40%, black 45%, transparent 92%),
-                linear-gradient(to bottom, transparent 0%, black 12%, black 65%, transparent 98%)
+                radial-gradient(ellipse 85% 82% at 50% 42%, black 45%, transparent 94%),
+                linear-gradient(to bottom, transparent 0%, black 10%, black 72%, transparent 98%)
               `,
               maskComposite: 'intersect',
               WebkitMaskComposite: 'source-in',
             }}
           >
-            {/* Environmental Color Grading Overlay */}
-            <motion.div
-              className="absolute inset-0 z-10 pointer-events-none mix-blend-color"
-              style={{
-                background: useTransform(
-                  split,
-                  [15, 50, 85],
-                  [
-                    'linear-gradient(135deg, rgba(232, 133, 74, 0.22) 0%, rgba(180, 90, 40, 0.15) 100%)',
-                    'linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(34, 211, 174, 0.05) 100%)',
-                    'linear-gradient(135deg, rgba(34, 211, 174, 0.18) 0%, rgba(20, 150, 130, 0.22) 100%)',
-                  ]
-                ),
-              }}
-            />
-
-            {/* Contrast / Scanline Environmental Overlay */}
-            <motion.div
-              className="absolute inset-0 z-10 pointer-events-none"
-              style={{
-                background: useTransform(
-                  split,
-                  [20, 50, 80],
-                  [
-                    'linear-gradient(135deg, rgba(35, 20, 10, 0.15) 0%, transparent 100%)',
-                    'transparent',
-                    'linear-gradient(135deg, transparent 0%, rgba(10, 30, 40, 0.15) 100%)',
-                  ]
-                ),
-              }}
-            />
-
             <Image
               src="/portrait.png"
               alt="Md Shoieb Hossain — Software Engineer & Video Editor"
               fill
               className="object-cover object-top"
               priority
-              sizes="(max-width: 768px) 80vw, 42vw"
+              sizes="(max-width: 768px) 75vw, 32vw"
             />
-          </div>
+          </motion.div>
         </motion.div>
       </motion.div>
 
       {/* ====================================================================
-          6. LAYER 3: FOREGROUND INTERSECTING TYPOGRAPHY ("HOSSAIN")
-          Passes across the lower dissolving torso creating true magazine depth
+          6. LAYER: FOREGROUND EDITORIAL IDENTITY (OVERLAPPING BOTTOM)
+          Restored clean, elegant, unified presentation
           ==================================================================== */}
       <motion.div
-        className="absolute inset-0 flex items-end justify-center pb-[10vh] md:pb-[8vh] pointer-events-none z-[4]"
+        className="absolute inset-0 flex items-end justify-center pb-[10vh] md:pb-[11vh] pointer-events-none z-[3]"
         style={{
-          y: nameFgY,
-          x: nameParallaxX * 0.7,
+          y: nameY,
+          x: nameParallaxX * 0.5,
         }}
       >
-        <h1 className="font-serif text-[clamp(4.5rem,14vw,14rem)] font-black leading-[0.8] tracking-[-0.04em] uppercase text-center whitespace-nowrap select-none">
-          <motion.span
-            className="block"
-            style={{
-              color: useTransform(
-                split,
-                [15, 50, 85],
-                ['rgba(232, 133, 74, 0.35)', 'rgba(237, 234, 227, 0.45)', 'rgba(34, 211, 174, 0.35)']
-              ),
-              textShadow: '0 0 35px rgba(0, 0, 0, 0.8)',
-            }}
-          >
-            HOSSAIN
-          </motion.span>
-        </h1>
+        <div className="text-center">
+          {/* Main Name Heading */}
+          <h1 className="font-serif text-[clamp(2.4rem,5.5vw,4.5rem)] font-black leading-[0.88] tracking-[-0.02em] text-[#EDEAE3] uppercase">
+            <span className="block">Md Shoieb</span>
+            <span className="block">Hossain</span>
+          </h1>
+
+          {/* BUILD ◆ CUT Indicators */}
+          <div className="mt-3.5 flex items-center justify-center gap-4 font-mono text-[clamp(0.65rem,1.2vw,0.85rem)] font-bold tracking-[5px] uppercase">
+            <motion.span
+              style={{
+                color: useTransform(split, [20, 50, 80], [
+                  'rgba(34, 211, 174, 0.35)',
+                  'rgba(34, 211, 174, 0.9)',
+                  'rgba(34, 211, 174, 1)',
+                ]),
+              }}
+            >
+              BUILD
+            </motion.span>
+            <motion.span
+              className="text-[#F59E0B] text-[8px]"
+              animate={{ opacity: [0.3, 0.8, 0.3] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              ◆
+            </motion.span>
+            <motion.span
+              style={{
+                color: useTransform(split, [20, 50, 80], [
+                  'rgba(232, 133, 74, 1)',
+                  'rgba(232, 133, 74, 0.9)',
+                  'rgba(232, 133, 74, 0.35)',
+                ]),
+              }}
+            >
+              CUT
+            </motion.span>
+          </div>
+
+          {/* Subtitle */}
+          <div className="mt-2 font-mono text-[9px] tracking-[3px] uppercase text-[#EDEAE3]/25">
+            Software Engineer · Video Editor · Dhaka, Bangladesh
+          </div>
+        </div>
       </motion.div>
 
       {/* ====================================================================
           7. THE SIGNATURE LUMINOUS SPINE & HANDLE
-          A real, crafted interactive spine with ruler ticks and gold handle
           ==================================================================== */}
       {/* Luminous Vertical Spine */}
       <motion.div
@@ -427,15 +440,15 @@ export default function HeroSplit() {
       >
         {/* Soft Radial Ambient Aura */}
         <motion.div
-          className="absolute top-0 bottom-0 w-[80px] -left-[40px]"
+          className="absolute top-0 bottom-0 w-[60px] -left-[30px]"
           style={{
             background: useTransform(
               split,
-              [15, 50, 85],
+              [20, 50, 80],
               [
-                'linear-gradient(to right, transparent, rgba(232, 133, 74, 0.12), transparent)',
-                'linear-gradient(to right, transparent, rgba(245, 158, 11, 0.14), transparent)',
-                'linear-gradient(to right, transparent, rgba(34, 211, 174, 0.12), transparent)',
+                'linear-gradient(to right, transparent, rgba(232, 133, 74, 0.1), transparent)',
+                'linear-gradient(to right, transparent, rgba(245, 158, 11, 0.12), transparent)',
+                'linear-gradient(to right, transparent, rgba(34, 211, 174, 0.1), transparent)',
               ]
             ),
           }}
@@ -443,31 +456,20 @@ export default function HeroSplit() {
 
         {/* Center Glowing Spine Line */}
         <motion.div
-          className="absolute top-[6%] bottom-[6%] left-1/2 -translate-x-1/2 w-[2px]"
+          className="absolute top-[8%] bottom-[8%] left-1/2 -translate-x-1/2 w-[2px]"
           style={{
             background: useTransform(
               split,
-              [15, 50, 85],
+              [20, 50, 80],
               [
                 'linear-gradient(to bottom, transparent 0%, #E8854A 25%, #F59E0B 50%, #E8854A 75%, transparent 100%)',
-                'linear-gradient(to bottom, transparent 0%, #22D3AE 20%, #F59E0B 50%, #E8854A 80%, transparent 100%)',
+                'linear-gradient(to bottom, transparent 0%, rgba(237,234,227,0.3) 20%, #F59E0B 50%, rgba(237,234,227,0.3) 80%, transparent 100%)',
                 'linear-gradient(to bottom, transparent 0%, #22D3AE 25%, #F59E0B 50%, #22D3AE 75%, transparent 100%)',
               ]
             ),
-            boxShadow: '0 0 16px rgba(245, 158, 11, 0.5)',
+            boxShadow: '0 0 14px rgba(245, 158, 11, 0.45)',
           }}
         />
-
-        {/* Ruler Tick Marks Along Spine */}
-        <div className="absolute top-[12%] bottom-[12%] left-1/2 -translate-x-1/2 hidden md:flex flex-col justify-between items-center opacity-40">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-1">
-              <span className="w-1.5 h-[1px] bg-[#EDEAE3]" />
-              <span className="w-1 h-1 rounded-full bg-[#F59E0B]/60" />
-              <span className="w-1.5 h-[1px] bg-[#EDEAE3]" />
-            </div>
-          ))}
-        </div>
       </motion.div>
 
       {/* Interactive Magnetic Handle */}
@@ -483,47 +485,46 @@ export default function HeroSplit() {
       >
         {/* Outer Pulsing Glow Aura */}
         <motion.div
-          className="absolute -inset-5 rounded-full blur-[16px]"
-          animate={{ scale: isHoveringHandle ? 1.35 : [1, 1.2, 1] }}
+          className="absolute -inset-4 rounded-full blur-[14px]"
+          animate={{ scale: isHoveringHandle ? 1.3 : [1, 1.15, 1] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             background: useTransform(
               split,
-              [15, 50, 85],
+              [20, 50, 80],
               [
                 'radial-gradient(circle, rgba(232, 133, 74, 0.5) 0%, transparent 70%)',
-                'radial-gradient(circle, rgba(245, 158, 11, 0.55) 0%, transparent 70%)',
+                'radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%)',
                 'radial-gradient(circle, rgba(34, 211, 174, 0.5) 0%, transparent 70%)',
               ]
             ),
           }}
         />
 
-        {/* Handle Badge */}
+        {/* Handle Button */}
         <motion.div
-          className="relative px-4 py-2 rounded-full border-2 border-[#F59E0B] bg-[#07090C]/95 backdrop-blur-md shadow-[0_0_24px_rgba(245,158,11,0.45)] flex items-center gap-3"
-          whileHover={{ scale: 1.1 }}
+          className="relative px-3.5 py-1.5 rounded-full border border-[#F59E0B] bg-[#07090C]/95 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center gap-2.5"
+          whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
         >
           {/* BUILD Indicator */}
           <motion.span
-            className="font-mono text-[10px] font-extrabold tracking-[1.5px]"
+            className="font-mono text-[9px] font-extrabold tracking-[1px]"
             style={{
-              color: useTransform(split, [15, 50, 85], ['rgba(34, 211, 174, 0.35)', 'rgba(34, 211, 174, 1)', 'rgba(34, 211, 174, 1)']),
+              color: useTransform(split, [20, 50, 80], ['rgba(34, 211, 174, 0.4)', 'rgba(34, 211, 174, 1)', 'rgba(34, 211, 174, 1)']),
             }}
           >
             ◄ BUILD
           </motion.span>
 
-          {/* Center Glowing Accent Dot */}
-          <span className="w-2 h-2 rounded-full bg-[#F59E0B] shadow-[0_0_10px_#F59E0B] animate-ping opacity-75" />
-          <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] shadow-[0_0_10px_#F59E0B] -ml-3.5" />
+          {/* Center Gold Accent Dot */}
+          <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] shadow-[0_0_8px_#F59E0B]" />
 
           {/* CUT Indicator */}
           <motion.span
-            className="font-mono text-[10px] font-extrabold tracking-[1.5px]"
+            className="font-mono text-[9px] font-extrabold tracking-[1px]"
             style={{
-              color: useTransform(split, [15, 50, 85], ['rgba(232, 133, 74, 1)', 'rgba(232, 133, 74, 1)', 'rgba(232, 133, 74, 0.35)']),
+              color: useTransform(split, [20, 50, 80], ['rgba(232, 133, 74, 1)', 'rgba(232, 133, 74, 1)', 'rgba(232, 133, 74, 0.4)']),
             }}
           >
             CUT ►
@@ -547,15 +548,13 @@ export default function HeroSplit() {
       </div>
 
       {/* Bottom Left */}
-      <div className="absolute bottom-6 left-6 md:left-10 font-mono text-[9px] tracking-[3px] uppercase text-[#EDEAE3]/25 space-y-0.5 pointer-events-none z-[8]">
-        <div>01_BUILD_SYSTEM // ACTIVE</div>
-        <div>LATENCY: &lt;14MS · SYS_2026</div>
+      <div className="absolute bottom-6 left-6 md:left-10 font-mono text-[9px] tracking-[3px] uppercase text-[#EDEAE3]/20 pointer-events-none z-[8]">
+        <div>B.S. COMPUTER SCIENCE · 2027</div>
       </div>
 
       {/* Bottom Right */}
-      <div className="absolute bottom-6 right-6 md:right-10 font-mono text-[9px] tracking-[3px] uppercase text-[#EDEAE3]/25 text-right space-y-0.5 pointer-events-none z-[8]">
-        <div>02_CUT_TIMELINE // ONLINE</div>
-        <div>PRORES 4444 XQ · 4K UHD</div>
+      <div className="absolute bottom-6 right-6 md:right-10 font-mono text-[9px] tracking-[3px] uppercase text-[#EDEAE3]/20 text-right pointer-events-none z-[8]">
+        <div>VIDEO EDITOR · 3+ YRS EXP</div>
       </div>
 
       {/* ====================================================================
@@ -570,20 +569,20 @@ export default function HeroSplit() {
             exit={{ opacity: 0, y: 10 }}
             transition={{ delay: 1.2, duration: 0.8 }}
           >
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-[#F59E0B]/40 bg-[#07090C]/90 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-[#F59E0B]/40 bg-[#07090C]/90 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
               <motion.span
-                className="text-[#F59E0B] text-[10px] font-bold"
-                animate={{ x: [-3, 0, -3] }}
+                className="text-[#F59E0B] text-[9px] font-bold"
+                animate={{ x: [-2, 0, -2] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
               >
                 ◄
               </motion.span>
-              <span className="font-mono text-[9px] font-bold uppercase tracking-[3px] text-[#EDEAE3]">
-                DRAG SPINE TO EXPLORE
+              <span className="font-mono text-[8px] font-bold uppercase tracking-[3px] text-[#EDEAE3]">
+                DRAG TO EXPLORE BOTH SIDES
               </span>
               <motion.span
-                className="text-[#F59E0B] text-[10px] font-bold"
-                animate={{ x: [3, 0, 3] }}
+                className="text-[#F59E0B] text-[9px] font-bold"
+                animate={{ x: [2, 0, 2] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
               >
                 ►
