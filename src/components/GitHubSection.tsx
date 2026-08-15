@@ -1,21 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-
-const contributionWeeks = Array.from({ length: 52 }, (_, weekIdx) => {
-  return Array.from({ length: 7 }, (_, dayIdx) => {
-    const seed = (weekIdx * 7 + dayIdx) * 16807 % 2147483647;
-    const count = seed % 10 > 3 ? seed % 7 : 0;
-    const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 4 ? 2 : count <= 6 ? 3 : 4;
-    return {
-      week: weekIdx + 1,
-      day: dayIdx,
-      count,
-      level,
-    };
-  });
-});
+import { useRef, useState, useEffect } from 'react';
 
 const featuredRepos = [
   { name: 'DurjoyAI', desc: 'Alexa-powered intelligent modular assistant with Brain-0 memory context', lang: 'TypeScript', tag: 'Flagship' },
@@ -24,10 +10,32 @@ const featuredRepos = [
   { name: 'Alexa-PC-Control', desc: 'Voice-controlled automated PC execution scripts and skill handler', lang: 'Python', tag: 'Tool' },
 ];
 
+type GithubDay = { date: string; level: number };
+type GithubWeek = { week: number; days: GithubDay[] };
+
 export default function GitHubSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-80px' });
-  const [hoveredCell, setHoveredCell] = useState<{ week: number; count: number } | null>(null);
+  const [hoveredCell, setHoveredCell] = useState<{ date: string; level: number } | null>(null);
+  const [contributionWeeks, setContributionWeeks] = useState<GithubWeek[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGitHubData() {
+      try {
+        const res = await fetch('/api/github');
+        const data = await res.json();
+        if (data.weeks) {
+          setContributionWeeks(data.weeks);
+        }
+      } catch (error) {
+        console.error('Failed to load GitHub data', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchGitHubData();
+  }, []);
 
   const colors = [
     'bg-[rgba(248,250,252,0.04)]',
@@ -76,11 +84,11 @@ export default function GitHubSection() {
         <div className="rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017] p-6 md:p-8 shadow-2xl mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div className="font-mono text-[11px] uppercase tracking-[2px] text-[#F8FAFC]/50">
-              52-Week Contribution Matrix
+              Last 365 Days Contribution Matrix
             </div>
             <div className="font-mono text-[11px] text-[#00F2C3]">
               {hoveredCell ? (
-                <span>Week {hoveredCell.week} // {hoveredCell.count} contributions recorded</span>
+                <span>{hoveredCell.date} // Level {hoveredCell.level} activity</span>
               ) : (
                 <span className="text-[#F8FAFC]/30">Hover any cell for activity details</span>
               )}
@@ -88,21 +96,33 @@ export default function GitHubSection() {
           </div>
 
           <div className="overflow-x-auto pb-2">
-            <div className="grid grid-flow-col auto-cols-[13px] gap-[3.5px] min-w-[720px]">
-              {contributionWeeks.map((week, weekIdx) => (
-                <div key={weekIdx} className="grid grid-rows-7 gap-[3.5px]">
-                  {week.map((day) => (
-                    <div
-                      key={day.day}
-                      onMouseEnter={() => setHoveredCell({ week: day.week, count: day.count })}
-                      onMouseLeave={() => setHoveredCell(null)}
-                      className={`w-[11.5px] h-[11.5px] rounded-[2px] ${colors[day.level]} transition-transform hover:scale-125 cursor-pointer`}
-                      title={`Week ${day.week}: ${day.count} contributions`}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="flex gap-[3.5px] min-w-[720px] animate-pulse">
+                {Array.from({ length: 53 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-[3.5px]">
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <div key={j} className="w-[11.5px] h-[11.5px] rounded-[2px] bg-[#111722]" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-flow-col auto-cols-[13px] gap-[3.5px] min-w-[720px]">
+                {contributionWeeks.map((week, weekIdx) => (
+                  <div key={weekIdx} className="grid grid-rows-7 gap-[3.5px]">
+                    {week.days.map((day, dayIdx) => (
+                      <div
+                        key={dayIdx}
+                        onMouseEnter={() => setHoveredCell({ date: day.date, level: day.level })}
+                        onMouseLeave={() => setHoveredCell(null)}
+                        className={`w-[11.5px] h-[11.5px] rounded-[2px] ${colors[day.level] || colors[0]} transition-transform hover:scale-125 cursor-pointer`}
+                        title={`${day.date} (Level ${day.level})`}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-[rgba(248,250,252,0.06)] font-mono text-[10px] text-[#F8FAFC]/40">
