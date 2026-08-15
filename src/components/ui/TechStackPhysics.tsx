@@ -30,9 +30,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const height = 600; 
 
     // 1. Setup Engine & Gravity
-    const engine = Matter.Engine.create({
-      enableSleeping: true, // Improves performance when settled
-    });
+    const engine = Matter.Engine.create();
     engineRef.current = engine;
     
     // Premium, floaty low-gravity feel
@@ -163,13 +161,13 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         context.beginPath();
         context.roundRect(-width / 2, -height / 2, width, height, height / 2);
         
-        // Premium glassmorphism / dark aesthetic
-        context.fillStyle = 'rgba(13, 17, 23, 0.95)';
+        // Premium glassmorphism / dark aesthetic (Brighter to contrast background)
+        context.fillStyle = 'rgba(25, 33, 44, 0.95)';
         context.fill();
 
-        // Glowing Border
+        // Glowing Border (Fully opaque for visibility)
         context.lineWidth = 1;
-        context.strokeStyle = `${accentColor}40`; // 25% opacity hex
+        context.strokeStyle = accentColor; 
         context.stroke();
 
         // Draw Indicator Dot
