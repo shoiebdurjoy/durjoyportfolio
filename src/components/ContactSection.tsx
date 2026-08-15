@@ -39,22 +39,22 @@ export default function ContactSection() {
             06 // Initiate Contact
           </div>
 
-          <h2 className="font-serif text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[1.05] tracking-tight text-[#F8FAFC] mb-6">
-            Build Systems.<br />
-            <span className="text-[#F59E0B] italic font-normal">Cut Stories.</span><br />
-            Or Both.
+          <h2 className="font-serif text-[clamp(3.5rem,10vw,8.5rem)] font-black uppercase leading-[0.95] tracking-tight text-[#F8FAFC] mb-8">
+            Let&apos;s Build<br />
+            <span className="text-[#00F2C3] italic font-normal">Something</span><br />
+            Great.
           </h2>
 
           <p className="font-sans text-[16px] md:text-[18px] text-[#F8FAFC]/70 leading-[1.7] max-w-xl mx-auto">
             Available for software engineering roles, AI system architectures, and commercial post-production video projects.
           </p>
 
-          {/* Big Interactive Email Link Button */}
-          <div className="pt-8">
+          {/* Big Interactive Buttons */}
+          <div className="pt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
             <MagneticButton strength={40}>
               <button
                 onClick={copyEmail}
-                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#0C1017] border border-[#F59E0B]/40 hover:border-[#F59E0B] hover:shadow-[0_0_35px_rgba(245,158,11,0.25)] transition-all cursor-pointer"
+                className="group inline-flex items-center gap-3 px-8 py-5 rounded-full bg-[#0C1017] border border-[#F59E0B]/40 hover:border-[#F59E0B] hover:shadow-[0_0_40px_rgba(245,158,11,0.3)] transition-all cursor-pointer"
               >
                 <span className="font-mono text-base md:text-lg font-bold text-[#F8FAFC] group-hover:text-[#F59E0B] transition-colors">
                   {email}
@@ -63,6 +63,18 @@ export default function ContactSection() {
                   {copied ? '✓ COPIED!' : 'CLICK TO COPY'}
                 </span>
               </button>
+            </MagneticButton>
+
+            <MagneticButton strength={30}>
+              <a
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-8 py-5 rounded-full bg-[#00F2C3] text-[#06080B] hover:bg-[#00F2C3]/90 hover:shadow-[0_0_40px_rgba(0,242,195,0.4)] transition-all cursor-pointer font-mono text-base md:text-lg font-bold uppercase tracking-wider"
+              >
+                Download Resume
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              </a>
             </MagneticButton>
           </div>
         </motion.div>

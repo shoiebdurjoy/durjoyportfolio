@@ -89,6 +89,18 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
               ))}
             </nav>
 
+            {/* Resume CTA */}
+            <MagneticButton strength={25}>
+              <a
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold uppercase tracking-[1.5px] text-[#07090C] bg-[#F59E0B] hover:bg-[#F59E0B]/90 px-4 py-2 rounded-full transition-colors shadow-[0_0_15px_rgba(245,158,11,0.3)] block"
+              >
+                Resume
+              </a>
+            </MagneticButton>
+
             {/* Cmd+K trigger */}
             <MagneticButton strength={30}>
               <button
@@ -140,6 +152,18 @@ export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
                   {link.label}
                 </motion.button>
               ))}
+              
+              <motion.a
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.30, duration: 0.3 }}
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 font-mono text-[13px] text-[#07090C] px-10 py-3.5 rounded-full bg-[#F59E0B] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+              >
+                Download Resume
+              </motion.a>
               <motion.button
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}

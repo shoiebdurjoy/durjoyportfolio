@@ -174,7 +174,7 @@ export default function HeroSplit() {
               Software & AI Architect
             </h2>
             <p className="font-sans text-[13px] text-[#F8FAFC]/60 mt-1.5 leading-[1.6]">
-              Computer Science @ BRAC University (&apos;27). Engineering intelligent assistants, scalable backend microservices, and deep learning pipelines.
+              Computer Science @ BRAC University ('27). Engineered a voice-driven multi-LLM gateway with &lt;14ms dispatch latency and scalable microservices.
             </p>
           </div>
 
@@ -226,7 +226,7 @@ export default function HeroSplit() {
               Video Editor & Storyteller
             </h2>
             <p className="font-sans text-[13px] text-[#F8FAFC]/60 mt-1.5 leading-[1.6]">
-              3+ years with Think Big Brand agency. Shaping high-retention commercials, documentary narratives, motion graphics, and color grading.
+              3+ years with Think Big Brand agency. Delivered high-retention commercials and documentary narratives driving massive organic engagement.
             </p>
           </div>
 
@@ -414,6 +414,18 @@ export default function HeroSplit() {
 
           <div className="mt-1.5 font-mono text-[9px] tracking-[3px] uppercase text-[#F8FAFC]/30">
             Software Architect · Video Editor · Dhaka, Bangladesh
+          </div>
+
+          <div className="mt-6 pointer-events-auto">
+            <a 
+              href="/resume.pdf" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[rgba(248,250,252,0.1)] hover:border-[#00F2C3] hover:bg-[#00F2C3]/10 hover:text-[#00F2C3] transition-all bg-[#0C1017]/50 backdrop-blur-md shadow-[0_0_15px_rgba(0,0,0,0.5)] font-mono text-[10px] uppercase tracking-[2px] text-[#F8FAFC] font-bold"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Download Resume
+            </a>
           </div>
         </div>
       </motion.div>
