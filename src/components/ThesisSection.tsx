@@ -6,37 +6,37 @@ import { useRef, useState } from 'react';
 const pipelineStages = [
   {
     step: '01',
-    title: 'Raw Bangla Video & Audio Input',
+    title: 'Raw Bangla Video & Audio Corpus',
     tag: 'Data Acquisition',
-    desc: 'Collection and curation of authentic conversational Bangla video clips and speech recordings.',
-    tech: ['Kaggle Datasets', 'Bangla Speech Repositories', 'Custom Audio Captures'],
+    desc: 'Curation of authentic conversational Bangla video clips and speech recordings across diverse speaker demographics.',
+    tech: ['Kaggle Datasets', 'Bangla Speech Corpus', 'Audio Segmentation'],
   },
   {
     step: '02',
     title: 'Preprocessing & Temporal Alignment',
-    tag: 'Signal Processing',
-    desc: 'Segmenting multi-speaker clips, normalizing sampling rates, audio noise filtering, and frame extraction.',
-    tech: ['FFmpeg', 'Audio Trimming', 'Visual Face Bounding Alignment'],
+    tag: 'Signal Normalization',
+    desc: 'Extracting video frames, normalizing audio sample rates to 16kHz, noise reduction, and aligning visual facial crops with acoustic frames.',
+    tech: ['FFmpeg', 'Audio Normalization', 'Face Bounding Crops'],
   },
   {
     step: '03',
     title: 'Multimodal Feature Extraction',
-    tag: 'Acoustic + Visual',
-    desc: 'Extracting Mel-Frequency Cepstral Coefficients (MFCC), chromagrams, and facial action units simultaneously.',
-    tech: ['Librosa', 'OpenCV', 'Mel-Spectrograms'],
+    tag: 'Dual Feature Space',
+    desc: 'Extracting Mel-Frequency Cepstral Coefficients (MFCC), chromagrams, and visual spatial features from frame sequences simultaneously.',
+    tech: ['Librosa', 'Mel-Spectrograms', 'OpenCV Spatial Embeddings'],
   },
   {
     step: '04',
-    title: 'Deep Learning Model Training',
-    tag: 'PyTorch / CUDA',
-    desc: 'Training multimodal neural networks combining spatial visual encoders with recurrent temporal acoustic transformers.',
-    tech: ['PyTorch', 'CUDA Acceleration', 'Cross-Attention Fusion'],
+    title: 'Cross-Modal Attention Fusion',
+    tag: 'PyTorch / CUDA Model',
+    desc: 'Training multimodal neural networks that fuse acoustic temporal embeddings with visual facial action representations via cross-attention.',
+    tech: ['PyTorch', 'CUDA Acceleration', 'Cross-Attention Layer'],
   },
   {
     step: '05',
-    title: 'Multimodal Emotion Classification',
+    title: 'Emotion Classification Inference',
     tag: 'Prediction Engine',
-    desc: 'Real-time inference categorizing Bangla emotional state (Happy, Sad, Angry, Surprised, Neutral) with high confidence.',
+    desc: 'Softmax classification predicting Bangla emotional state (Happy, Sad, Angry, Fear, Neutral) with high precision and F1 confidence.',
     tech: ['Softmax Classifier', 'Confusion Matrix Evaluation', 'F1 Metrics'],
   },
 ];
@@ -50,10 +50,10 @@ export default function ThesisSection() {
     <section
       id="thesis"
       ref={containerRef}
-      className="relative py-24 md:py-36 border-t border-[rgba(237,234,227,0.06)] bg-[#07090C] overflow-hidden"
+      className="relative py-28 md:py-40 bg-[#06080B] text-[#F8FAFC] border-t border-[rgba(248,250,252,0.06)] overflow-hidden"
     >
-      {/* Subtle Glow */}
-      <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#22D3AE]/[0.03] blur-[140px] pointer-events-none" />
+      {/* Background Radiance */}
+      <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#00F2C3]/[0.03] blur-[160px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
         {/* Section Header */}
@@ -61,30 +61,26 @@ export default function ThesisSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-14 md:mb-18"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-[rgba(248,250,252,0.08)] mb-16"
         >
-          <div className="flex items-center gap-2.5 font-mono text-[11px] tracking-[3px] uppercase text-[#22D3AE] mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22D3AE]" />
-            Bachelor Thesis // Machine Learning Research
-          </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h2 className="font-serif text-[clamp(2rem,4.5vw,3.5rem)] font-black uppercase tracking-[-0.02em] leading-[1] text-[#EDEAE3]">
-                Bangla Multimodal Emotion Recognition
-              </h2>
-              <p className="font-mono text-[12px] text-[#22D3AE] mt-2">
-                BRAC University · Deep Learning & Signal Processing
-              </p>
+          <div>
+            <div className="flex items-center gap-2 font-mono text-[11px] tracking-[3px] uppercase text-[#00F2C3] font-semibold mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00F2C3]" />
+              03 // Academic Research
             </div>
-            <p className="font-sans text-[14px] text-[#EDEAE3]/50 max-w-sm">
-              An end-to-end multimodal deep learning pipeline classifying emotions from Bangla speech audio and video streams.
-            </p>
+            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[0.95] text-[#F8FAFC]">
+              Bangla Multimodal<br />
+              <span className="text-[#00F2C3] italic font-normal">Emotion Recognition.</span>
+            </h2>
           </div>
+          <p className="font-sans text-[14px] text-[#F8FAFC]/50 max-w-xs">
+            Bachelor&apos;s Thesis at BRAC University · Deep Learning, Computer Vision & Audio Signal Processing.
+          </p>
         </motion.div>
 
-        {/* Interactive Storytelling Pipeline */}
+        {/* Interactive Visual Pipeline */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Stage Selector */}
+          {/* Stage Buttons */}
           <div className="lg:col-span-5 space-y-3">
             {pipelineStages.map((stage, idx) => {
               const isActive = activeStep === idx;
@@ -94,31 +90,31 @@ export default function ThesisSection() {
                   onClick={() => setActiveStep(idx)}
                   className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 flex items-start gap-4 ${
                     isActive
-                      ? 'border-[#22D3AE] bg-[#0D1117] shadow-[0_0_20px_rgba(34,211,174,0.12)]'
-                      : 'border-[rgba(237,234,227,0.08)] bg-[#0D1117]/60 hover:border-[rgba(237,234,227,0.2)]'
+                      ? 'border-[#00F2C3] bg-[#0C1017] shadow-[0_0_20px_rgba(0,242,195,0.12)]'
+                      : 'border-[rgba(248,250,252,0.08)] bg-[#0C1017]/50 hover:border-[rgba(248,250,252,0.2)]'
                   }`}
                 >
                   <span
                     className={`font-mono text-sm font-bold mt-0.5 ${
-                      isActive ? 'text-[#22D3AE]' : 'text-[#EDEAE3]/40'
+                      isActive ? 'text-[#00F2C3]' : 'text-[#F8FAFC]/30'
                     }`}
                   >
                     {stage.step}
                   </span>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3
+                      <h4
                         className={`font-sans text-[14px] font-semibold ${
-                          isActive ? 'text-[#EDEAE3]' : 'text-[#EDEAE3]/70'
+                          isActive ? 'text-[#F8FAFC]' : 'text-[#F8FAFC]/70'
                         }`}
                       >
                         {stage.title}
-                      </h3>
+                      </h4>
                       {isActive && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#22D3AE] animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00F2C3] animate-pulse" />
                       )}
                     </div>
-                    <div className="font-mono text-[10px] text-[#22D3AE]/70 mt-0.5">
+                    <div className="font-mono text-[10px] text-[#00F2C3]/70 mt-0.5">
                       {stage.tag}
                     </div>
                   </div>
@@ -127,38 +123,37 @@ export default function ThesisSection() {
             })}
           </div>
 
-          {/* Right Stage Detail Spotlight */}
+          {/* Active Stage Spotlight Panel */}
           <div className="lg:col-span-7">
-            <div className="p-8 md:p-10 rounded-xl border border-[#22D3AE]/30 bg-[#0D1117] relative overflow-hidden shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[rgba(237,234,227,0.08)] pb-5 mb-6">
+            <div className="p-8 md:p-10 rounded-xl border border-[#00F2C3]/30 bg-[#0C1017] relative overflow-hidden shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[rgba(248,250,252,0.08)] pb-5 mb-6">
                 <div>
-                  <span className="font-mono text-[10px] uppercase tracking-[2px] text-[#22D3AE]">
-                    Pipeline Stage {pipelineStages[activeStep].step} of 05
+                  <span className="font-mono text-[10px] uppercase tracking-[2px] text-[#00F2C3]">
+                    Pipeline Stage {pipelineStages[activeStep].step} / 05
                   </span>
-                  <h3 className="font-serif text-2xl md:text-3xl font-black text-[#EDEAE3] mt-1">
+                  <h3 className="font-serif text-2xl md:text-3xl font-black text-[#F8FAFC] mt-1">
                     {pipelineStages[activeStep].title}
                   </h3>
                 </div>
-                <span className="px-3 py-1 rounded bg-[#22D3AE]/10 border border-[#22D3AE]/30 font-mono text-[11px] text-[#22D3AE]">
+                <span className="px-3 py-1 rounded bg-[#00F2C3]/10 border border-[#00F2C3]/30 font-mono text-[11px] text-[#00F2C3]">
                   {pipelineStages[activeStep].tag}
                 </span>
               </div>
 
               <div className="space-y-6">
-                <p className="font-sans text-[15px] leading-[1.8] text-[#EDEAE3]/80">
+                <p className="font-sans text-[15px] leading-[1.8] text-[#F8FAFC]/80">
                   {pipelineStages[activeStep].desc}
                 </p>
 
-                {/* Pipeline visual flow node */}
-                <div className="p-4 rounded-lg bg-[#131920] border border-[rgba(237,234,227,0.06)] font-mono text-[11px] text-[#EDEAE3]/70 space-y-2">
-                  <div className="text-[#22D3AE] font-semibold uppercase text-[10px] tracking-[1.5px]">
-                    // Tools & Frameworks Applied
+                <div className="p-4 rounded-lg bg-[#111722] border border-[rgba(248,250,252,0.06)] font-mono text-[11px] space-y-2">
+                  <div className="text-[#00F2C3] font-semibold uppercase text-[10px] tracking-[1.5px]">
+                    // Frameworks & Techniques
                   </div>
                   <div className="flex flex-wrap gap-2 pt-1">
                     {pipelineStages[activeStep].tech.map((t) => (
                       <span
                         key={t}
-                        className="px-2.5 py-1 rounded bg-[#0D1117] border border-[#22D3AE]/20 text-[#EDEAE3] text-[11px]"
+                        className="px-2.5 py-1 rounded bg-[#06080B] border border-[#00F2C3]/20 text-[#F8FAFC] text-[11px]"
                       >
                         {t}
                       </span>
@@ -170,16 +165,16 @@ export default function ThesisSection() {
                   <button
                     onClick={() => setActiveStep((prev) => (prev > 0 ? prev - 1 : prev))}
                     disabled={activeStep === 0}
-                    className="font-mono text-[11px] text-[#EDEAE3]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="font-mono text-[11px] text-[#F8FAFC]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
-                    ← Previous Stage
+                    ← Previous
                   </button>
                   <button
                     onClick={() =>
                       setActiveStep((prev) => (prev < pipelineStages.length - 1 ? prev + 1 : prev))
                     }
                     disabled={activeStep === pipelineStages.length - 1}
-                    className="font-mono text-[11px] text-[#22D3AE] hover:underline disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="font-mono text-[11px] text-[#00F2C3] hover:underline disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     Next Stage →
                   </button>
