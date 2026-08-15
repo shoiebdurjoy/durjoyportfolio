@@ -89,11 +89,12 @@ export default function VideoSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="rounded-xl border border-[#F59E0B]/30 bg-[#0C1017] overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.08)] mb-8 max-w-4xl mx-auto"
         >
-          <div className="relative w-full aspect-[4/3] sm:aspect-video bg-[#06080B] flex flex-col items-center justify-center border-b border-[rgba(248,250,252,0.08)] overflow-hidden">
+          {/* Use min-height to guarantee the iframe container never collapses */}
+          <div className="relative w-full h-[400px] md:h-[500px] bg-[#06080B] flex flex-col items-center justify-center border-b border-[rgba(248,250,252,0.08)] overflow-hidden">
             <iframe
-              key={activeVideo.behanceId} // Force re-render on change
+              key={activeVideo.behanceId}
               src={`https://www.behance.net/embed/project/${activeVideo.behanceId}?ilo0=1`}
-              className="w-full h-full absolute inset-0 border-0"
+              className="w-full h-full border-0"
               allowFullScreen
               loading="lazy"
               allow="clipboard-write"
@@ -126,7 +127,7 @@ export default function VideoSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-4xl mx-auto mb-16"
+          className="flex flex-col md:flex-row gap-3 max-w-4xl mx-auto mb-16"
         >
           {videoProjects.map((video, idx) => {
             const isSelected = activeVideo.id === video.id;
@@ -134,7 +135,7 @@ export default function VideoSection() {
               <TiltCard
                 key={video.id}
                 intensity={8}
-                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                className={`flex-1 p-3 md:p-4 rounded-xl border cursor-pointer transition-all duration-300 relative overflow-hidden ${
                   isSelected
                     ? 'border-[#F59E0B] bg-[#0C1017] shadow-[0_0_20px_rgba(245,158,11,0.15)]'
                     : 'border-[rgba(248,250,252,0.08)] bg-[#0C1017]/60 hover:border-[#F59E0B]/50'
