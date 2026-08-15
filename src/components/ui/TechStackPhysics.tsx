@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Matter from 'matter-js';
-import { motion } from 'framer-motion';
 
 export type TechItem = {
   name: string;
@@ -29,12 +28,10 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const width = currentScene.clientWidth;
     const height = 600; 
 
-    // 1. Setup Engine & Gravity
+    // 1. Setup Engine & Gravity (Restored to original snappy physics)
     const engine = Matter.Engine.create();
     engineRef.current = engine;
-    
-    // Premium, floaty low-gravity feel
-    engine.gravity.y = 0.15;
+    engine.gravity.y = 0.5; // Restored original gravity
 
     // 2. Setup Canvas Renderer
     const render = Matter.Render.create({
@@ -51,13 +48,16 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     renderRef.current = render;
 
     // 3. Create Walls, Floor, and Invisible Shelves
+    const CATEGORY_PILL = 0x0001;
+    const CATEGORY_WALL = 0x0002;
+
     const wallOptions = { 
       isStatic: true, 
       render: { visible: false },
       friction: 0.5,
       restitution: 0.2,
       collisionFilter: {
-        category: 0x0002 // Wall category
+        category: CATEGORY_WALL
       }
     };
     
@@ -66,17 +66,15 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const rightWall = Matter.Bodies.rectangle(width + 50, height / 2, 100, height * 2, wallOptions);
     const ceiling = Matter.Bodies.rectangle(width / 2, -1000, width * 2, 100, wallOptions); 
 
-    // Create 3 invisible static shelves to create vertical distribution
+    // 3 invisible static shelves for natural distribution
     const shelf1 = Matter.Bodies.rectangle(width * 0.25, height * 0.45, width * 0.25, 20, wallOptions);
     const shelf2 = Matter.Bodies.rectangle(width * 0.75, height * 0.35, width * 0.25, 20, wallOptions);
     const shelf3 = Matter.Bodies.rectangle(width * 0.5, height * 0.75, width * 0.4, 20, wallOptions);
 
     Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling, shelf1, shelf2, shelf3]);
 
-    // 4. Create Tech Pills
+    // 4. Create Tech Pills (Restored original physics settings)
     const bodies: Matter.Body[] = [];
-    
-    // Shuffle items so they don't fall in the same order
     const shuffledItems = [...items].sort(() => Math.random() - 0.5);
 
     shuffledItems.forEach((item, index) => {
@@ -84,20 +82,26 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       const x = (width * 0.1) + (Math.random() * (width * 0.8));
       const y = -100 - (index * 80); 
       
-      const textWidth = item.name.length * 8 + 60; 
-      const pillWidth = Math.max(130, textWidth);
+      const textWidth = item.name.length * 8 + 40; 
+      const pillWidth = Math.max(120, textWidth);
       const pillHeight = 44;
 
+      const isCreative = item.category === 'creative';
+      const isAI = item.category === 'ai';
+      const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+
       const body = Matter.Bodies.rectangle(x, y, pillWidth, pillHeight, {
-        restitution: 0.4, // Slight bounce
-        friction: 0.05,
-        frictionAir: 0.015, // Air resistance adds to the premium feel
-        chamfer: { radius: pillHeight / 2 }, // Rounded collision box
+        restitution: 0.6, // Restored bounciness
+        friction: 0.1,    // Restored friction
+        chamfer: { radius: pillHeight / 2 },
         collisionFilter: {
-          category: 0x0001 // Pill category
+          category: CATEGORY_PILL
         },
         render: {
-          visible: false // We will custom draw it in afterRender
+          // Native rendering is highly optimized and prevents lag
+          fillStyle: '#111822',
+          strokeStyle: accentColor,
+          lineWidth: 1
         }
       });
       
@@ -107,22 +111,21 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
 
     Matter.Composite.add(engine.world, bodies);
 
-    // 5. Mouse Interaction
+    // 5. Mouse Interaction (Restored original stiffness)
     const mouse = Matter.Mouse.create(render.canvas);
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
-        stiffness: 0.1,
+        stiffness: 0.2, // Restored original snappy grab stiffness
         render: { visible: false }
       },
       collisionFilter: {
-        mask: 0x0001 // Mouse only interacts with Pill category
+        mask: CATEGORY_PILL // Only grab pills, never shelves
       }
     });
     Matter.Composite.add(engine.world, mouseConstraint);
     render.mouse = mouse;
     
-    // Subtle Cursor Management
     Matter.Events.on(mouseConstraint, 'mousemove', (event) => {
       const found = Matter.Query.point(bodies, event.mouse.position);
       if (found.length > 0) {
@@ -146,7 +149,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       document.body.style.cursor = 'crosshair';
     });
 
-    // 6. Custom HD Renderer
+    // 6. Custom HD Renderer just for Text and Dot overlay
     Matter.Events.on(render, 'afterRender', () => {
       const context = render.context;
       
@@ -154,41 +157,24 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         const data = itemMapRef.current.get(body.id);
         if (!data) return;
 
-        const { item, width, height } = data;
+        const { item, width } = data;
         const isCreative = item.category === 'creative';
         const isAI = item.category === 'ai';
         const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
-
+        
         context.save();
         context.translate(body.position.x, body.position.y);
         context.rotate(body.angle);
-
-        // Draw Pill Background
-        context.beginPath();
-        context.roundRect(-width / 2, -height / 2, width, height, height / 2);
-        
-        // Premium glassmorphism / dark aesthetic (Brighter to contrast background)
-        context.fillStyle = 'rgba(25, 33, 44, 0.95)';
-        context.fill();
-
-        // Glowing Border (Fully opaque for visibility)
-        context.lineWidth = 1;
-        context.strokeStyle = accentColor; 
-        context.stroke();
 
         // Draw Indicator Dot
         context.beginPath();
         context.arc(-width / 2 + 18, 0, 3.5, 0, 2 * Math.PI);
         context.fillStyle = accentColor;
-        // Dot Glow
-        context.shadowColor = accentColor;
-        context.shadowBlur = 8;
         context.fill();
-        context.shadowBlur = 0; // Reset shadow for text
 
         // Draw Text
         context.font = '500 12px "JetBrains Mono", monospace';
-        context.fillStyle = 'rgba(237, 234, 227, 0.9)'; // Text color
+        context.fillStyle = 'rgba(237, 234, 227, 0.9)';
         context.textAlign = 'left';
         context.textBaseline = 'middle';
         context.fillText(item.name, -width / 2 + 32, 1);
@@ -203,7 +189,6 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     Matter.Render.run(render);
     Matter.Runner.run(runner, engine);
 
-    // Resize Handler
     const handleResize = () => {
       if (!currentScene) return;
       const newWidth = currentScene.clientWidth;
@@ -213,7 +198,6 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       Matter.Body.setPosition(ground, { x: newWidth / 2, y: height + 50 });
       Matter.Body.setPosition(rightWall, { x: newWidth + 50, y: height / 2 });
       
-      // Update shelves on resize to keep them proportional
       Matter.Body.setPosition(shelf1, { x: newWidth * 0.25, y: height * 0.45 });
       Matter.Body.setPosition(shelf2, { x: newWidth * 0.75, y: height * 0.35 });
       Matter.Body.setPosition(shelf3, { x: newWidth * 0.5, y: height * 0.75 });
@@ -235,7 +219,6 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
 
   return (
     <div className="relative w-full rounded-2xl border border-[rgba(237,234,227,0.06)] bg-[#07090C] shadow-2xl overflow-hidden group">
-      {/* Subtle Architectural Grid Background */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-20"
         style={{
@@ -252,7 +235,6 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         className="w-full h-[600px] cursor-crosshair relative z-10"
       />
       
-      {/* Refined Context / Instructions (Matches editorial aesthetic) */}
       <div className="absolute top-6 right-8 pointer-events-none z-20 flex flex-col items-end opacity-40 group-hover:opacity-100 transition-opacity duration-500">
         <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[3px] text-[#EDEAE3]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#22D3AE] animate-pulse" />
@@ -263,9 +245,8 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         </div>
       </div>
       
-      {/* Left Axis Label */}
       <div className="absolute top-1/2 left-4 -translate-y-1/2 -rotate-90 origin-center pointer-events-none z-20 opacity-20 font-mono text-[8px] tracking-[4px] text-[#EDEAE3] uppercase">
-        Y-AXIS · GRAVITY 0.15
+        Y-AXIS · GRAVITY 0.5
       </div>
     </div>
   );
