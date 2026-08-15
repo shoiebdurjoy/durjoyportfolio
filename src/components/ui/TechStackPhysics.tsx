@@ -111,6 +111,23 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
       const found = Matter.Query.point(pills, mouse.position);
       if (found.length > 0) {
         document.body.style.cursor = 'grabbing';
+      } else {
+        // Gamification: Click empty space to trigger a shockwave!
+        const mousePos = mouse.position;
+        pills.forEach(body => {
+          const dx = body.position.x - mousePos.x;
+          const dy = body.position.y - mousePos.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 400) { 
+            // Apply radial force inversely proportional to distance
+            const forceMagnitude = (400 - dist) * 0.0004; 
+            Matter.Body.applyForce(body, body.position, {
+              x: (dx / dist) * forceMagnitude,
+              y: (dy / dist) * forceMagnitude
+            });
+          }
+        });
       }
     });
     
@@ -299,7 +316,7 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
           Interactive Stack
         </div>
         <div className="mt-1 font-mono text-[8px] text-[#EDEAE3]/50">
-          PHYSICS ENGINE ONLINE · GRAB & THROW
+          PHYSICS ENGINE ONLINE · GRAB, THROW, OR CLICK TO EXPLODE
         </div>
       </div>
       
