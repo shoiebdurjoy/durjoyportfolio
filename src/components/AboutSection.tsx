@@ -79,7 +79,7 @@ export default function AboutSection() {
                   className="inline-block mr-[0.25em]"
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true, margin: "-15px" }}
                   transition={{ duration: 0.5, delay: i * 0.03 + 0.1 }}
                 >
                   {word}
