@@ -52,8 +52,8 @@ function MarqueeRow({
 }) {
   const [isPaused, setIsPaused] = useState(false);
 
-  // Duplicate list once to create a seamless infinite marquee
-  const displayItems = [...items, ...items];
+  // Duplicate list multiple times to create a seamless infinite marquee on ultra-wide screens
+  const displayItems = [...items, ...items, ...items, ...items, ...items, ...items];
 
   return (
     <div
@@ -137,10 +137,10 @@ export default function TechStack() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+          className="flex flex-col items-center justify-center text-center gap-6"
         >
-          <div>
-            <div className="flex items-center gap-2.5 font-mono text-[11px] tracking-[3px] uppercase text-[#F59E0B] mb-3">
+          <div className="flex flex-col items-center">
+            <div className="flex items-center justify-center gap-2.5 font-mono text-[11px] tracking-[3px] uppercase text-[#F59E0B] mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
               Tech Stack // Applied Engineering
             </div>
@@ -149,7 +149,7 @@ export default function TechStack() {
             </h2>
           </div>
 
-          <div className="font-mono text-[11px] text-[#EDEAE3]/40 flex items-center gap-4">
+          <div className="font-mono text-[11px] text-[#EDEAE3]/40 flex items-center justify-center flex-wrap gap-4 mt-2">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#22D3AE]" /> Engineering
             </span>
@@ -172,7 +172,7 @@ export default function TechStack() {
 
       {/* Interactive Tooltip Context Box */}
       <div className="max-w-6xl mx-auto px-6 md:px-12 mt-8 min-h-[44px]">
-        <div className="p-3.5 rounded-lg border border-[rgba(237,234,227,0.08)] bg-[#0D1117]/80 flex items-center justify-between gap-4">
+        <div className="p-3.5 rounded-lg border border-[rgba(237,234,227,0.08)] bg-[#0D1117]/80 flex flex-col md:flex-row items-center justify-center text-center gap-4">
           <div className="font-mono text-[11px] text-[#EDEAE3]/50 flex items-center gap-2">
             <span className="text-[#F59E0B]">ⓘ</span>
             <span>
