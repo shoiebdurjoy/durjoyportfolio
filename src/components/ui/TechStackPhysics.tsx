@@ -21,25 +21,24 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   
-  // Create a mapping from body id to item for hover events
   const itemMapRef = useRef<Map<number, TechItem>>(new Map());
 
   useEffect(() => {
     if (!sceneRef.current) return;
     const currentScene = sceneRef.current;
+    const width = currentScene.clientWidth;
+    const height = 600; 
 
-    // 1. Setup Engine
-    const engine = Matter.Engine.create();
+    // 1. Setup Engine & Gravity
+    const engine = Matter.Engine.create({
+      enableSleeping: true, // Improves performance when settled
+    });
     engineRef.current = engine;
     
-    // Slight gravity
-    engine.gravity.y = 0.5;
+    // Premium, floaty low-gravity feel
+    engine.gravity.y = 0.15;
 
-    // 2. Setup Renderer (Optional: we can render natively via Canvas for massive performance)
-    // We will use the built-in canvas renderer but style the bodies to look like our pills!
-    const width = currentScene.clientWidth;
-    const height = 500; // Fixed canvas height
-
+    // 2. Setup Canvas Renderer
     const render = Matter.Render.create({
       element: currentScene,
       engine: engine,
@@ -53,38 +52,48 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     });
     renderRef.current = render;
 
-    // 3. Create Walls & Floor
-    const wallOptions = { isStatic: true, render: { fillStyle: 'transparent' } };
+    // 3. Create Walls, Floor, and Invisible Shelves
+    const wallOptions = { 
+      isStatic: true, 
+      render: { visible: false },
+      friction: 0.5,
+      restitution: 0.2 
+    };
+    
     const ground = Matter.Bodies.rectangle(width / 2, height + 50, width * 2, 100, wallOptions);
     const leftWall = Matter.Bodies.rectangle(-50, height / 2, 100, height * 2, wallOptions);
     const rightWall = Matter.Bodies.rectangle(width + 50, height / 2, 100, height * 2, wallOptions);
-    const ceiling = Matter.Bodies.rectangle(width / 2, -1000, width * 2, 100, wallOptions); // Tall ceiling for falling
+    const ceiling = Matter.Bodies.rectangle(width / 2, -1000, width * 2, 100, wallOptions); 
 
-    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
+    // Create 3 invisible static shelves to create vertical distribution
+    const shelf1 = Matter.Bodies.rectangle(width * 0.25, height * 0.45, width * 0.25, 20, wallOptions);
+    const shelf2 = Matter.Bodies.rectangle(width * 0.75, height * 0.35, width * 0.25, 20, wallOptions);
+    const shelf3 = Matter.Bodies.rectangle(width * 0.5, height * 0.75, width * 0.4, 20, wallOptions);
+
+    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling, shelf1, shelf2, shelf3]);
 
     // 4. Create Tech Pills
     const bodies: Matter.Body[] = [];
     
-    items.forEach((item, index) => {
-      // Calculate random start position above the viewport
-      const x = Math.random() * (width - 100) + 50;
-      const y = -100 - (index * 60); // Stagger drop
+    // Shuffle items so they don't fall in the same order
+    const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+
+    shuffledItems.forEach((item, index) => {
+      // Stagger start positions across the width and high above
+      const x = (width * 0.1) + (Math.random() * (width * 0.8));
+      const y = -100 - (index * 80); 
       
-      const isCreative = item.category === 'creative';
-      const isAI = item.category === 'ai';
-      
-      // Determine pill dimensions based on text length
-      const textWidth = item.name.length * 10 + 40; // Approx
-      const pillWidth = Math.max(120, textWidth);
+      const textWidth = item.name.length * 8 + 60; 
+      const pillWidth = Math.max(130, textWidth);
       const pillHeight = 44;
 
       const body = Matter.Bodies.rectangle(x, y, pillWidth, pillHeight, {
-        restitution: 0.6, // Bounciness
-        friction: 0.1,
+        restitution: 0.4, // Slight bounce
+        friction: 0.05,
+        frictionAir: 0.015, // Air resistance adds to the premium feel
+        chamfer: { radius: pillHeight / 2 }, // Rounded collision box
         render: {
-          fillStyle: '#0D1117',
-          strokeStyle: isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE',
-          lineWidth: 2,
+          visible: false // We will custom draw it in afterRender
         }
       });
       
@@ -99,18 +108,14 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
-        stiffness: 0.2,
-        render: {
-          visible: false
-        }
+        stiffness: 0.1,
+        render: { visible: false }
       }
     });
     Matter.Composite.add(engine.world, mouseConstraint);
-
-    // Keep mouse in sync with render scale
     render.mouse = mouse;
     
-    // Hover Events
+    // Subtle Cursor Management
     Matter.Events.on(mouseConstraint, 'mousemove', (event) => {
       const found = Matter.Query.point(bodies, event.mouse.position);
       if (found.length > 0) {
@@ -118,41 +123,77 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         const item = itemMapRef.current.get(found[0].id);
         if (item) onHoverItem(item);
       } else {
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = 'crosshair';
         onHoverItem(null);
       }
     });
 
     Matter.Events.on(mouseConstraint, 'mousedown', () => {
-      document.body.style.cursor = 'grabbing';
+      const found = Matter.Query.point(bodies, mouse.position);
+      if (found.length > 0) {
+        document.body.style.cursor = 'grabbing';
+      }
     });
+    
     Matter.Events.on(mouseConstraint, 'mouseup', () => {
-      document.body.style.cursor = 'default';
+      document.body.style.cursor = 'crosshair';
     });
 
-    // Custom Render Loop to draw Text over Bodies
+    // 6. Custom HD Renderer
     Matter.Events.on(render, 'afterRender', () => {
       const context = render.context;
+      
       bodies.forEach((body) => {
         const item = itemMapRef.current.get(body.id);
         if (!item) return;
+
+        const isCreative = item.category === 'creative';
+        const isAI = item.category === 'ai';
+        const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+        const isHovered = document.body.style.cursor === 'grab' || document.body.style.cursor === 'grabbing'; // Rough hover check, better to track specific body
         
+        const width = body.bounds.max.x - body.bounds.min.x;
+        const height = body.bounds.max.y - body.bounds.min.y;
+
         context.save();
         context.translate(body.position.x, body.position.y);
         context.rotate(body.angle);
+
+        // Draw Pill Background
+        context.beginPath();
+        context.roundRect(-width / 2, -height / 2, width, height, height / 2);
         
+        // Premium glassmorphism / dark aesthetic
+        context.fillStyle = 'rgba(13, 17, 23, 0.95)';
+        context.fill();
+
+        // Glowing Border
+        context.lineWidth = 1;
+        context.strokeStyle = `${accentColor}40`; // 25% opacity hex
+        context.stroke();
+
+        // Draw Indicator Dot
+        context.beginPath();
+        context.arc(-width / 2 + 18, 0, 3.5, 0, 2 * Math.PI);
+        context.fillStyle = accentColor;
+        // Dot Glow
+        context.shadowColor = accentColor;
+        context.shadowBlur = 8;
+        context.fill();
+        context.shadowBlur = 0; // Reset shadow for text
+
         // Draw Text
-        context.font = '500 13px "JetBrains Mono", monospace';
-        context.fillStyle = '#EDEAE3';
-        context.textAlign = 'center';
+        context.font = '500 12px "JetBrains Mono", monospace';
+        context.fillStyle = 'rgba(237, 234, 227, 0.9)'; // Text color
+        context.textAlign = 'left';
         context.textBaseline = 'middle';
-        context.fillText(item.name, 0, 0);
+        context.fillText(item.name, -width / 2 + 32, 1);
         
         context.restore();
       });
     });
 
-    // 6. Run Engine
+    // 7. Run Engine
     const runner = Matter.Runner.create();
     runnerRef.current = runner;
     Matter.Render.run(render);
@@ -160,13 +201,20 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
 
     // Resize Handler
     const handleResize = () => {
+      if (!currentScene) return;
       const newWidth = currentScene.clientWidth;
       render.canvas.width = newWidth;
       render.options.width = newWidth;
+      
       Matter.Body.setPosition(ground, { x: newWidth / 2, y: height + 50 });
       Matter.Body.setPosition(rightWall, { x: newWidth + 50, y: height / 2 });
-      Matter.Body.setPosition(ceiling, { x: newWidth / 2, y: -1000 });
+      
+      // Update shelves on resize to keep them proportional
+      Matter.Body.setPosition(shelf1, { x: newWidth * 0.25, y: height * 0.45 });
+      Matter.Body.setPosition(shelf2, { x: newWidth * 0.75, y: height * 0.35 });
+      Matter.Body.setPosition(shelf3, { x: newWidth * 0.5, y: height * 0.75 });
     };
+    
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -182,21 +230,38 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
   }, [items, onHoverItem]);
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-[rgba(237,234,227,0.08)] bg-[#07090C] shadow-2xl">
+    <div className="relative w-full rounded-2xl border border-[rgba(237,234,227,0.06)] bg-[#07090C] shadow-2xl overflow-hidden group">
+      {/* Subtle Architectural Grid Background */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(237,234,227,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(237,234,227,0.08) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }}
+      />
+      
       <div 
         ref={sceneRef} 
-        className="w-full h-[500px] cursor-crosshair"
+        className="w-full h-[600px] cursor-crosshair relative z-10"
       />
-      {/* Overlay Instructions */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 pointer-events-none">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="px-4 py-1.5 rounded-full bg-[#0D1117]/80 backdrop-blur border border-[#F59E0B]/30 font-mono text-[9px] uppercase tracking-[3px] text-[#F59E0B]"
-        >
-          PHYSICS ENGINE ACTIVE // DRAG TO THROW
-        </motion.div>
+      
+      {/* Refined Context / Instructions (Matches editorial aesthetic) */}
+      <div className="absolute top-6 right-8 pointer-events-none z-20 flex flex-col items-end opacity-40 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[3px] text-[#EDEAE3]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#22D3AE] animate-pulse" />
+          Interactive Stack
+        </div>
+        <div className="mt-1 font-mono text-[8px] text-[#EDEAE3]/50">
+          PHYSICS ENGINE ONLINE · GRAB & THROW
+        </div>
+      </div>
+      
+      {/* Left Axis Label */}
+      <div className="absolute top-1/2 left-4 -translate-y-1/2 -rotate-90 origin-center pointer-events-none z-20 opacity-20 font-mono text-[8px] tracking-[4px] text-[#EDEAE3] uppercase">
+        Y-AXIS · GRAVITY 0.15
       </div>
     </div>
   );
