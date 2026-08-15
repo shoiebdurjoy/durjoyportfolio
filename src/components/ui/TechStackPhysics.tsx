@@ -66,12 +66,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
     const rightWall = Matter.Bodies.rectangle(width + 50, height / 2, 100, height * 2, wallOptions);
     const ceiling = Matter.Bodies.rectangle(width / 2, -1000, width * 2, 100, wallOptions); 
 
-    // 3 invisible static shelves for natural distribution
-    const shelf1 = Matter.Bodies.rectangle(width * 0.25, height * 0.45, width * 0.25, 20, wallOptions);
-    const shelf2 = Matter.Bodies.rectangle(width * 0.75, height * 0.35, width * 0.25, 20, wallOptions);
-    const shelf3 = Matter.Bodies.rectangle(width * 0.5, height * 0.75, width * 0.4, 20, wallOptions);
-
-    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling, shelf1, shelf2, shelf3]);
+    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
     // 4. Create Tech Pills (Restored original physics settings)
     const bodies: Matter.Body[] = [];
@@ -197,10 +192,6 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       
       Matter.Body.setPosition(ground, { x: newWidth / 2, y: height + 50 });
       Matter.Body.setPosition(rightWall, { x: newWidth + 50, y: height / 2 });
-      
-      Matter.Body.setPosition(shelf1, { x: newWidth * 0.25, y: height * 0.45 });
-      Matter.Body.setPosition(shelf2, { x: newWidth * 0.75, y: height * 0.35 });
-      Matter.Body.setPosition(shelf3, { x: newWidth * 0.5, y: height * 0.75 });
     };
     
     window.addEventListener('resize', handleResize);
