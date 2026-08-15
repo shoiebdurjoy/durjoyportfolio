@@ -12,9 +12,10 @@ export type TechItem = {
 interface TechStackPhysicsProps {
   items: TechItem[];
   onHoverItem: (item: TechItem | null) => void;
+  isVisible?: boolean;
 }
 
-export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysicsProps) {
+export default function TechStackPhysics({ items, onHoverItem, isVisible }: TechStackPhysicsProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const renderRef = useRef<Matter.Render | null>(null);
@@ -109,7 +110,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
 
       row.forEach((data) => {
         const x = currentX + (data.pillWidth / 2);
-        const y = currentY;
+        const y = currentY - 800; // Suspend high in the sky!
 
         const isCreative = data.item.category === 'creative';
         const isAI = data.item.category === 'ai';
@@ -118,6 +119,7 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
         const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
           restitution: 0.6,
           friction: 0.1,
+          isStatic: true, // Start static so they don't fall until visible
           chamfer: { radius: data.pillHeight / 2 },
           collisionFilter: {
             category: CATEGORY_PILL
@@ -242,6 +244,22 @@ export default function TechStackPhysics({ items, onHoverItem }: TechStackPhysic
       render.textures = {};
     };
   }, [items, onHoverItem]);
+
+  // Drop animation when scrolled into view
+  useEffect(() => {
+    if (!isVisible || !engineRef.current) return;
+    
+    const engine = engineRef.current;
+    // Get only the pills
+    const pills = engine.world.bodies.filter(b => b.collisionFilter.category === 0x0001);
+    
+    // Drop them row by row with a slight stagger for a beautiful cascading build effect
+    pills.forEach((body, index) => {
+      setTimeout(() => {
+        Matter.Body.setStatic(body, false);
+      }, index * 20); // 20ms stagger per pill
+    });
+  }, [isVisible]);
 
   return (
     <div className="relative w-full rounded-2xl border border-[rgba(237,234,227,0.06)] bg-[#07090C] shadow-2xl overflow-hidden group">

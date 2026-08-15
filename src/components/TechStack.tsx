@@ -111,6 +111,7 @@ export default function TechStack() {
         <TechStackPhysics 
           items={allItems} 
           onHoverItem={setActiveTech} 
+          isVisible={isInView}
         />
       </div>
 
