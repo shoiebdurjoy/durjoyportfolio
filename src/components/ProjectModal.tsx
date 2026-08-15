@@ -23,6 +23,7 @@ export type ProjectDetails = {
     title: string;
     description: string;
   }[];
+  hoverImage?: string;
 };
 
 export default function ProjectModal({

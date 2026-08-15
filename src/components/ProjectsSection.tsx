@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import ProjectModal, { type ProjectDetails } from './ProjectModal';
 import TiltCard from '@/src/components/ui/TiltCard';
+import HoverImageReveal from '@/src/components/ui/HoverImageReveal';
 
 const featuredProject: ProjectDetails = {
   id: 'durjoyai',
@@ -61,6 +62,7 @@ const allProjects: ProjectDetails[] = [
       { title: 'Platform Dashboard', description: 'Main user feed and discovery layout.' },
       { title: 'NestJS Microservices Architecture', description: 'Backend REST API schema and relation models.' },
     ],
+    hoverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
   },
   {
     id: 'emergon',
@@ -87,6 +89,7 @@ const allProjects: ProjectDetails[] = [
       { title: 'Incident Response Live Feed', description: 'Real-time emergency unit locator and alert map.' },
       { title: 'AI Triage Severity Engine', description: 'Automated urgency score and report triage view.' },
     ],
+    hoverImage: 'https://images.unsplash.com/photo-1583324113626-70df0f4deaab?auto=format&fit=crop&q=80&w=800',
   },
   {
     id: 'gamecritic',
@@ -114,6 +117,7 @@ const allProjects: ProjectDetails[] = [
       { title: 'Game Discovery Feed', description: 'Aggregated reviews, rating distributions, and genre filters.' },
       { title: 'Review Submission Modal', description: 'Interactive community scoring and markdown review interface.' },
     ],
+    hoverImage: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800',
   },
 ];
 
@@ -255,7 +259,8 @@ export default function ProjectsSection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: idx * 0.1 }}
             >
-              <TiltCard intensity={8} className="p-6 md:p-8 rounded-xl bg-[#0C1017]/80 border border-[rgba(248,250,252,0.08)] hover:border-[#00F2C3]/40 hover:bg-[#0C1017] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group relative overflow-hidden">
+              <HoverImageReveal imageSrc={project.hoverImage}>
+                <TiltCard intensity={8} className="p-6 md:p-8 rounded-xl bg-[#0C1017]/80 border border-[rgba(248,250,252,0.08)] hover:border-[#00F2C3]/40 hover:bg-[#0C1017] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 group relative overflow-hidden">
                 <div className="space-y-2 max-w-xl relative z-10">
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-[11px] text-[#00F2C3] font-bold">0{idx + 2}</span>
@@ -300,7 +305,8 @@ export default function ProjectsSection() {
                   </a>
                 )}
                 </div>
-              </TiltCard>
+                </TiltCard>
+              </HoverImageReveal>
             </motion.div>
           ))}
         </div>
