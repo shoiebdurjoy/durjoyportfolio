@@ -211,69 +211,76 @@ export default function TechStackPhysics({ items, onHoverItem, isVisible }: Tech
     const width = sceneRef.current?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth - 64 : 1000);
     const height = 600;
     
-    const shuffledItems = [...items].sort(() => Math.random() - 0.5);
-
-    const pillData = shuffledItems.map(item => {
-      const textWidth = item.name.length * 8 + 40; 
-      const pillWidth = Math.max(120, textWidth);
-      return { item, pillWidth, pillHeight: 44 };
-    });
-
-    const maxRowWidth = width * 0.85; 
     const gap = 4; 
-    const rows: (typeof pillData)[] = [];
-    let currentRow: typeof pillData = [];
-    let currentRowWidth = 0;
-
-    pillData.forEach(data => {
-      if (currentRowWidth + data.pillWidth + gap > maxRowWidth && currentRow.length > 0) {
-        rows.push(currentRow);
-        currentRow = [];
-        currentRowWidth = 0;
-      }
-      currentRow.push(data);
-      currentRowWidth += data.pillWidth + gap;
-    });
-    if (currentRow.length > 0) {
-      rows.push(currentRow);
-    }
-
-    const bodiesToDrop: { body: Matter.Body, data: typeof pillData[0] }[] = [];
-    // We reverse rows so we build the layout structure from bottom to top...
-    // But when we spawn them dynamically to fall in, we should drop the BOTTOM row FIRST!
-    // So the bottom row falls, then the next row falls on top of it.
+    const bodiesToDrop: { body: Matter.Body, data: any }[] = [];
     
-    rows.reverse().forEach((row) => {
-      const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
-      let currentX = (width - rowTotalWidth) / 2; 
-
-      row.forEach((data) => {
-        const x = currentX + (data.pillWidth / 2);
-        // Spawn just above the visible canvas so it falls in naturally
-        const y = -100; 
-
-        const isCreative = data.item.category === 'creative';
-        const isAI = data.item.category === 'ai';
-        const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
-
-        const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
-          restitution: 0.6,
-          friction: 0.1,
-          chamfer: { radius: data.pillHeight / 2 },
-          collisionFilter: { category: 0x0001 },
-          render: {
-            fillStyle: '#111822',
-            strokeStyle: accentColor,
-            lineWidth: 1
-          }
-        });
-        
-        itemMapRef.current.set(body.id, { item: data.item, width: data.pillWidth, height: data.pillHeight });
-        bodiesToDrop.push({ body, data });
-
-        currentX += data.pillWidth + gap;
+    const buildPile = (pileItems: TechItem[], startX: number, pileW: number) => {
+      const pillData = pileItems.sort(() => Math.random() - 0.5).map(item => {
+        const textWidth = item.name.length * 8 + 40; 
+        const pillWidth = Math.max(120, textWidth);
+        return { item, pillWidth, pillHeight: 44 };
       });
-    });
+
+      const rows: (typeof pillData)[] = [];
+      let currentRow: typeof pillData = [];
+      let currentRowWidth = 0;
+
+      pillData.forEach(data => {
+        if (currentRowWidth + data.pillWidth + gap > pileW && currentRow.length > 0) {
+          rows.push(currentRow);
+          currentRow = [];
+          currentRowWidth = 0;
+        }
+        currentRow.push(data);
+        currentRowWidth += data.pillWidth + gap;
+      });
+      if (currentRow.length > 0) rows.push(currentRow);
+
+      rows.reverse().forEach((row) => {
+        const rowTotalWidth = row.reduce((sum, data) => sum + data.pillWidth, 0) + (row.length - 1) * gap;
+        let currentX = startX + (pileW - rowTotalWidth) / 2; 
+
+        row.forEach((data) => {
+          const x = currentX + (data.pillWidth / 2);
+          // Spawn just above the visible canvas so it falls in naturally
+          const y = -100 - (Math.random() * 50); 
+
+          const isCreative = data.item.category === 'creative';
+          const isAI = data.item.category === 'ai';
+          const accentColor = isCreative ? '#E8854A' : isAI ? '#F59E0B' : '#22D3AE';
+
+          const body = Matter.Bodies.rectangle(x, y, data.pillWidth, data.pillHeight, {
+            restitution: 0.6,
+            friction: 0.1,
+            chamfer: { radius: data.pillHeight / 2 },
+            collisionFilter: { category: 0x0001 },
+            render: {
+              fillStyle: '#111822',
+              strokeStyle: accentColor,
+              lineWidth: 1
+            }
+          });
+          
+          itemMapRef.current.set(body.id, { item: data.item, width: data.pillWidth, height: data.pillHeight });
+          bodiesToDrop.push({ body, data });
+
+          currentX += data.pillWidth + gap;
+        });
+      });
+    };
+
+    const techItems = items.filter(i => i.category !== 'creative' && i.category !== 'ai');
+    const aiItems = items.filter(i => i.category === 'ai');
+    const creativeItems = items.filter(i => i.category === 'creative');
+
+    // Pile 1: Engineering (Left 50%)
+    buildPile(techItems, width * 0.05, width * 0.45);
+    
+    // Pile 2: AI & ML (Middle 25%)
+    buildPile(aiItems, width * 0.52, width * 0.23);
+    
+    // Pile 3: Creative (Right 20%)
+    buildPile(creativeItems, width * 0.77, width * 0.18);
 
     const timeouts: NodeJS.Timeout[] = [];
     
