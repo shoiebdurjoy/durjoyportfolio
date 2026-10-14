@@ -182,11 +182,13 @@ export default function Hero() {
                 style={{
                   maskImage:
                     'radial-gradient(circle 46cqw at 50% calc(100% - 46cqw), #000 99.5%, transparent 100%), linear-gradient(#000, #000)',
-                  maskSize: '100% 100%, 100% calc(100% - 46cqw)',
+                  maskSize: '100% 100%, 64% calc(100% - 46cqw)',
+                  maskPosition: '0 0, 50% 0',
                   maskRepeat: 'no-repeat',
                   WebkitMaskImage:
                     'radial-gradient(circle 46cqw at 50% calc(100% - 46cqw), #000 99.5%, transparent 100%), linear-gradient(#000, #000)',
-                  WebkitMaskSize: '100% 100%, 100% calc(100% - 46cqw)',
+                  WebkitMaskSize: '100% 100%, 64% calc(100% - 46cqw)',
+                  WebkitMaskPosition: '0 0, 50% 0',
                   WebkitMaskRepeat: 'no-repeat',
                 }}
               >
@@ -196,7 +198,7 @@ export default function Hero() {
                   width={358}
                   height={722}
                   priority
-                  className="absolute left-[10%] top-0 h-auto w-[80%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
+                  className="absolute left-[13%] top-[5%] h-auto w-[70%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
                 />
               </div>
             </div>
