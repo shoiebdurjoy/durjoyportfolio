@@ -1,213 +1,99 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-import MagneticButton from '@/src/components/ui/MagneticButton';
-
-type TechItem = {
-  name: string;
-  category: 'languages' | 'frameworks' | 'systems' | 'ai' | 'creative';
-  context: string;
-};
-
-const row1: TechItem[] = [
-  { name: 'Python', category: 'languages', context: 'Used in AI pipelines, thesis research, and FastAPI/Flask backends' },
-  { name: 'TypeScript', category: 'languages', context: 'Primary language for DurjoyAI, LowKeyBD, and web platforms' },
-  { name: 'Next.js', category: 'frameworks', context: 'Full-stack framework for LowKeyBD platform and this portfolio' },
-  { name: 'PyTorch', category: 'ai', context: 'Deep learning framework for Bangla Multimodal Emotion Recognition thesis' },
-  { name: 'NestJS', category: 'frameworks', context: 'Enterprise backend architecture for LowKeyBD REST & WebSocket APIs' },
-  { name: 'FastAPI', category: 'frameworks', context: 'High-throughput async Python APIs for AI model serving' },
-  { name: 'C++', category: 'languages', context: 'Academic foundation for algorithms and data structures at BRAC University' },
-];
-
-const row2: TechItem[] = [
-  { name: 'Docker', category: 'systems', context: 'Containerization across DurjoyAI and full-stack environments' },
-  { name: 'PostgreSQL', category: 'systems', context: 'Primary relational database for EMERGON and LowKeyBD' },
-  { name: 'Redis', category: 'systems', context: 'In-memory caching and session store for LowKeyBD' },
-  { name: 'Flask', category: 'frameworks', context: 'Backend REST API and Socket.IO engine for EMERGON system' },
-  { name: 'React', category: 'frameworks', context: 'Component-driven UI development across multiple platforms' },
-  { name: 'CUDA', category: 'ai', context: 'GPU acceleration for training multimodal thesis models' },
-  { name: 'Git & Linux', category: 'systems', context: 'Version control, shell scripting, and server infrastructure' },
-];
-
-const row3: TechItem[] = [
-  { name: 'Premiere Pro', category: 'creative', context: 'Primary NLE editor for 3+ years at Think Big Brand agency' },
-  { name: 'After Effects', category: 'creative', context: 'Motion graphics, visual effects, and typography animation' },
-  { name: 'DaVinci Resolve', category: 'creative', context: 'Color grading and post-production delivery' },
-  { name: 'Alexa Skills', category: 'ai', context: 'Voice command interface built for DurjoyAI PC control' },
-  { name: 'OpenAI API', category: 'ai', context: 'LLM engine integration and prompt orchestration in DurjoyAI' },
-  { name: 'CapCut', category: 'creative', context: 'High-velocity short-form social content creation' },
-  { name: 'Socket.IO', category: 'systems', context: 'Real-time bidirectional event dispatch for EMERGON emergency alerts' },
-];
-
-function MarqueeRow({
-  items,
-  direction = 'left',
-  speed = 35,
-  onHoverItem,
-}: {
-  items: TechItem[];
-  direction?: 'left' | 'right';
-  speed?: number;
-  onHoverItem: (item: TechItem | null) => void;
-}) {
-  const [isPaused, setIsPaused] = useState(false);
-
-  // Duplicate list multiple times to create a seamless infinite marquee on ultra-wide screens
-  const displayItems = [...items, ...items, ...items, ...items, ...items, ...items];
-
-  return (
-    <div
-      className="relative flex overflow-hidden py-1.5"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => {
-        setIsPaused(false);
-        onHoverItem(null);
-      }}
-    >
-      <motion.div
-        className="flex gap-3 shrink-0"
-        animate={{
-          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
-        }}
-        transition={{
-          x: {
-            duration: speed,
-            repeat: Infinity,
-            ease: 'linear',
-            repeatType: 'loop',
-          },
-        }}
-        style={{
-          animationPlayState: isPaused ? 'paused' : 'running',
-        }}
-      >
-        {displayItems.map((tech, idx) => {
-          const isCreative = tech.category === 'creative';
-          const isAI = tech.category === 'ai';
-
-          return (
-            <MagneticButton key={`${tech.name}-${idx}`} strength={10}>
-              <div
-                onMouseEnter={() => onHoverItem(tech)}
-                className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-[#0D1117]/90 text-[12px] font-mono cursor-pointer transition-all duration-200 select-none shrink-0 ${
-                  isCreative
-                    ? 'border-[rgba(232,133,74,0.2)] hover:border-[#E8854A] hover:bg-[#E8854A]/10 hover:shadow-[0_0_15px_rgba(232,133,74,0.25)] text-[#EDEAE3]'
-                    : isAI
-                    ? 'border-[rgba(245,158,11,0.25)] hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 hover:shadow-[0_0_15px_rgba(245,158,11,0.25)] text-[#EDEAE3]'
-                    : 'border-[rgba(34,211,174,0.2)] hover:border-[#22D3AE] hover:bg-[#22D3AE]/10 hover:shadow-[0_0_15px_rgba(34,211,174,0.25)] text-[#EDEAE3]'
-                }`}
-              >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isCreative
-                      ? 'bg-[#E8854A]'
-                      : isAI
-                      ? 'bg-[#F59E0B]'
-                      : 'bg-[#22D3AE]'
-                  }`}
-                />
-                <span className="font-medium text-[#EDEAE3] group-hover:text-white">
-                  {tech.name}
-                </span>
-              </div>
-            </MagneticButton>
-          );
-        })}
-      </motion.div>
-    </div>
-  );
-}
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { stackGroups } from '@/src/data/content';
+import { LineReveal, SectionLabel } from '@/src/components/ui/Reveal';
 
 export default function TechStack() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-80px' });
-  const [activeTech, setActiveTech] = useState<TechItem | null>(null);
+  const [active, setActive] = useState(0);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const group = stackGroups[active];
+  const current = group.items.find((i) => i.name === hovered);
 
   return (
-    <section
-      id="stack"
-      ref={containerRef}
-      className="relative py-24 md:py-32 border-t border-[rgba(237,234,227,0.06)] bg-[#07090C] overflow-hidden"
-    >
-      {/* Edge Gradient Fades for Smooth Marquee */}
-      <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#07090C] to-transparent z-10 pointer-events-none" />
-      <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#07090C] to-transparent z-10 pointer-events-none" />
+    <section id="stack" className="border-y border-line bg-white">
+      <div className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
+        <SectionLabel index="03">Toolkit</SectionLabel>
+        <h2 className="mt-6 font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[0.95] tracking-[-0.02em]">
+          <LineReveal text="Tools I actually" />
+          <LineReveal text="use, daily." delay={0.08} className="italic text-muted" />
+        </h2>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10 mb-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col items-center justify-center text-center gap-6"
-        >
-          <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center gap-2.5 font-mono text-[11px] tracking-[3px] uppercase text-[#F59E0B] mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
-              Tech Stack // Applied Engineering
+        <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-12">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar lg:col-span-4 lg:flex-col lg:gap-0" role="tablist" aria-label="Tool categories">
+            {stackGroups.map((g, i) => (
+              <button
+                key={g.key}
+                role="tab"
+                aria-selected={active === i}
+                onClick={() => { setActive(i); setHovered(null); }}
+                className={`group flex shrink-0 items-baseline justify-between gap-6 rounded-full border px-5 py-3 text-left transition-colors lg:rounded-none lg:border-0 lg:border-b lg:border-line lg:px-0 lg:py-6 ${
+                  active === i ? 'border-ink bg-ink text-white lg:bg-transparent lg:text-ink' : 'border-line text-muted hover:text-ink'
+                }`}
+              >
+                <span className="font-serif text-2xl lg:text-5xl">
+                  {active === i && <span className="mr-3 hidden text-accent lg:inline">→</span>}
+                  {g.title}
+                </span>
+                <span className="text-[13px] tabular-nums">{String(g.items.length).padStart(2, '0')}</span>
+              </button>
+            ))}
+            <p className="mt-6 hidden text-[15px] text-muted lg:block">{group.blurb}</p>
+          </div>
+
+          <div className="lg:col-span-8">
+            <AnimatePresence mode="wait">
+              <motion.ul
+                key={group.key}
+                className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                variants={{ show: { transition: { staggerChildren: 0.03 } }, hidden: {} }}
+              >
+                {group.items.map((item) => (
+                  <motion.li
+                    key={item.name}
+                    variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <button
+                      onMouseEnter={() => setHovered(item.name)}
+                      onFocus={() => setHovered(item.name)}
+                      onClick={() => setHovered(item.name)}
+                      className={`flex w-full items-center justify-between rounded-2xl border px-5 py-5 text-left text-[16px] font-medium transition-all duration-300 ${
+                        hovered === item.name ? 'border-accent bg-accent-soft' : 'border-line bg-paper hover:border-ink/30'
+                      }`}
+                    >
+                      {item.name}
+                      <span className={`h-2 w-2 rounded-full transition-colors ${hovered === item.name ? 'bg-accent' : 'bg-ink/15'}`} />
+                    </button>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </AnimatePresence>
+
+            <div className="mt-6 flex min-h-[72px] items-center gap-4 rounded-2xl bg-ink px-6 py-5 text-white" aria-live="polite">
+              <span className="text-accent">✦</span>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={current?.name ?? 'hint'}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25 }}
+                  className="text-[15px] leading-snug"
+                >
+                  {current ? (
+                    <><strong className="font-semibold">{current.name}</strong> <span className="text-white/70">— {current.context}</span></>
+                  ) : (
+                    <span className="text-white/60">Hover or tap any tool to see where I&apos;ve used it in real work.</span>
+                  )}
+                </motion.p>
+              </AnimatePresence>
             </div>
-            <h2 className="font-serif text-[clamp(2rem,4vw,3.2rem)] font-black uppercase tracking-[-0.02em] leading-[1] text-[#EDEAE3]">
-              Tools I actually use.
-            </h2>
           </div>
-
-          <div className="font-mono text-[11px] text-[#EDEAE3]/40 flex items-center justify-center flex-wrap gap-4 mt-2">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#22D3AE]" /> Engineering
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#F59E0B]" /> AI & ML
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#E8854A]" /> Video & Motion
-            </span>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Marquee Rows */}
-      <motion.div
-        className="space-y-3.5 relative z-10 max-w-[100vw]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={{
-          visible: { transition: { staggerChildren: 0.15 } },
-          hidden: {},
-        }}
-      >
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
-          <MarqueeRow items={row1} direction="left" speed={40} onHoverItem={setActiveTech} />
-        </motion.div>
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
-          <MarqueeRow items={row2} direction="right" speed={45} onHoverItem={setActiveTech} />
-        </motion.div>
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
-          <MarqueeRow items={row3} direction="left" speed={38} onHoverItem={setActiveTech} />
-        </motion.div>
-      </motion.div>
-
-      {/* Interactive Tooltip Context Box */}
-      <div className="max-w-6xl mx-auto px-6 md:px-12 mt-8 min-h-[44px]">
-        <div className="p-3.5 rounded-lg border border-[rgba(237,234,227,0.08)] bg-[#0D1117]/80 flex flex-col md:flex-row items-center justify-center text-center gap-4">
-          <div className="font-mono text-[11px] text-[#EDEAE3]/50 flex items-center gap-2">
-            <span className="text-[#F59E0B]">ⓘ</span>
-            <span>
-              {activeTech ? (
-                <>
-                  <strong className="text-[#EDEAE3] font-semibold">{activeTech.name}:</strong>{' '}
-                  <span className="text-[#EDEAE3]/80">{activeTech.context}</span>
-                </>
-              ) : (
-                'Hover any technology pill to see where and how it was used in real projects.'
-              )}
-            </span>
-          </div>
-          {activeTech && (
-            <span className="font-mono text-[9px] uppercase tracking-[1.5px] px-2 py-0.5 rounded bg-[#EDEAE3]/10 text-[#EDEAE3]/60 hidden sm:inline-block">
-              {activeTech.category}
-            </span>
-          )}
         </div>
       </div>
     </section>

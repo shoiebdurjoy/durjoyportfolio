@@ -1,80 +1,51 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useState } from 'react';
+import { MotionConfig } from 'framer-motion';
 import Navigation from '@/src/components/Navigation';
-import CommandPalette from '@/src/components/CommandPalette';
-import HeroSplit from '@/src/components/hero/HeroSplit';
+import Hero from '@/src/components/Hero';
 import AboutSection from '@/src/components/AboutSection';
-import TechStack from '@/src/components/TechStack';
 import ProjectsSection from '@/src/components/ProjectsSection';
+import TechStack from '@/src/components/TechStack';
 import ThesisSection from '@/src/components/ThesisSection';
 import VideoSection from '@/src/components/VideoSection';
 import GitHubSection from '@/src/components/GitHubSection';
 import ContactSection from '@/src/components/ContactSection';
-import LiveHUD from '@/src/components/ui/LiveHUD';
-import MobileHero from '@/src/components/hero/MobileHero';
+
+const CommandPalette = dynamic(() => import('@/src/components/CommandPalette'), { ssr: false });
+const Cursor = dynamic(() => import('@/src/components/ui/Cursor'), { ssr: false });
+
 export default function Home() {
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile(); // Check immediately on client mount
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Global shortcut: Cmd/Ctrl + K
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
+        setPaletteOpen((o) => !o);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#07090C] text-[#EDEAE3] selection:bg-[#F59E0B] selection:text-[#07090C] overflow-x-hidden">
-      {/* Fixed Navigation Bar */}
-      <Navigation onCommandPaletteOpen={() => setIsCommandPaletteOpen(true)} />
-
-      {/* Premium Live HUD Overlay */}
-      <LiveHUD />
-
-      {/* Global Command Palette */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-      />
-
-      <main className="w-full">
-        {/* 1. Hero: Interactive BUILD ↔ CUT (B&W to Full Color) */}
-        {isMobile ? <MobileHero /> : <HeroSplit />}
-
-        {/* 2. About & Statistics Cards */}
+    <MotionConfig reducedMotion="user">
+      <Cursor />
+      <Navigation onCommandPaletteOpen={() => setPaletteOpen(true)} />
+      <main>
+        <Hero />
         <AboutSection />
-
-        {/* 3. Tech Stack: Interactive Marquee with Project Context Tooltips */}
-        <TechStack />
-
-        {/* 4. Selected Work: Featured DurjoyAI with Case Study Modal & Grid */}
         <ProjectsSection />
-
-        {/* 5. Thesis: Interactive Deep Learning Research Pipeline */}
+        <TechStack />
         <ThesisSection />
-
-        {/* 6. The Cutting Room: Dedicated Video Editing & Agency Showcase */}
         <VideoSection />
-
-        {/* 7. Open Source: Live GitHub Activity & Contribution Heatmap */}
         <GitHubSection />
-
-        {/* 8. Contact & Minimal Editorial Footer */}
         <ContactSection />
       </main>
-    </div>
+      {paletteOpen && <CommandPalette onClose={closePalette} />}
+    </MotionConfig>
   );
 }

@@ -1,141 +1,68 @@
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700;1,900&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
-
 @import "tailwindcss";
 
-/* ============================================
-   DURJOY PORTFOLIO — Master Design System
-   "The Architect & The Auteur"
-   ============================================ */
-
 @theme {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Playfair Display", Georgia, Cambria, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-  --color-background: #06080B;
-  --color-foreground: #F8FAFC;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), Georgia, serif;
+
+  --color-paper: #F5F3EE;
+  --color-card: #FFFFFF;
+  --color-ink: #121210;
+  --color-ink-soft: #3A3934;
+  --color-muted: #77756D;
+  --color-line: #E3E0D8;
+  --color-accent: #FF4F1A;
+  --color-accent-soft: #FFE6DB;
+
+  --color-clay: #F3DFD2;
+  --color-sage: #DCE5D6;
+  --color-sky: #D9E3EE;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-:root {
-  /* Obsidian Base Palette */
-  --bg-primary: #06080B;
-  --bg-surface: #0C1017;
-  --bg-card: #111722;
-  --bg-card-hover: #161E2E;
-
-  /* Accent Color System */
-  --accent-teal: #00F2C3;
-  --accent-teal-glow: rgba(0, 242, 195, 0.2);
-  --accent-gold: #F59E0B;
-  --accent-gold-glow: rgba(245, 158, 11, 0.25);
-  --accent-amber: #EA580C;
-  --accent-amber-glow: rgba(234, 88, 12, 0.2);
-
-  /* Text Hierarchy */
-  --text-primary: #F8FAFC;
-  --text-secondary: rgba(248, 250, 252, 0.72);
-  --text-muted: rgba(248, 250, 252, 0.45);
-  --text-dim: rgba(248, 250, 252, 0.25);
-
-  /* Subtle Borders */
-  --border-subtle: rgba(248, 250, 252, 0.08);
-  --border-hover: rgba(248, 250, 252, 0.18);
-}
-
-
 
 html {
-  scroll-behavior: smooth;
+  background: var(--color-paper);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--bg-primary);
-  color: var(--text-primary);
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
+  background: var(--color-paper);
   overflow-x: hidden;
-  min-height: 100vh;
 }
 
 ::selection {
-  background: var(--accent-gold);
-  color: #06080B;
+  background: var(--color-accent);
+  color: #fff;
 }
 
-/* Luxury Smooth Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #06080B;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(248, 250, 252, 0.15);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.5);
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(248, 250, 252, 0.15) #06080B;
-}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
 
-/* Reduced Motion Safety */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 40s linear infinite; }
+
+@keyframes blink { 50% { opacity: 0; } }
+.animate-blink { animation: blink 1s step-end infinite; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Focus Ring */
-:focus-visible {
-  outline: 2px solid var(--accent-gold);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Custom Glass & Glow Utilities */
-.glass-panel {
-  background: rgba(12, 16, 23, 0.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-.glow-gold {
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.18), 0 0 50px rgba(245, 158, 11, 0.06);
-}
-
-.glow-teal {
-  box-shadow: 0 0 25px rgba(0, 242, 195, 0.18), 0 0 50px rgba(0, 242, 195, 0.06);
-}
-
-.glow-amber {
-  box-shadow: 0 0 25px rgba(234, 88, 12, 0.18), 0 0 50px rgba(234, 88, 12, 0.06);
-}
-
-@keyframes grain {
-  0%, 100% { transform: translate(0, 0); }
-  10% { transform: translate(-5%, -5%); }
-  20% { transform: translate(-10%, 5%); }
-  30% { transform: translate(5%, -10%); }
-  40% { transform: translate(-5%, 15%); }
-  50% { transform: translate(-10%, 5%); }
-  60% { transform: translate(15%, 0); }
-  70% { transform: translate(0, 10%); }
-  80% { transform: translate(-15%, 0); }
-  90% { transform: translate(10%, 5%); }
-}
-
-.animate-grain {
-  animation: grain 8s steps(10) infinite;
 }

@@ -1,179 +1,148 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import MagneticButton from '@/src/components/ui/MagneticButton';
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { navLinks, profile } from '@/src/data/content';
+import { useFocusTrap } from '@/src/components/ui/useFocusTrap';
 
-type NavigationProps = {
-  onCommandPaletteOpen: () => void;
-};
+export function scrollToId(href: string) {
+  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+}
 
-const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Stack', href: '#stack' },
-  { label: 'Work', href: '#work' },
-  { label: 'Thesis', href: '#thesis' },
-  { label: 'Video', href: '#cutting-room' },
-  { label: 'GitHub', href: '#github' },
-  { label: 'Contact', href: '#contact' },
-];
-
-export default function Navigation({ onCommandPaletteOpen }: NavigationProps) {
+export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteOpen: () => void }) {
+  const { scrollY, scrollYProgress } = useScroll();
+  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useFocusTrap(drawerRef, open, close);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setScrolled(y > 80);
-      setScrollProgress(max > 0 ? (y / max) * 100 : 0);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    const id = requestAnimationFrame(() => setScrolled(window.scrollY > 24));
+    return () => cancelAnimationFrame(id);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [mobileMenuOpen]);
+  useMotionValueEvent(scrollY, 'change', (v) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setHidden(v > prev && v > 400 && !open);
+    setScrolled(v > 24);
+  });
 
-  const handleLinkClick = (href: string) => {
-    setMobileMenuOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+  const go = (href: string) => {
+    setOpen(false);
+    scrollToId(href);
   };
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          scrolled
-            ? 'bg-[#07090C]/90 backdrop-blur-xl border-b border-[rgba(237,234,227,0.06)]'
-            : 'bg-transparent'
-        }`}
+      <motion.header
+        className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
+        animate={{ y: hidden ? -100 : 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Progress bar */}
-        <div
-          className="absolute top-0 left-0 h-[1.5px] bg-[#F59E0B] z-50 transition-all duration-100"
-          style={{ width: `${scrollProgress}%` }}
-        />
+        <nav
+          aria-label="Primary"
+          className={`relative flex w-full max-w-6xl items-center justify-between rounded-full border px-3 py-2 pl-5 transition-all duration-500 ${
+            scrolled ? 'border-line bg-white/75 shadow-[0_8px_30px_-12px_rgba(18,18,16,0.15)] backdrop-blur-xl' : 'border-transparent bg-transparent'
+          }`}
+        >
+          <button onClick={() => go('#top')} className="flex items-baseline gap-1 text-ink" aria-label="Back to top">
+            <span className="font-serif text-2xl leading-none">Durjoy</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          </button>
 
-        <div className="h-14 md:h-16 flex items-center justify-between px-6 md:px-12 max-w-7xl mx-auto">
-          {/* Logo */}
-          <MagneticButton strength={15}>
+          <ul className="hidden items-center gap-1 md:flex">
+            {navLinks.map((l) => (
+              <li key={l.href}>
+                <button
+                  onClick={() => go(l.href)}
+                  className="rounded-full px-3.5 py-2 text-[14px] font-medium text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
+                >
+                  {l.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-baseline gap-1 select-none group cursor-pointer"
+              onClick={onCommandPaletteOpen}
+              aria-label="Open command palette"
+              className="hidden h-10 items-center gap-2 rounded-full border border-line bg-white px-3 text-[13px] text-muted transition-colors hover:text-ink sm:flex"
             >
-              <span className="font-serif text-lg tracking-tight text-[#EDEAE3] group-hover:text-[#F59E0B] transition-colors">
-                DURJOY
-              </span>
-              <span className="font-mono text-[10px] text-[#EDEAE3]/30 tracking-wider">.dev</span>
+              Search
+              <kbd className="rounded-md bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">⌘K</kbd>
             </button>
-          </MagneticButton>
-
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-7">
-            <nav className="flex gap-6">
-              {NAV_LINKS.map((link) => (
-                <MagneticButton key={link.label} strength={20}>
-                  <button
-                    onClick={() => handleLinkClick(link.href)}
-                    className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#EDEAE3]/50 hover:text-[#EDEAE3] transition-colors cursor-pointer block py-2"
-                  >
-                    {link.label}
-                  </button>
-                </MagneticButton>
-              ))}
-            </nav>
-
-            {/* Resume CTA */}
-            <MagneticButton strength={25}>
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-[10px] font-bold uppercase tracking-[1.5px] text-[#07090C] bg-[#F59E0B] hover:bg-[#F59E0B]/90 px-4 py-2 rounded-full transition-colors shadow-[0_0_15px_rgba(245,158,11,0.3)] block"
-              >
-                Resume
-              </a>
-            </MagneticButton>
-
-            {/* Cmd+K trigger */}
-            <MagneticButton strength={30}>
-              <button
-                onClick={onCommandPaletteOpen}
-                className="flex items-center gap-2 px-3 py-1.5 rounded border border-[rgba(237,234,227,0.1)] hover:border-[#F59E0B]/50 hover:bg-[#F59E0B]/[0.05] transition-all cursor-pointer"
-                aria-label="Open command palette"
-              >
-                <span className="font-mono text-[10px] text-[#EDEAE3]/40">Search</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-[#131920] border border-[rgba(237,234,227,0.1)] font-mono text-[9px] text-[#F59E0B]">
-                  ⌘K
-                </kbd>
-              </button>
-            </MagneticButton>
+            <a
+              href={`mailto:${profile.email}`}
+              className="hidden h-10 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-white transition-transform hover:scale-[1.03] sm:flex"
+            >
+              <span className="h-2 w-2 rounded-full bg-[#3DDC84] shadow-[0_0_0_3px_rgba(61,220,132,0.25)]" />
+              Let&apos;s talk
+            </a>
+            <button
+              onClick={() => setOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white md:hidden"
+              aria-label="Open menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 8h16M4 16h16" /></svg>
+            </button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] z-50 cursor-pointer"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <span className={`block w-5 h-[1.5px] bg-[#EDEAE3] transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-[6.5px]' : ''}`} />
-            <span className={`block w-5 h-[1.5px] bg-[#EDEAE3] transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-[1.5px] bg-[#EDEAE3] transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-[6.5px]' : ''}`} />
-          </button>
-        </div>
-      </header>
+          <motion.span
+            aria-hidden
+            className="absolute inset-x-6 -bottom-px h-px origin-left bg-accent"
+            style={{ scaleX: scrollYProgress, opacity: scrolled ? 1 : 0 }}
+          />
+        </nav>
+      </motion.header>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {open && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-30 bg-[#07090C]/98 backdrop-blur-xl flex flex-col items-center justify-center p-6"
+            id="mobile-menu"
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="fixed inset-0 z-[60] flex flex-col bg-paper px-6 pb-10 pt-6"
+            initial={{ opacity: 0, y: -24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -24 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           >
-            <nav className="flex flex-col items-center gap-6">
-              {NAV_LINKS.map((link, i) => (
-                <motion.button
-                  key={link.label}
-                  initial={{ opacity: 0, y: 15 }}
+            <div className="flex items-center justify-between">
+              <span className="font-serif text-2xl">Durjoy<span className="text-accent">.</span></span>
+              <button onClick={close} aria-label="Close menu" className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
+            </div>
+            <ul className="mt-14 flex flex-1 flex-col gap-1">
+              {navLinks.map((l, i) => (
+                <motion.li
+                  key={l.href}
+                  initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.04 + i * 0.04, duration: 0.3 }}
-                  onClick={() => handleLinkClick(link.href)}
-                  className="font-serif text-3xl text-[#EDEAE3] hover:text-[#F59E0B] transition-colors"
+                  transition={{ delay: 0.15 + i * 0.05, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {link.label}
-                </motion.button>
+                  <button onClick={() => go(l.href)} className="flex w-full items-baseline gap-4 border-b border-line py-3 text-left">
+                    <span className="text-[12px] text-muted">0{i + 1}</span>
+                    <span className="font-serif text-5xl">{l.label}</span>
+                  </button>
+                </motion.li>
               ))}
-              
-              <motion.a
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.30, duration: 0.3 }}
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 font-mono text-[13px] text-[#07090C] px-10 py-3.5 rounded-full bg-[#F59E0B] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-              >
-                Download Resume
-              </motion.a>
-              <motion.button
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.3 }}
-                onClick={() => { setMobileMenuOpen(false); onCommandPaletteOpen(); }}
-                className="mt-4 font-mono text-xs text-[#F59E0B] border border-[#F59E0B]/30 px-6 py-2.5 rounded-full bg-[#F59E0B]/10"
-              >
-                Search Commands (⌘K)
-              </motion.button>
-            </nav>
+            </ul>
+            <div className="flex flex-col gap-3">
+              <a href={`mailto:${profile.email}`} className="rounded-full bg-accent py-4 text-center font-medium text-white">
+                {profile.email}
+              </a>
+              <a href={profile.resume} target="_blank" rel="noopener noreferrer" className="rounded-full border border-ink py-4 text-center font-medium">
+                Download résumé
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

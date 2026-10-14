@@ -1,50 +1,42 @@
 import { NextResponse } from 'next/server';
 
+type Day = { date: string; level: number };
+type Week = { week: number; days: Day[] };
+
+let lastGood: Week[] | null = null;
+
+const CACHE = 'public, s-maxage=3600, stale-while-revalidate=86400';
+
 export async function GET() {
   try {
     const res = await fetch('https://github.com/users/shoiebdurjoy/contributions', {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 },
     });
-    
-    if (!res.ok) {
-      throw new Error(`Failed to fetch GitHub contributions: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`GitHub responded ${res.status}`);
 
     const html = await res.text();
     const regex = /<td[^>]+data-date="([^"]+)"[^>]+data-level="([^"]+)"[^>]*>/g;
-    
-    const days: { date: string; level: number }[] = [];
+    const days: Day[] = [];
     let match;
     while ((match = regex.exec(html)) !== null) {
-      days.push({
-        date: match[1],
-        level: parseInt(match[2], 10)
-      });
+      days.push({ date: match[1], level: parseInt(match[2], 10) });
     }
+    if (!days.length) throw new Error('No contribution cells parsed');
 
-    // The days array is grouped by day of week (all Sundays, then all Mondays, etc.)
-    // We have 371 days (53 weeks * 7 days).
-    const weeksCount = Math.ceil(days.length / 7); // Usually 53
-    const weeks: { week: number; days: { date: string; level: number }[] }[] = Array.from(
-      { length: weeksCount },
-      (_, i) => ({ week: i, days: [] })
-    );
+    // GitHub renders rows by weekday, so cell i belongs to weekday floor(i / weeks), week i % weeks.
+    const weeksCount = Math.ceil(days.length / 7);
+    const weeks: Week[] = Array.from({ length: weeksCount }, (_, i) => ({ week: i, days: [] }));
+    days.forEach((d, i) => {
+      weeks[i % weeksCount].days[Math.floor(i / weeksCount)] = d;
+    });
 
-    for (let i = 0; i < days.length; i++) {
-      // index i corresponds to (dayOfWeek * weeksCount) + weekIndex
-      const dayOfWeek = Math.floor(i / weeksCount);
-      const weekIndex = i % weeksCount;
-      if (weeks[weekIndex]) {
-        weeks[weekIndex].days[dayOfWeek] = days[i];
-      }
-    }
-
-    // Ensure all days are packed correctly and filter empty weeks
-    const validWeeks = weeks.filter(w => w.days.length > 0);
-
-    return NextResponse.json({ weeks: validWeeks });
+    lastGood = weeks;
+    return NextResponse.json({ weeks }, { headers: { 'Cache-Control': CACHE } });
   } catch (error) {
-    console.error('Error fetching GitHub data:', error);
-    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+    console.error('GitHub contributions fetch failed:', error);
+    return NextResponse.json(
+      { weeks: lastGood ?? [], stale: true },
+      { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } },
+    );
   }
 }
