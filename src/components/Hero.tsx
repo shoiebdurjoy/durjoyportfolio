@@ -162,19 +162,6 @@ export default function Hero() {
                     opacity: mode === 'build' ? 1 : 0.2,
                   }}
                 />
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={mode}
-                    aria-hidden
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ duration: 0.6, ease }}
-                    className="absolute inset-x-0 bottom-[8%] text-center font-serif text-[30cqw] italic leading-none text-white/20"
-                  >
-                    {mode === 'build' ? 'build.' : 'cut.'}
-                  </motion.span>
-                </AnimatePresence>
               </div>
 
               <div
@@ -198,7 +185,7 @@ export default function Hero() {
                   width={358}
                   height={722}
                   priority
-                  className="absolute left-[13%] top-[5%] h-auto w-[70%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
+                  className="absolute left-[19%] top-[5%] h-auto w-[70%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
                 />
               </div>
             </div>
