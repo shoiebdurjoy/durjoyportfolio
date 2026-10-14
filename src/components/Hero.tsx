@@ -191,12 +191,12 @@ export default function Hero() {
                 }}
               >
                 <Image
-                  src="/durjoy-portrait-2.webp"
+                  src="/durjoy-portrait-3.webp"
                   alt="Md Shoieb Hossain (Durjoy)"
-                  width={550}
-                  height={810}
+                  width={358}
+                  height={722}
                   priority
-                  className="absolute left-[6%] top-0 h-auto w-[88%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
+                  className="absolute left-[10%] top-0 h-auto w-[80%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
                 />
               </div>
             </div>
