@@ -1,173 +1,92 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { featuredRepos, profile } from '@/src/data/content';
+import { Reveal, SectionLabel } from '@/src/components/ui/Reveal';
 
-const featuredRepos = [
-  { name: 'DurjoyAI', desc: 'Alexa-powered intelligent modular assistant with Brain-0 memory context', lang: 'TypeScript', tag: 'Flagship' },
-  { name: 'lowkeybd', desc: 'Scalable full-stack platform built with Next.js and NestJS microservices', lang: 'TypeScript', tag: 'Platform' },
-  { name: 'Game-Critic', desc: 'Community video game review and aggregation platform with auth & ratings', lang: 'JavaScript', tag: 'Full-Stack' },
-  { name: 'Alexa-PC-Control', desc: 'Voice-controlled automated PC execution scripts and skill handler', lang: 'Python', tag: 'Tool' },
-];
+type Day = { date: string; level: number };
+type Week = { week: number; days: Day[] };
 
-type GithubDay = { date: string; level: number };
-type GithubWeek = { week: number; days: GithubDay[] };
+const levels = ['bg-paper', 'bg-[#FFD3C2]', 'bg-[#FFA27F]', 'bg-[#FF7444]', 'bg-accent'];
 
 export default function GitHubSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-80px' });
-  const [hoveredCell, setHoveredCell] = useState<{ date: string; level: number } | null>(null);
-  const [contributionWeeks, setContributionWeeks] = useState<GithubWeek[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [weeks, setWeeks] = useState<Week[] | null>(null);
+  const [hover, setHover] = useState<Day | null>(null);
 
   useEffect(() => {
-    async function fetchGitHubData() {
-      try {
-        const res = await fetch('/api/github');
-        const data = await res.json();
-        if (data.weeks) {
-          setContributionWeeks(data.weeks);
-        }
-      } catch (error) {
-        console.error('Failed to load GitHub data', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchGitHubData();
+    fetch('/api/github')
+      .then((r) => r.json())
+      .then((d) => setWeeks(d.weeks ?? []))
+      .catch(() => setWeeks([]));
   }, []);
 
-  const colors = [
-    'bg-[rgba(248,250,252,0.04)]',
-    'bg-[#00F2C3]/25',
-    'bg-[#00F2C3]/45',
-    'bg-[#00F2C3]/75',
-    'bg-[#00F2C3]',
-  ];
-
   return (
-    <section
-      id="github"
-      ref={containerRef}
-      className="relative py-28 md:py-40 bg-[#06080B] text-[#F8FAFC] border-t border-[rgba(248,250,252,0.06)] overflow-hidden"
-    >
-      <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-[rgba(248,250,252,0.08)] mb-16"
-        >
+    <section id="github" className="mx-auto max-w-6xl px-5 pb-28 md:px-8 md:pb-36">
+      <div className="rounded-[32px] border border-line bg-white p-6 md:p-10">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[11px] tracking-[3px] uppercase text-[#00F2C3] font-semibold mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00F2C3]" />
-              05 // Codebase Telemetry
-            </div>
-            <h2 className="font-serif text-[clamp(2.2rem,5vw,4rem)] font-black uppercase tracking-tight leading-[1.05] text-[#F8FAFC]">
-              GitHub Activity &<br />
-              <span className="text-[#00F2C3] italic font-normal">Contributions.</span>
+            <SectionLabel index="06">Open source</SectionLabel>
+            <h2 className="mt-5 font-serif text-5xl leading-none md:text-6xl">
+              Building <span className="italic text-muted">in public.</span>
             </h2>
           </div>
           <a
-            href="https://github.com/shoiebdurjoy"
+            href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-[#111722] hover:bg-[#00F2C3] hover:text-[#06080B] border border-[rgba(248,250,252,0.12)] font-mono text-[12px] font-semibold transition-all cursor-pointer shadow-lg"
+            className="inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-white transition-colors hover:bg-accent"
           >
-            <span>@shoiebdurjoy on GitHub</span>
-            <span>↗</span>
+            @{profile.githubHandle} ↗
           </a>
-        </motion.div>
-
-        {/* Heatmap Matrix Frame */}
-        <div className="rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017] p-6 md:p-8 shadow-2xl mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div className="font-mono text-[11px] uppercase tracking-[2px] text-[#F8FAFC]/50">
-              Last 365 Days Contribution Matrix
-            </div>
-            <div className="font-mono text-[11px] text-[#00F2C3]">
-              {hoveredCell ? (
-                <span>{hoveredCell.date} // Level {hoveredCell.level} activity</span>
-              ) : (
-                <span className="text-[#F8FAFC]/30">Hover any cell for activity details</span>
-              )}
-            </div>
-          </div>
-
-          <div className="overflow-x-auto pb-2">
-            {isLoading ? (
-              <div className="flex gap-[3.5px] min-w-[720px] animate-pulse">
-                {Array.from({ length: 53 }).map((_, i) => (
-                  <div key={i} className="flex flex-col gap-[3.5px]">
-                    {Array.from({ length: 7 }).map((_, j) => (
-                      <div key={j} className="w-[11.5px] h-[11.5px] rounded-[2px] bg-[#111722]" />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-flow-col auto-cols-[13px] gap-[3.5px] min-w-[720px]">
-                {contributionWeeks.map((week, weekIdx) => (
-                  <div key={weekIdx} className="grid grid-rows-7 gap-[3.5px]">
-                    {week.days.map((day, dayIdx) => (
-                      <div
-                        key={dayIdx}
-                        onMouseEnter={() => setHoveredCell({ date: day.date, level: day.level })}
-                        onMouseLeave={() => setHoveredCell(null)}
-                        className={`w-[11.5px] h-[11.5px] rounded-[2px] ${colors[day.level] || colors[0]} transition-transform hover:scale-125 cursor-pointer`}
-                        title={`${day.date} (Level ${day.level})`}
-                      />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[rgba(248,250,252,0.06)] font-mono text-[10px] text-[#F8FAFC]/40">
-            <span>Jan — Dec Active Engineering</span>
-            <div className="flex items-center gap-1.5">
-              <span>Less</span>
-              {colors.map((c, i) => (
-                <div key={i} className={`w-[10px] h-[10px] rounded-[2px] ${c}`} />
-              ))}
-              <span>More</span>
-            </div>
-          </div>
         </div>
 
-        {/* Featured Repos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {featuredRepos.map((repo) => (
-            <a
-              key={repo.name}
-              href={`https://github.com/shoiebdurjoy/${repo.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-5 rounded-xl border border-[rgba(248,250,252,0.08)] bg-[#0C1017]/80 hover:border-[#00F2C3]/50 hover:bg-[#0C1017] transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[12px] font-bold text-[#F8FAFC] group-hover:text-[#00F2C3] transition-colors">
-                    {repo.name}
-                  </span>
-                  <span className="font-mono text-[10px] text-[#F8FAFC]/40">↗</span>
+        <div className="mt-10 overflow-x-auto pb-2 no-scrollbar" data-lenis-prevent-horizontal>
+          <div className="flex min-w-[740px] gap-[4px]" aria-label="GitHub contribution calendar" role="img">
+            {(weeks && weeks.length ? weeks : Array.from({ length: 53 }, (_, i) => ({ week: i, days: [] as Day[] }))).map((w) => (
+              <div key={w.week} className="flex flex-1 flex-col gap-[4px]">
+                {Array.from({ length: 7 }).map((_, j) => {
+                  const d = w.days[j];
+                  return (
+                    <div
+                      key={j}
+                      onMouseEnter={() => d && setHover(d)}
+                      onMouseLeave={() => setHover(null)}
+                      className={`aspect-square w-full rounded-[3px] transition-transform hover:scale-125 ${d ? levels[d.level] ?? levels[0] : 'bg-paper'} ${!weeks ? 'animate-pulse' : ''}`}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-3 flex items-center justify-between text-[13px] text-muted">
+          <span>{hover ? `${hover.date} · level ${hover.level}` : 'Last 12 months'}</span>
+          <span className="flex items-center gap-1.5">
+            Less {levels.map((c) => <span key={c} className={`h-3 w-3 rounded-[3px] ${c}`} />)} More
+          </span>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {featuredRepos.map((r, i) => (
+            <Reveal key={r.name} delay={i * 0.05}>
+              <a
+                href={`${profile.github}/${r.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex h-full flex-col justify-between rounded-2xl bg-paper p-5 transition-colors hover:bg-accent-soft"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[16px] font-semibold">{r.name}</span>
+                    <span className="text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span>
+                  </div>
+                  <p className="mt-2 text-[14px] leading-snug text-ink-soft">{r.desc}</p>
                 </div>
-                <p className="font-sans text-[12px] text-[#F8FAFC]/60 leading-[1.5]">
-                  {repo.desc}
-                </p>
-              </div>
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-[rgba(248,250,252,0.05)] font-mono text-[10px] text-[#F8FAFC]/40">
-                <span className="flex items-center gap-1.5 text-[#00F2C3]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00F2C3]" />
-                  {repo.lang}
+                <span className="mt-5 flex items-center gap-2 text-[13px] text-muted">
+                  <span className="h-2 w-2 rounded-full bg-accent" /> {r.lang}
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-[#111722] text-[#F8FAFC]/50">
-                  {repo.tag}
-                </span>
-              </div>
-            </a>
+              </a>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -1,190 +1,97 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useMemo, useRef, useState } from 'react';
+import { navLinks, profile, projects } from '@/src/data/content';
+import { scrollToId } from '@/src/components/Navigation';
+import { useFocusTrap } from '@/src/components/ui/useFocusTrap';
 
-type Command = {
-  id: string;
-  label: string;
-  group: string;
-  icon: string;
-  action?: () => void;
-  url?: string;
-  keywords?: string;
-};
+type Command = { id: string; label: string; group: string; hint?: string; run: () => void };
 
 const commands: Command[] = [
-  // Navigation
-  { id: 'about', label: 'About', group: 'Navigation', icon: '→', action: () => { document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'work', label: 'Work', group: 'Navigation', icon: '→', action: () => { document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'stack', label: 'Tech Stack', group: 'Navigation', icon: '→', action: () => { document.querySelector('#stack')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'cutting-room', label: 'The Cutting Room', group: 'Navigation', icon: '→', action: () => { document.querySelector('#cutting-room')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'github-section', label: 'GitHub Activity', group: 'Navigation', icon: '→', action: () => { document.querySelector('#github')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'contact', label: 'Contact', group: 'Navigation', icon: '→', action: () => { document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' }); } },
-  // Projects
-  { id: 'durjoyai', label: 'DurjoyAI', group: 'Projects', icon: '◆', keywords: 'ai assistant alexa typescript' },
-  { id: 'emergon', label: 'EMERGON', group: 'Projects', icon: '◆', keywords: 'emergency flask react' },
-  { id: 'lowkeybd', label: 'LowKeyBD', group: 'Projects', icon: '◆', keywords: 'next nest typescript' },
-  { id: 'thesis', label: 'Bangla Emotion Recognition', group: 'Projects', icon: '◆', keywords: 'pytorch thesis ml' },
-  { id: 'gamecritic', label: 'Game-Critic', group: 'Projects', icon: '◆', keywords: 'game review' },
-  // Quick Actions
-  { id: 'hire', label: 'Hire Me', group: 'Quick Actions', icon: '⚡', action: () => { document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' }); } },
-  { id: 'source', label: 'View Source Code', group: 'Quick Actions', icon: '💻', url: 'https://github.com/shoiebdurjoy' },
-  // External
-  { id: 'github', label: 'GitHub Profile', group: 'External', icon: '↗', url: 'https://github.com/shoiebdurjoy' },
-  { id: 'linkedin', label: 'LinkedIn', group: 'External', icon: '↗', url: 'https://www.linkedin.com/in/shoieb-durjoy-01a942234/' },
-  { id: 'email', label: 'Email', group: 'External', icon: '↗', url: 'mailto:shoiebdurjoy@gmail.com' },
+  ...navLinks.map((l) => ({ id: l.href, label: l.label, group: 'Jump to', run: () => scrollToId(l.href) })),
+  ...projects.map((p) => ({ id: p.id, label: p.title, hint: p.short, group: 'Projects', run: () => scrollToId('#work') })),
+  { id: 'email', label: 'Email me', hint: profile.email, group: 'Contact', run: () => (window.location.href = `mailto:${profile.email}`) },
+  { id: 'resume', label: 'Download résumé', group: 'Contact', run: () => window.open(profile.resume, '_blank', 'noopener') },
+  { id: 'gh', label: 'GitHub', group: 'Links', run: () => window.open(profile.github, '_blank', 'noopener') },
+  { id: 'li', label: 'LinkedIn', group: 'Links', run: () => window.open(profile.linkedin, '_blank', 'noopener') },
+  { id: 'be', label: 'Behance', group: 'Links', run: () => window.open(profile.behance, '_blank', 'noopener') },
 ];
 
-export default function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [index, setIndex] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  useFocusTrap(ref, true, onClose);
 
-  // Open with Cmd/Ctrl+K handled typically by parent, but we handle the close with Escape
-  useEffect(() => {
-    if (isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [isOpen]);
-
-  const filteredCommands = useMemo(() => {
-    if (!query) return commands;
-    const lowerQuery = query.toLowerCase();
-    return commands.filter((cmd) => {
-      return (
-        cmd.label.toLowerCase().includes(lowerQuery) ||
-        cmd.keywords?.toLowerCase().includes(lowerQuery) ||
-        cmd.group.toLowerCase().includes(lowerQuery)
-      );
-    });
+  const results = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    return q ? commands.filter((c) => `${c.label} ${c.hint ?? ''} ${c.group}`.toLowerCase().includes(q)) : commands;
   }, [query]);
 
-  const groupedCommands = useMemo(() => {
-    const groups: Record<string, Command[]> = {};
-    filteredCommands.forEach((cmd) => {
-      if (!groups[cmd.group]) groups[cmd.group] = [];
-      groups[cmd.group].push(cmd);
-    });
-    return groups;
-  }, [filteredCommands]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % filteredCommands.length);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const selected = filteredCommands[selectedIndex];
-      if (selected) {
-        handleSelect(selected);
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      onClose();
-    }
+  const select = (c: Command) => {
+    onClose();
+    c.run();
   };
 
-  const handleSelect = (cmd: Command) => {
-    if (cmd.action) {
-      cmd.action();
-    } else if (cmd.url) {
-      window.open(cmd.url, '_blank', 'noopener,noreferrer');
-    }
-    onClose();
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (!results.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setIndex((i) => (i + 1) % results.length); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setIndex((i) => (i - 1 + results.length) % results.length); }
+    if (e.key === 'Enter') { e.preventDefault(); select(results[index]); }
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
-            aria-hidden="true"
+    <div className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[14vh]">
+      <motion.div className="absolute inset-0 bg-ink/30 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={onClose} aria-hidden />
+      <motion.div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+        initial={{ opacity: 0, y: -10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-line bg-white shadow-2xl"
+      >
+        <div className="flex items-center gap-3 border-b border-line px-5">
+          <span className="text-muted">⌕</span>
+          <input
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setIndex(0); }}
+            onKeyDown={onKeyDown}
+            placeholder="Search sections, projects, links…"
+            aria-label="Search commands"
+            aria-controls="palette-results"
+            aria-activedescendant={results[index] ? `cmd-${results[index].id}` : undefined}
+            className="h-14 w-full bg-transparent text-[16px] outline-none placeholder:text-muted"
           />
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20%] pointer-events-none px-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="w-full max-w-xl bg-[#131920] rounded-xl border border-[rgba(237,234,227,0.08)] shadow-2xl overflow-hidden pointer-events-auto"
-            >
-              <div className="flex items-center px-4 py-4 border-b border-[rgba(237,234,227,0.08)]">
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Search commands..."
-                  className="w-full bg-transparent border-none outline-none font-mono text-[#EDEAE3] placeholder-[rgba(237,234,227,0.4)] text-sm"
-                  aria-label="Command palette search"
-                />
-                <div className="flex items-center justify-center px-2 py-1 rounded bg-[rgba(237,234,227,0.04)] border border-[rgba(237,234,227,0.08)] ml-4 shrink-0">
-                  <span className="font-mono text-[10px] text-[rgba(237,234,227,0.5)]">⌘K</span>
-                </div>
-              </div>
-
-              <div className="max-h-[60vh] overflow-y-auto py-2 overscroll-contain">
-                {filteredCommands.length === 0 ? (
-                  <div className="px-4 py-8 text-center font-mono text-sm text-[rgba(237,234,227,0.4)]">
-                    No results found
-                  </div>
-                ) : (
-                  Object.entries(groupedCommands).map(([group, groupCommands]) => (
-                    <div key={group} className="mb-2">
-                      <div className="px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-[rgba(237,234,227,0.4)]">
-                        {group}
-                      </div>
-                      <div className="px-2">
-                        {groupCommands.map((cmd) => {
-                          const globalIndex = filteredCommands.findIndex((c) => c.id === cmd.id);
-                          const isActive = globalIndex === selectedIndex;
-                          return (
-                            <button
-                              key={cmd.id}
-                              onClick={() => handleSelect(cmd)}
-                              onMouseEnter={() => setSelectedIndex(globalIndex)}
-                              className={`w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-colors relative group ${
-                                isActive ? 'bg-[rgba(237,234,227,0.04)] text-[#22D3AE]' : 'text-[#EDEAE3] hover:bg-[rgba(237,234,227,0.02)]'
-                              }`}
-                            >
-                              {isActive && (
-                                <motion.div
-                                  layoutId="command-active"
-                                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#22D3AE] rounded-r-full"
-                                />
-                              )}
-                              <span className={`font-mono text-sm mr-3 ${isActive ? 'text-[#22D3AE]' : 'text-[rgba(237,234,227,0.4)]'}`}>
-                                {cmd.icon}
-                              </span>
-                              <span className="font-sans text-sm">{cmd.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </>
-      )}
-    </AnimatePresence>
+          <kbd className="rounded-md bg-paper px-2 py-1 text-[11px] text-muted">Esc</kbd>
+        </div>
+        <ul id="palette-results" role="listbox" className="max-h-[50vh] overflow-y-auto p-2" data-lenis-prevent>
+          {results.length === 0 && <li className="px-4 py-8 text-center text-muted">No results</li>}
+          {results.map((c, i) => {
+            const header = i === 0 || results[i - 1].group !== c.group ? c.group : null;
+            return (
+              <li key={c.id} role="presentation">
+                {header && <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{header}</div>}
+                <button
+                  id={`cmd-${c.id}`}
+                  role="option"
+                  aria-selected={i === index}
+                  tabIndex={-1}
+                  onMouseEnter={() => setIndex(i)}
+                  onClick={() => select(c)}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[15px] ${i === index ? 'bg-accent-soft' : ''}`}
+                >
+                  <span className="font-medium">{c.label}</span>
+                  <span className="text-[13px] text-muted">{i === index ? '↵' : c.hint}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </motion.div>
+    </div>
   );
 }
