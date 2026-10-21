@@ -22,7 +22,7 @@ type Clip = {
   tags: string[];
 };
 
-// Dates follow the résumé; Think Big Brand is listed there as a 3-year engagement without exact dates.
+// Dates follow the résumé; Think Big Brand runs 2023 to present (part-time).
 const clips: Clip[] = [
   {
     id: 'durjoyai', layer: 'DurjoyAI', title: 'DurjoyAI — personal AI assistant', from: 2026.0, to: TODAY,
@@ -43,8 +43,8 @@ const clips: Clip[] = [
     tags: ['PyTorch', 'Librosa', 'CUDA', 'LaTeX'],
   },
   {
-    id: 'tbb', layer: 'Think Big Brand', title: 'Think Big Brand — video editor', from: 2022.6, to: 2025.6,
-    when: '3-year engagement · part-time', color: '#3DDC84',
+    id: 'tbb', layer: 'Think Big Brand', title: 'Think Big Brand — video editor', from: 2023.0, to: TODAY,
+    when: '2023 — present · part-time', color: '#3DDC84',
     detail: 'Commercials, narrative reels and documentaries for clients under tight deadlines — managing revisions and grading in Premiere, After Effects and Resolve.',
     tags: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
   },
