@@ -5,7 +5,6 @@ import { useRef, useState } from 'react';
 import { navLinks, profile } from '@/src/data/content';
 import { scrollToId } from '@/src/components/Navigation';
 import { LineReveal, Reveal } from '@/src/components/ui/Reveal';
-import Section from '@/src/components/ui/Section';
 
 export default function ContactSection() {
   const [copied, setCopied] = useState(false);
@@ -24,9 +23,8 @@ export default function ContactSection() {
   };
 
   return (
-    <Section id="contact" theme="dark" className="mb-3 mt-6">
-      <div className="relative overflow-hidden px-6 pt-24 text-white md:px-12 md:pt-32">
-        <div data-core aria-hidden className="pointer-events-none absolute right-[-12vw] top-10 aspect-square w-[70vw] max-w-[640px] md:right-[2vw] md:top-16 md:w-[44vw]" />
+    <section id="contact" className="px-3 pb-3 md:px-4 md:pb-4">
+      <div className="relative overflow-hidden rounded-[36px] bg-ink px-6 pt-24 text-white md:px-12 md:pt-32">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
@@ -48,7 +46,7 @@ export default function ContactSection() {
               className="group flex min-w-0 items-center justify-between gap-3 rounded-full border border-white/15 bg-white/5 py-2 pl-5 pr-2 text-left transition-colors hover:border-white/40 md:gap-6 md:pl-7"
             >
               <span className="truncate text-[15px] font-medium md:text-xl">{profile.email}</span>
-              <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-3 text-[13px] font-semibold transition-colors md:px-5 md:text-[14px] ${copied ? 'bg-[#3DDC84] text-[#121210]' : 'bg-white text-[#121210] group-hover:bg-accent group-hover:text-white'}`}>
+              <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-3 text-[13px] font-semibold transition-colors md:px-5 md:text-[14px] ${copied ? 'bg-[#3DDC84] text-ink' : 'bg-white text-ink group-hover:bg-accent group-hover:text-white'}`}>
                 {copied ? 'Copied ✓' : 'Copy email'}
               </span>
             </button>
@@ -105,6 +103,6 @@ export default function ContactSection() {
           </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }

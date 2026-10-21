@@ -4,7 +4,6 @@ import { motion, useScroll } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { thesisStages } from '@/src/data/content';
 import { SectionLabel } from '@/src/components/ui/Reveal';
-import Section from '@/src/components/ui/Section';
 
 const emotions = ['Happy', 'Sad', 'Angry', 'Fear', 'Neutral'];
 
@@ -14,8 +13,8 @@ export default function ThesisSection() {
   const { scrollYProgress } = useScroll({ target: listRef, offset: ['start 60%', 'end 60%'] });
 
   return (
-    <Section id="thesis" theme="light">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 py-28 md:px-8 md:py-36 lg:grid-cols-12">
+    <section id="thesis" className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
             <SectionLabel index="04">Research</SectionLabel>
@@ -27,8 +26,7 @@ export default function ThesisSection() {
               signals to classify emotion in conversational Bangla.
             </p>
 
-            <div className="relative mt-10 rounded-3xl border border-line bg-card p-6">
-              <div data-core aria-hidden className="pointer-events-none absolute -right-28 -top-24 hidden aspect-square w-48 lg:block" />
+            <div className="mt-10 rounded-3xl border border-line bg-white p-6">
               <div className="flex items-baseline justify-between">
                 <span className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">Pipeline stage</span>
                 <span className="font-serif text-5xl tabular-nums">
@@ -61,7 +59,7 @@ export default function ThesisSection() {
               onViewportEnter={() => setActive(i)}
               viewport={{ margin: '-45% 0px -45% 0px' }}
               className={`rounded-[28px] border p-7 transition-all duration-500 md:p-9 ${
-                active === i ? 'border-ink bg-card shadow-[0_30px_60px_-30px_rgba(18,18,16,0.3)]' : 'border-line bg-transparent opacity-60'
+                active === i ? 'border-ink bg-white shadow-[0_30px_60px_-30px_rgba(18,18,16,0.3)]' : 'border-line bg-transparent opacity-60'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -79,6 +77,6 @@ export default function ThesisSection() {
           ))}
         </ol>
       </div>
-    </Section>
+    </section>
   );
 }
