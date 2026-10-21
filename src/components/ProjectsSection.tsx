@@ -14,6 +14,7 @@ const toneBg: Record<Project['tone'], string> = {
   sage: 'bg-sage text-[#121210]',
   sky: 'bg-sky text-[#121210]',
   violet: 'bg-[#E3DEFF] text-[#121210]',
+  mint: 'bg-[#D6F2E6] text-[#121210]',
 };
 
 function VoiceVisual() {
@@ -133,8 +134,35 @@ function TbbVisual() {
   );
 }
 
+function BaekyVisual() {
+  return (
+    <div className="mx-auto w-[168px] rounded-[26px] border-[5px] border-[#121210] bg-[#F5F3EE] p-2.5 shadow-[0_24px_40px_-20px_rgba(18,18,16,0.55)]">
+      <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-[#121210]/80" />
+      <div className="rounded-2xl bg-[#121210] p-3 text-white">
+        <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-white/50">Net balance</div>
+        <div className="mt-0.5 text-[18px] font-semibold tracking-tight">৳ 3,500</div>
+        <div className="mt-1 flex gap-2 text-[8px] text-white/60"><span>You owe ৳1.5k</span><span>Owed ৳5k</span></div>
+      </div>
+      <div className="mt-2 rounded-xl bg-white p-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-semibold text-[#121210]">Gig · Rafi</span>
+          <span className="rounded-full bg-[#10B981] px-1.5 py-0.5 text-[7px] font-semibold text-white">bKash</span>
+        </div>
+        <div className="mt-1 text-[14px] font-semibold text-[#121210]">৳ 5,000</div>
+        <div className="mt-1.5 h-1 rounded-full bg-[#E3E0D8]"><div className="h-full w-3/5 rounded-full bg-[#10B981]" /></div>
+        <div className="mt-1 text-[8px] text-[#77756D]">Due 12 Nov · reminder on</div>
+      </div>
+      <div className="mt-2 flex items-center gap-1.5 rounded-xl bg-white px-2.5 py-2">
+        <span className="h-4 w-4 rounded-full bg-[#FF5A24]" />
+        <span className="text-[8px] text-[#3A3934]">Proof photo added ✓</span>
+      </div>
+    </div>
+  );
+}
+
 const visuals: Record<string, () => React.ReactElement> = {
   tbb: TbbVisual,
+  baeky: BaekyVisual,
   durjoyai: VoiceVisual,
   lowkeybd: PlatformVisual,
   emergon: RadarVisual,

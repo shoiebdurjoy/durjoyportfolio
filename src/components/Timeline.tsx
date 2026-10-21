@@ -37,6 +37,12 @@ const clips: Clip[] = [
     tags: ['React', 'TypeScript', 'Supabase', 'PostgreSQL'],
   },
   {
+    id: 'baeky', layer: 'Baeky', title: 'Baeky — money agreements app', from: 2026.74, to: TODAY,
+    when: 'Sep 2026 — present', color: '#2DD4BF',
+    detail: 'Flutter + FastAPI app for borrowing and lending between friends: agreements with proof, reminders, chat and exact-decimal balances. Android first, iOS ready.',
+    tags: ['Flutter', 'FastAPI', 'PostgreSQL', 'Redis'],
+  },
+  {
     id: 'emergon', layer: 'EMERGON', title: 'EMERGON — smart emergency system', from: 2026.05, to: 2026.45,
     when: 'Spring 2026', color: '#F5B841',
     detail: 'Four-person team. Real-time Socket.IO coordination, Twilio SMS alerts and Google Maps request mapping; backend on Render, frontend on Vercel.',

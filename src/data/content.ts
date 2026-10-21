@@ -42,7 +42,7 @@ export type Project = {
   stack: string[];
   github?: string;
   liveDemo?: string;
-  tone: 'ink' | 'clay' | 'sage' | 'sky' | 'violet';
+  tone: 'ink' | 'clay' | 'sage' | 'sky' | 'violet' | 'mint';
 };
 
 export const projects: Project[] = [
@@ -73,6 +73,32 @@ export const projects: Project[] = [
     github: 'https://github.com/shoiebdurjoy/workspace-manager',
     liveDemo: 'https://workspace-manager-five.vercel.app/login',
     tone: 'violet',
+  },
+  {
+    id: 'baeky',
+    title: 'Baeky',
+    short: 'Money agreements app · in progress',
+    tagline: 'A Flutter app for borrowing and lending between friends: agree, track, remind, pay, confirm.',
+    category: 'Mobile App',
+    year: 'In progress',
+    overview:
+      'Baeky makes borrowing and lending money between friends, family and trusted contacts clear and accountable. Users connect with friends, chat, and create digital agreements called Gigs that record the amount, repayment date, payment method (such as bKash or a bank card) and photo evidence. Both sides get due-date reminders and a clean history, instead of relying on scattered chats, screenshots or memory. Baeky is not a bank or wallet: it records agreements and payments made outside the app. Android first, iOS ready.',
+    architecture: {
+      title: 'Agreement Lifecycle & Backend Architecture',
+      flow: ['Flutter App (Riverpod)', 'FastAPI Modular Monolith', 'PostgreSQL (exact money math)', 'Redis Chat & Rate Limits', 'Reminder Scheduler', 'Push Notifications (FCM)'],
+      details:
+        'Every agreement follows Agree → Track → Remind → Pay → Confirm → Complete. Amounts are stored as exact decimals, repayments are confirmed by the lender with row locking so a payment can never be confirmed twice, and a durable Asia/Dhaka reminder scheduler deduplicates reminders with PostgreSQL advisory locks.',
+    },
+    features: [
+      'Gigs: money agreements with amount, due date, payment method and photo proof',
+      'Friends, profiles and real-time 1-to-1 chat (WebSockets + Redis)',
+      'Due-date reminders, notification centre and push notifications',
+      'Dashboard showing what you owe, what you are owed and your net balance',
+      'Argon2id sign-in with rotating refresh tokens and theft detection',
+      'Private proof uploads with file verification and participant-only access',
+    ],
+    stack: ['Flutter', 'Dart', 'Riverpod', 'FastAPI', 'Python', 'PostgreSQL', 'Redis', 'Firebase'],
+    tone: 'mint',
   },
   {
     id: 'durjoyai',
@@ -188,6 +214,7 @@ export const stackGroups: StackGroup[] = [
       { name: 'Next.js', context: 'Full-stack framework for LowKeyBD and this portfolio' },
       { name: 'NestJS', context: 'Enterprise backend for LowKeyBD REST & WebSocket APIs' },
       { name: 'FastAPI', context: 'High-throughput async Python APIs for AI model serving' },
+      { name: 'Flutter', context: 'Cross-platform mobile client for Baeky (Android first, iOS ready)' },
       { name: 'React', context: 'Component-driven UI across multiple platforms' },
       { name: 'Flask', context: 'REST API and Socket.IO engine for EMERGON' },
       { name: 'Supabase', context: 'Auth, Postgres and row-level security behind TBB Workspace' },
