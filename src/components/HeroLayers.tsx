@@ -114,18 +114,21 @@ function TimelinePanel() {
 function Monitor() {
   return (
     <>
-      <Chrome title="Program: Commercial_v12" right="4K · 24fps" />
+      <Chrome title="Program: Brand_Talking_Head_v12" right="4K · 24fps" />
       <div className="p-3">
-        <div className="relative aspect-video overflow-hidden rounded-md" style={{ background: 'linear-gradient(160deg,#FFB38A 0%,#FF5A24 38%,#3B1A33 72%,#0E0B14 100%)' }}>
-          <div className="absolute inset-x-0 bottom-[22%] h-[30%]" style={{ background: 'linear-gradient(180deg,transparent,rgba(10,6,12,0.85))' }} />
-          <div className="absolute left-[12%] bottom-[18%] h-[38%] w-[7%] rounded-t-full bg-[#0E0B14]" />
-          <div className="absolute left-[24%] bottom-[18%] h-[26%] w-[5%] rounded-t-full bg-[#0E0B14]" />
-          <div className="absolute inset-x-0 top-0 h-[10%] bg-black" />
-          <div className="absolute inset-x-0 bottom-0 h-[10%] bg-black" />
-          <span className="absolute right-[4%] top-[14%] flex items-center gap-1 font-mono text-[9px] text-white/80">
+        <div className="relative aspect-video overflow-hidden rounded-md" style={{ background: 'linear-gradient(135deg,#2A2F3A 0%,#1B1E27 55%,#3A1F16 100%)' }}>
+          {/* Talking-head frame: presenter, lower-third and captions */}
+          <div className="absolute left-1/2 top-[24%] h-[30%] w-[15%] -translate-x-1/2 rounded-full bg-[#C9926E]" />
+          <div className="absolute left-1/2 top-[52%] h-[60%] w-[38%] -translate-x-1/2 rounded-t-[60%] bg-[#33405A]" />
+          <div className="absolute bottom-[12%] left-[5%] rounded-sm bg-[#FF5A24] px-2 py-1">
+            <div className="text-[8px] font-bold leading-none text-white">Brand Founder</div>
+            <div className="mt-0.5 text-[6px] leading-none text-white/80">Why our service exists</div>
+          </div>
+          <div className="absolute inset-x-[22%] bottom-[3%] rounded-sm bg-black/60 px-2 py-0.5 text-center text-[7px] text-white">we help brands explain what they do</div>
+          <span className="absolute right-[4%] top-[8%] flex items-center gap-1 font-mono text-[9px] text-white/80">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#FF3B30]" /> REC
           </span>
-          <span className="absolute bottom-[14%] left-[4%] font-mono text-[9px] text-white/80">01:00:14:08</span>
+          <span className="absolute left-[4%] top-[8%] font-mono text-[9px] text-white/80">01:00:14:08</span>
         </div>
       </div>
     </>

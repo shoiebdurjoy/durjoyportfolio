@@ -6,11 +6,11 @@ import { stats } from '@/src/data/content';
 import { Reveal, SectionLabel } from '@/src/components/ui/Reveal';
 
 const statement =
-  'Most developers think purely in logic. Most filmmakers think purely in feeling. I work where the two meet — every frame and every function has to earn its place.';
+  'Most developers think purely in logic. Most video editors think purely in attention. I work where the two meet — every function and every cut has to earn its place.';
 
 function Word({ word, progress, range }: { word: string; progress: MotionValue<number>; range: [number, number] }) {
   const opacity = useTransform(progress, range, [0.14, 1]);
-  const accent = word.startsWith('logic') || word.startsWith('feeling');
+  const accent = word.startsWith('logic') || word.startsWith('attention');
   return (
     <motion.span style={{ opacity }} className={`mr-[0.22em] inline-block ${accent ? 'font-accent text-accent' : ''}`}>
       {word}
@@ -54,8 +54,8 @@ export default function AboutSection() {
           </p>
           <p className="mt-5 text-[17px] leading-relaxed text-ink-soft">
             In parallel, I&apos;ve spent <strong className="font-semibold text-ink">3+ years as a professional video editor</strong> at Think Big
-            Brand, editing commercial campaigns and documentaries. Editing taught me what systems design did: cut everything
-            that doesn&apos;t serve the story.
+            Brand, editing ads, shorts and talking-head videos for businesses explaining their brand and services. Editing taught me what systems design did: cut everything
+            that doesn&apos;t serve the message.
           </p>
         </Reveal>
 

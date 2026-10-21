@@ -53,7 +53,7 @@ function Intro() {
         <LineReveal text="use, daily." delay={0.08} className="font-accent text-accent" />
       </h2>
       <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-soft">
-        Engineering, AI and the edit suite. Hover any tool to see where it earned its place.
+        Engineering, AI and video editing. Hover any tool to see where it earned its place.
       </p>
     </div>
   );

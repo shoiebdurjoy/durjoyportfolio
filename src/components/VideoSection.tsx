@@ -58,13 +58,13 @@ function Reel({ id, index, front, playing, onPlay }: { id: string; index: number
                 setPlayed(true);
                 onPlay();
               }}
-              aria-label={`Play reel ${index + 1}`}
+              aria-label={`Play video ${index + 1}`}
               className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-xl text-[#121210] shadow-2xl transition-transform duration-300 hover:scale-110"
             >
               ▶
             </button>
           ) : null}
-          {!loaded && <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">Loading reel {String(index + 1).padStart(2, '0')}</span>}
+          {!loaded && <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">Loading video {String(index + 1).padStart(2, '0')}</span>}
         </div>
       )}
     </div>
@@ -142,15 +142,15 @@ export default function VideoSection() {
     <section id="cutting-room" data-tone="dark" className="overflow-x-clip py-28 md:py-36">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 px-5 md:flex-row md:items-end md:px-10">
         <div>
-          <SectionLabel index="06">The cutting room</SectionLabel>
+          <SectionLabel index="06">Video work</SectionLabel>
           <h2 className="font-serif mt-6 text-[clamp(2.6rem,6vw,5.5rem)] leading-[0.95]">
-            <LineReveal text="Where footage" />
-            <LineReveal text="becomes story." delay={0.08} className="font-accent text-accent" />
+            <LineReveal text="Brand videos" />
+            <LineReveal text="that get watched." delay={0.08} className="font-accent text-accent" />
           </h2>
         </div>
         <Reveal>
           <p className="max-w-xs text-[15px] leading-relaxed text-ink-soft">
-            Three years at <strong className="font-medium text-ink">Think Big Brand</strong> cutting commercials, narrative reels and documentaries, then grading them.
+            Three years at <strong className="font-medium text-ink">Think Big Brand</strong> editing ads, shorts and talking-head videos for businesses: clear, fast and on brand.
           </p>
         </Reveal>
       </div>
@@ -165,7 +165,7 @@ export default function VideoSection() {
         }}
         role="region"
         aria-roledescription="carousel"
-        aria-label="Video reels"
+        aria-label="Brand videos"
       >
         {behanceProjects.map((id, i) => (
           <FanCard key={id} index={i} pos={pos} active={active} onPick={(k) => !drag.current.moved && snapTo(pos.get() + k)}>
@@ -174,7 +174,7 @@ export default function VideoSection() {
                 <Reel id={id} index={i} front={i === active} playing={playing && i === active} onPlay={() => setPlayingIndex(i)} />
               </div>
               <figcaption className="flex items-center justify-between px-2 pt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white/50">
-                <span>Reel {String(i + 1).padStart(2, '0')}</span>
+                <span>Video {String(i + 1).padStart(2, '0')}</span>
                 <span>Behance</span>
               </figcaption>
             </figure>
@@ -189,16 +189,16 @@ export default function VideoSection() {
             className="group flex h-full flex-col justify-between rounded-[22px] bg-accent p-8 text-white"
           >
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/80">Full portfolio</span>
-            <span className="text-[38px] font-semibold leading-[0.95] tracking-[-0.04em]">See every cut on <span className="font-accent">Behance</span></span>
+            <span className="text-[38px] font-semibold leading-[0.95] tracking-[-0.04em]">See all my videos on <span className="font-accent">Behance</span></span>
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-xl text-accent transition-transform duration-500 group-hover:rotate-[-45deg]">→</span>
           </a>
         </FanCard>
       </div>
 
       <div className="mx-auto mt-4 flex max-w-7xl items-center justify-center gap-4 px-5">
-        <button onClick={() => go(-1)} aria-label="Previous reel" className="flex h-12 w-12 items-center justify-center rounded-full border border-line transition-colors hover:border-ink">←</button>
+        <button onClick={() => go(-1)} aria-label="Previous video" className="flex h-12 w-12 items-center justify-center rounded-full border border-line transition-colors hover:border-ink">←</button>
         <span className="label min-w-24 text-center tabular-nums text-muted">{String(active + 1).padStart(2, '0')} / {String(TOTAL).padStart(2, '0')}</span>
-        <button onClick={() => go(1)} aria-label="Next reel" className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper transition-colors hover:bg-accent hover:text-white">→</button>
+        <button onClick={() => go(1)} aria-label="Next video" className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper transition-colors hover:bg-accent hover:text-white">→</button>
       </div>
     </section>
   );

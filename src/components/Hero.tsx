@@ -91,7 +91,7 @@ export default function Hero() {
           </div>
 
           <p style={{ animationDelay: '0.05s' }} className="hero-fade-up label mt-10 text-muted">Hello, I&apos;m</p>
-          <h1 className="mt-4 text-[clamp(3.4rem,6.6vw,7rem)] font-semibold leading-[0.9] tracking-[-0.06em]">
+          <h1 className="font-serif mt-4 text-[clamp(3.4rem,6.6vw,7rem)] leading-[0.9] tracking-[-0.05em]">
             <span className="block overflow-hidden pb-[0.04em]">
               <span className="hero-rise block" style={{ animationDelay: '0.1s' }}>Shoieb Hossain</span>
             </span>
@@ -103,7 +103,7 @@ export default function Hero() {
           <p style={{ animationDelay: '0.35s' }} className="hero-fade-up mt-5 max-w-xl text-[clamp(1.2rem,1.7vw,1.6rem)] font-medium leading-snug tracking-[-0.02em]">
             {[
               { lead: 'I build', accent: 'intelligent', rest: 'software', m: 'build' as Persona },
-              { lead: '& cut', accent: 'cinematic', rest: 'stories.', m: 'cut' as Persona },
+              { lead: '& cut', accent: 'brand', rest: 'videos that sell.', m: 'cut' as Persona },
             ].map((line) => (
               <span
                 key={line.m}
@@ -117,8 +117,8 @@ export default function Hero() {
           </p>
 
           <p style={{ animationDelay: '0.45s' }} className="hero-fade-up mt-6 max-w-md text-[16px] leading-relaxed text-ink-soft">
-            Computer Science at BRAC University, building AI systems and full-stack platforms. Three years cutting
-            commercials at Think Big Brand.
+            Computer Science at BRAC University, building AI systems and full-stack platforms. Three years editing
+            ads, shorts and talking-head brand videos at Think Big Brand.
           </p>
 
           <div style={{ animationDelay: '0.55s' }} className="hero-fade-up mt-9 flex flex-wrap items-center gap-3">
@@ -152,7 +152,7 @@ export default function Hero() {
             {(['build', 'cut'] as const).map((m) => (
               <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)} className="label relative rounded-full px-5 py-2">
                 {mode === m && <motion.span layoutId="persona-pill" className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
-                <span className={`relative ${mode === m ? 'text-paper' : 'text-muted'}`}>{m === 'build' ? 'Build · code' : 'Cut · film'}</span>
+                <span className={`relative ${mode === m ? 'text-paper' : 'text-muted'}`}>{m === 'build' ? 'Build · code' : 'Cut · video'}</span>
               </button>
             ))}
           </div>

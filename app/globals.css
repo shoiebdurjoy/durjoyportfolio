@@ -2,8 +2,8 @@
 
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  /* `font-serif` is the display face for headings (tight Inter); `font-accent` is the italic serif accent. */
-  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* `font-serif` is the heading face (Geist, medium weight); `font-accent` is the italic serif accent. */
+  --font-serif: var(--font-geist), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-accent: var(--font-playfair), Georgia, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
@@ -64,8 +64,8 @@ html.tone-dark {
 
 
 .font-serif {
-  font-weight: 600;
-  letter-spacing: -0.045em;
+  font-weight: 500;
+  letter-spacing: -0.04em;
 }
 
 .font-accent {
@@ -97,6 +97,50 @@ html.tone-dark {
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
+
+/* Apple-style "liquid glass" for the floating nav: frosted + saturated backdrop, a bright
+   specular top edge and a soft sheen. Light and dark variants follow the page tone. */
+.liquid-glass {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.38));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+    0 10px 36px -12px rgba(18, 18, 16, 0.22),
+    0 2px 6px -2px rgba(18, 18, 16, 0.08);
+  /* The blur itself comes from Tailwind's backdrop utilities on the element: a hand-written
+     backdrop-filter here gets collapsed to the -webkit- form only, which Chrome ignores. */
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 140% at 20% -40%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%);
+}
+html.tone-dark .liquid-glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 12px 40px -12px rgba(0, 0, 0, 0.6);
+}
+html.tone-dark .liquid-glass::before {
+  background: radial-gradient(120% 140% at 20% -40%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 55%);
+}
+.liquid-pill {
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+html.tone-dark .liquid-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
 
 @keyframes marquee {
   from { transform: translateX(0); }

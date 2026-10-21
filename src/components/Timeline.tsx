@@ -6,7 +6,7 @@ import { LineReveal, Reveal, SectionLabel } from '@/src/components/ui/Reveal';
 
 // Axis runs Jan 2022 → Jan 2027; positions are fractional years.
 const START = 2022;
-const END = 2027;
+const END = 2028;
 const TODAY = 2026.8;
 const pct = (y: number) => `${((y - START) / (END - START)) * 100}%`;
 
@@ -45,12 +45,12 @@ const clips: Clip[] = [
   {
     id: 'tbb', layer: 'Think Big Brand', title: 'Think Big Brand — video editor', from: 2023.0, to: TODAY,
     when: '2023 — present · part-time', color: '#3DDC84',
-    detail: 'Commercials, narrative reels and documentaries for clients under tight deadlines — managing revisions and grading in Premiere, After Effects and Resolve.',
+    detail: 'Ads, shorts and talking-head videos for businesses explaining their company, brand and services — quick turnarounds and client revisions in Premiere, After Effects and Resolve.',
     tags: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
   },
   {
-    id: 'brac', layer: 'BRAC University', title: 'BRAC University — B.S. Computer Science', from: 2022.6, to: 2026.95,
-    when: 'Expected 2026', color: '#60A5FA',
+    id: 'brac', layer: 'BRAC University', title: 'BRAC University — B.S. Computer Science', from: 2022.6, to: 2027.5,
+    when: 'Expected 2027', color: '#60A5FA',
     detail: 'Backend architecture, databases and machine learning. Advanced Web Development certificate; Spanish SPN101.',
     tags: ['Algorithms', 'Systems', 'ML'],
   },
@@ -88,13 +88,13 @@ export default function Timeline() {
         <div>
           <SectionLabel index="02">Experience</SectionLabel>
           <h2 className="font-serif mt-6 text-[clamp(2.6rem,6vw,5.5rem)] leading-[0.95]">
-            <LineReveal text="Four years," />
+            <LineReveal text="Years of work," />
             <LineReveal text="one timeline." delay={0.08} className="font-accent text-accent" />
           </h2>
         </div>
         <Reveal>
           <p className="max-w-xs text-[15px] leading-relaxed text-ink-soft">
-            Laid out the way I&apos;d cut it. Scroll to scrub the playhead, hover a clip to inspect it.
+            Laid out like an editing timeline. Scroll to scrub the playhead, hover a clip to inspect it.
           </p>
         </Reveal>
       </div>
@@ -109,7 +109,7 @@ export default function Timeline() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
             </div>
             <span className="text-[#8E8E8E]">Timeline</span>
-            <span className="rounded bg-[#2E2E2E] px-2 py-0.5 text-white">Durjoy_2022–2026 ×</span>
+            <span className="rounded bg-[#2E2E2E] px-2 py-0.5 text-white">Durjoy_2022–2027 ×</span>
             <span className="ml-auto hidden font-mono text-[#8E8E8E] sm:inline">24 fps · 1920×1080</span>
           </div>
 

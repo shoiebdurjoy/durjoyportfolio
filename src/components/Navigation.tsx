@@ -11,7 +11,6 @@ export function scrollToId(href: string) {
 
 export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteOpen: () => void }) {
   const { scrollY, scrollYProgress } = useScroll();
-  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -24,8 +23,6 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
   }, []);
 
   useMotionValueEvent(scrollY, 'change', (v) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setHidden(v > prev && v > 400 && !open);
     setScrolled(v > 24);
   });
 
@@ -38,26 +35,24 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
     <>
       <motion.header
         className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
-        animate={{ y: hidden ? -100 : 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <nav
           aria-label="Primary"
           className={`relative flex w-full max-w-6xl items-center justify-between rounded-full border px-3 py-2 pl-5 transition-all duration-500 ${
-            scrolled ? 'border-line bg-paper/70 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.25)] backdrop-blur-xl' : 'border-transparent bg-transparent'
+            scrolled ? 'liquid-glass backdrop-blur-[22px] backdrop-saturate-[1.8]' : 'border-transparent bg-transparent'
           }`}
         >
-          <button onClick={() => go('#top')} className="flex items-baseline gap-1 text-ink" aria-label="Back to top">
+          <button onClick={() => go('#top')} className="relative flex items-baseline gap-1 text-ink" aria-label="Back to top">
             <span className="text-[20px] font-semibold leading-none tracking-[-0.04em]">Durjoy</span>
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           </button>
 
-          <ul className="hidden items-center gap-1 md:flex">
+          <ul className="relative hidden items-center gap-1 md:flex">
             {navLinks.map((l) => (
               <li key={l.href}>
                 <button
                   onClick={() => go(l.href)}
-                  className="rounded-full px-3.5 py-2 text-[14px] font-medium text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
+                  className="relative rounded-full px-3.5 py-2 text-[14px] font-medium text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink"
                 >
                   {l.label}
                 </button>
@@ -65,14 +60,14 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
             ))}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-2">
             <button
               onClick={onCommandPaletteOpen}
               aria-label="Open command palette"
-              className="hidden h-10 items-center gap-2 rounded-full border border-line bg-card px-3 text-[13px] text-muted transition-colors hover:text-ink sm:flex"
+              className="liquid-pill relative hidden h-10 items-center gap-2 rounded-full px-3 text-[13px] text-muted transition-colors hover:text-ink sm:flex"
             >
               Search
-              <kbd className="rounded-md bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">⌘K</kbd>
+              <kbd className="rounded-md bg-ink/[0.06] px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">⌘K</kbd>
             </button>
             <a
               href={`mailto:${profile.email}`}

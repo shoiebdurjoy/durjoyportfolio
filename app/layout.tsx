@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
 import { profile, siteUrl } from "@/src/data/content";
@@ -14,6 +14,13 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
   style: ["italic"],
   variable: "--font-playfair",
+  display: "swap",
+});
+
+// Headings only.
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
   display: "swap",
 });
 
@@ -33,7 +40,7 @@ export const metadata: Metadata = {
   description,
   keywords: [
     "Md Shoieb Hossain", "Shoieb Durjoy", "Durjoy", "Software Engineer", "AI Engineer",
-    "Full Stack Developer", "Video Editor", "Motion Designer", "BRAC University", "Dhaka", "DurjoyAI",
+    "Full Stack Developer", "Video Editor", "Commercial Video Editor", "BRAC University", "Dhaka", "DurjoyAI",
   ],
   authors: [{ name: profile.name, url: siteUrl }],
   creator: profile.name,
@@ -74,13 +81,13 @@ const jsonLd = {
     address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
     alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" },
     sameAs: [profile.github, profile.linkedin, profile.behance],
-    knowsAbout: ["Artificial Intelligence", "Full-Stack Development", "Deep Learning", "Video Editing", "Motion Graphics"],
+    knowsAbout: ["Artificial Intelligence", "Full-Stack Development", "Deep Learning", "Video Editing", "Commercial Video Production"],
   },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geistMono.variable} tone-dark antialiased`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geist.variable} ${geistMono.variable} tone-dark antialiased`}>
       <body className="min-h-screen font-sans text-ink">
         <div id="tone-layer" aria-hidden className="tone-layer" />
         <script

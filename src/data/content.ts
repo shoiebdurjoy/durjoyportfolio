@@ -18,12 +18,12 @@ export const navLinks = [
   { label: 'Work', href: '#work' },
   { label: 'Stack', href: '#stack' },
   { label: 'Research', href: '#thesis' },
-  { label: 'Reels', href: '#cutting-room' },
+  { label: 'Videos', href: '#cutting-room' },
   { label: 'Contact', href: '#contact' },
 ];
 
 export const stats = [
-  { value: 3, suffix: '+', label: 'Years editing', detail: 'Think Big Brand, an international content agency: commercials, narrative reels and color grading.' },
+  { value: 3, suffix: '+', label: 'Years editing', detail: 'Think Big Brand, an international content agency: ads, shorts and talking-head videos for businesses.' },
   { value: 7, suffix: '+', label: 'Shipped repos', detail: 'Production AI (DurjoyAI), full-stack platforms (LowKeyBD) and deep learning research.' },
   { value: 2, suffix: 'nd', label: 'National place', detail: 'Runner-up in the Bangladesh Securities & Exchange Commission (BSEC) national competition.' },
   { value: 27, prefix: "'", label: 'BRAC CS', detail: 'B.S. in Computer Science, focused on backend architecture and machine learning.' },
@@ -184,11 +184,11 @@ export const stackGroups: StackGroup[] = [
   {
     key: 'cut',
     title: 'Video & Motion',
-    blurb: 'Edit, grade, animate and deliver.',
+    blurb: 'Cut, animate and deliver brand videos.',
     items: [
       { name: 'Premiere Pro', context: 'Primary NLE for 3+ years at Think Big Brand' },
-      { name: 'After Effects', context: 'Motion graphics, visual effects and typography animation' },
-      { name: 'DaVinci Resolve', context: 'Color grading and post-production delivery' },
+      { name: 'After Effects', context: 'Motion graphics, titles and typography animation for ads' },
+      { name: 'DaVinci Resolve', context: 'Colour correction and final delivery' },
       { name: 'CapCut', context: 'High-velocity short-form social content' },
     ],
   },
