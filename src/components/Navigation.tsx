@@ -44,11 +44,11 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
         <nav
           aria-label="Primary"
           className={`relative flex w-full max-w-6xl items-center justify-between rounded-full border px-3 py-2 pl-5 transition-all duration-500 ${
-            scrolled ? 'border-line bg-white/75 shadow-[0_8px_30px_-12px_rgba(18,18,16,0.15)] backdrop-blur-xl' : 'border-transparent bg-transparent'
+            scrolled ? 'border-line bg-paper/70 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.25)] backdrop-blur-xl' : 'border-transparent bg-transparent'
           }`}
         >
           <button onClick={() => go('#top')} className="flex items-baseline gap-1 text-ink" aria-label="Back to top">
-            <span className="font-serif text-2xl leading-none">Durjoy</span>
+            <span className="text-[20px] font-semibold leading-none tracking-[-0.04em]">Durjoy</span>
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           </button>
 
@@ -69,21 +69,21 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
             <button
               onClick={onCommandPaletteOpen}
               aria-label="Open command palette"
-              className="hidden h-10 items-center gap-2 rounded-full border border-line bg-white px-3 text-[13px] text-muted transition-colors hover:text-ink sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-full border border-line bg-card px-3 text-[13px] text-muted transition-colors hover:text-ink sm:flex"
             >
               Search
               <kbd className="rounded-md bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">⌘K</kbd>
             </button>
             <a
               href={`mailto:${profile.email}`}
-              className="hidden h-10 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-white transition-transform hover:scale-[1.03] sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-paper transition-transform hover:scale-[1.03] sm:flex"
             >
               <span className="h-2 w-2 rounded-full bg-[#3DDC84] shadow-[0_0_0_3px_rgba(61,220,132,0.25)]" />
               Let&apos;s talk
             </a>
             <button
               onClick={() => setOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-paper md:hidden"
               aria-label="Open menu"
               aria-expanded={open}
               aria-controls="mobile-menu"

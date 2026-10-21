@@ -1,13 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, useMotionValue, useScroll, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { profile } from '@/src/data/content';
 import { scrollToId } from '@/src/components/Navigation';
+import HeroLayers from '@/src/components/HeroLayers';
+import type { Persona } from '@/src/lib/persona';
 
-type Mode = 'build' | 'cut';
-const ease = [0.16, 1, 0.3, 1] as const;
+
 
 function DhakaTime() {
   const [time, setTime] = useState('');
@@ -25,254 +26,133 @@ function DhakaTime() {
 }
 
 export default function Hero() {
-  const [mode, setMode] = useState<Mode>('build');
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const rx = useSpring(useTransform(my, [-0.5, 0.5], [6, -6]), { stiffness: 120, damping: 18 });
-  const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-8, 8]), { stiffness: 120, damping: 18 });
+  const [mode, setMode] = useState<Persona>('build');
+  const section = useRef<HTMLElement>(null);
+  const [desk, setDesk] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setDesk(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-  };
+  // Desktop intro: the hero pins while the tool stack settles from centre stage to the right and
+  // the copy slides in. On smaller screens everything is simply laid out.
+  const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] });
+  const settled = useMotionValue(1);
+  const progress = useTransform(scrollYProgress, [0, 0.6], [0, 1], { clamp: true });
+  const settle = desk ? progress : settled;
+  const stageX = useTransform(settle, [0, 1], ['3vw', '0vw']);
+  const stageScale = useTransform(settle, [0, 1], [1.06, 1]);
+  const stageY = useTransform(settle, [0, 1], ['2vh', '0vh']);
+  const hintOpacity = useTransform(settle, [0, 0.2], [1, 0]);
 
   return (
-    <section id="top" className="relative overflow-hidden pt-28 md:pt-36">
+    <section ref={section} id="top" data-tone="dark" className="relative lg:h-[240vh]">
+      <div className="relative min-h-[100svh] overflow-hidden lg:sticky lg:top-0 lg:h-screen">
+      {/* Faint grid + glow behind the drop. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-40 -top-40 h-[620px] w-[620px] rounded-full opacity-70 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #FFD9C7 0%, rgba(245,243,238,0) 70%)' }}
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage: 'linear-gradient(var(--color-ink) 1px, transparent 1px), linear-gradient(90deg, var(--color-ink) 1px, transparent 1px)',
+          backgroundSize: '72px 72px',
+          maskImage: 'radial-gradient(70% 60% at 65% 45%, #000 0%, transparent 75%)',
+          WebkitMaskImage: 'radial-gradient(70% 60% at 65% 45%, #000 0%, transparent 75%)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-[-10%] top-[5%] h-[80vh] w-[80vh] rounded-full blur-[120px] transition-colors duration-1000"
+        style={{ background: mode === 'build' ? 'rgba(255,79,26,0.16)' : 'rgba(143,168,255,0.16)' }}
       />
 
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 md:px-8 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-7 lg:pt-6">
-          <div className="hero-fade-up inline-flex items-center gap-2.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] text-ink-soft">
-            <span className="relative flex h-2 w-2">
+      <motion.div style={{ opacity: hintOpacity }} className="label pointer-events-none absolute inset-x-0 bottom-6 z-10 hidden flex-col items-center gap-3 text-muted lg:flex">
+        Scroll
+        <span className="relative h-10 w-px overflow-hidden bg-line"><span className="absolute inset-x-0 top-0 h-4 animate-[scrollcue_1.8s_ease-in-out_infinite] bg-ink" /></span>
+      </motion.div>
+
+      <div className="relative z-10 mx-auto grid min-h-[100svh] max-w-7xl grid-cols-1 items-center gap-14 px-5 pb-16 pt-28 md:px-10 lg:grid-cols-12 lg:gap-10 lg:pb-12 lg:pt-24">
+        {/* Copy */}
+        <div className="lg:col-span-7">
+          <div className="hero-fade-up flex w-fit items-center gap-3 rounded-full border border-line bg-card/60 py-1.5 pl-1.5 pr-4 text-[13px] text-ink-soft backdrop-blur-md">
+            <Image src="/durjoy.jpg" alt="" width={56} height={56} priority className="h-7 w-7 rounded-full object-cover object-top" />
+            <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3DDC84] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#3DDC84]" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3DDC84]" />
             </span>
-            Open to roles &amp; projects · Dhaka <DhakaTime />
+            Open to roles · Dhaka <DhakaTime />
           </div>
 
-          <h1 className="mt-8 font-serif text-[clamp(3.1rem,5.3vw,5.4rem)] leading-[0.95] tracking-[-0.02em]">
-            <span className="sr-only">Md Shoieb Hossain (Durjoy), software engineer and video editor. </span>
-            {[
-              { text: 'I build', italic: 'intelligent', rest: 'software', m: 'build' as Mode },
-              { text: '& cut', italic: 'cinematic', rest: 'stories.', m: 'cut' as Mode },
-            ].map((line, i) => (
-              <span key={line.m} className="block overflow-hidden pb-[0.06em]" aria-hidden>
-                <span
-                  className="hero-rise block cursor-pointer transition-colors duration-500"
-                  style={{ color: mode === line.m ? 'var(--color-ink)' : '#B9B6AD', animationDelay: `${0.1 + i * 0.12}s` }}
-                  onMouseEnter={() => setMode(line.m)}
-                  onClick={() => setMode(line.m)}
-                >
-                  {line.text}{' '}
-                  <em className={`transition-colors duration-500 ${mode === line.m ? 'text-accent' : ''}`}>{line.italic}</em>
-                  <br className="sm:hidden" /> {line.rest}
-                </span>
-              </span>
-            ))}
+          <p style={{ animationDelay: '0.05s' }} className="hero-fade-up label mt-10 text-muted">Hello, I&apos;m</p>
+          <h1 className="mt-4 text-[clamp(3.4rem,6.6vw,7rem)] font-semibold leading-[0.9] tracking-[-0.06em]">
+            <span className="block overflow-hidden pb-[0.04em]">
+              <span className="hero-rise block" style={{ animationDelay: '0.1s' }}>Shoieb Hossain</span>
+            </span>
+            <span className="block overflow-hidden pb-[0.12em]">
+              <span className="hero-rise block font-accent font-normal text-accent" style={{ animationDelay: '0.2s' }}>Durjoy</span>
+            </span>
           </h1>
 
-          <p
-            style={{ animationDelay: '0.45s' }}
-            className="hero-fade-up mt-8 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[18px]"
-          >
-            I&apos;m <strong className="font-semibold text-ink">Md Shoieb Hossain</strong>, a Computer Science student at BRAC University
-            building AI systems and full-stack platforms, and a video editor with 3+ years crafting commercials for an
-            international agency.
+          <p style={{ animationDelay: '0.35s' }} className="hero-fade-up mt-5 max-w-xl text-[clamp(1.2rem,1.7vw,1.6rem)] font-medium leading-snug tracking-[-0.02em]">
+            {[
+              { lead: 'I build', accent: 'intelligent', rest: 'software', m: 'build' as Persona },
+              { lead: '& cut', accent: 'cinematic', rest: 'stories.', m: 'cut' as Persona },
+            ].map((line) => (
+              <span
+                key={line.m}
+                className="cursor-default transition-opacity duration-500"
+                style={{ opacity: mode === line.m ? 1 : 0.4 }}
+                onMouseEnter={() => setMode(line.m)}
+              >
+                {line.lead} <span className="font-accent text-accent">{line.accent}</span> {line.rest}{' '}
+              </span>
+            ))}
           </p>
 
-          <div
-            style={{ animationDelay: '0.55s' }}
-            className="hero-fade-up mt-9 flex flex-wrap items-center gap-3"
-          >
+          <p style={{ animationDelay: '0.45s' }} className="hero-fade-up mt-6 max-w-md text-[16px] leading-relaxed text-ink-soft">
+            Computer Science at BRAC University, building AI systems and full-stack platforms. Three years cutting
+            commercials at Think Big Brand.
+          </p>
+
+          <div style={{ animationDelay: '0.55s' }} className="hero-fade-up mt-9 flex flex-wrap items-center gap-3">
             <button
               onClick={() => scrollToId('#work')}
-              className="group inline-flex h-14 items-center gap-3 rounded-full bg-accent pl-7 pr-2 text-[15px] font-medium text-white transition-transform hover:scale-[1.02]"
+              className="group inline-flex h-12 items-center gap-3 rounded-full bg-ink pl-6 pr-1.5 text-[14px] font-medium text-paper transition-colors hover:bg-accent hover:text-white"
             >
-              See selected work
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-accent transition-transform duration-500 group-hover:rotate-[-45deg]">
-                →
-              </span>
+              View work
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white transition-transform duration-500 group-hover:rotate-[-45deg] group-hover:bg-white group-hover:text-accent">→</span>
             </button>
             <a
               href={profile.resume}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center rounded-full border border-ink/15 bg-white px-7 text-[15px] font-medium transition-colors hover:border-ink"
+              className="inline-flex h-12 items-center rounded-full border border-line px-6 text-[14px] font-medium transition-colors hover:border-ink"
             >
-              Download résumé
+              Résumé
             </a>
-          </div>
-
-          <div
-            style={{ animationDelay: '0.8s' }}
-            className="hero-fade-in mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-6 text-[14px] text-muted"
-          >
-            <span><strong className="font-semibold text-ink">BRAC</strong> CS ’27</span>
-            <span><strong className="font-semibold text-ink">3+ yrs</strong> at Think Big Brand</span>
-            <span><strong className="font-semibold text-ink">2nd</strong> BSEC national</span>
           </div>
         </div>
 
-        <div className="relative lg:col-span-5">
-          {/* Entrance runs in CSS so the portrait paints before hydration; perspective sits here for the tilt below. */}
-          <div className="hero-pop-in" style={{ perspective: 1200, animationDelay: '0.2s' }}>
+        {/* 3D tool stack with its persona switch */}
+        <div className="flex flex-col items-center lg:col-span-5">
           <motion.div
-            onMouseMove={onMove}
-            onMouseLeave={() => { mx.set(0); my.set(0); }}
-            style={{ rotateX: rx, rotateY: ry, transformStyle: 'preserve-3d' }}
-            className="relative mx-auto max-w-[440px]"
+            className="hero-fade-in relative aspect-[6/5] w-full max-w-[560px]"
+            style={{ animationDelay: '0.2s', x: stageX, y: stageY, scale: stageScale }}
           >
-            <div className="relative aspect-[5/6] [container-type:inline-size]">
-              <motion.div
-                aria-hidden
-                className="absolute left-[2%] top-[21.7%] aspect-square w-[96%] rounded-full border border-dashed border-ink/20"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-              />
-              <div
-                className={`absolute bottom-0 left-[4%] aspect-square w-[92%] overflow-hidden rounded-full transition-colors duration-700 ${
-                  mode === 'build' ? 'bg-accent' : 'bg-ink'
-                } shadow-[0_40px_80px_-30px_rgba(18,18,16,0.5)]`}
-              >
-                <div
-                  aria-hidden
-                  className="absolute inset-0 transition-opacity duration-700"
-                  style={{
-                    background: 'radial-gradient(90% 70% at 30% 20%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%)',
-                    opacity: mode === 'build' ? 1 : 0.2,
-                  }}
-                />
-              </div>
-
-              <div
-                className="absolute inset-0"
-                style={{
-                  maskImage:
-                    'radial-gradient(circle 46cqw at 50% calc(100% - 46cqw), #000 99.5%, transparent 100%), linear-gradient(#000, #000)',
-                  maskSize: '100% 100%, 64% calc(100% - 46cqw)',
-                  maskPosition: '0 0, 50% 0',
-                  maskRepeat: 'no-repeat',
-                  WebkitMaskImage:
-                    'radial-gradient(circle 46cqw at 50% calc(100% - 46cqw), #000 99.5%, transparent 100%), linear-gradient(#000, #000)',
-                  WebkitMaskSize: '100% 100%, 64% calc(100% - 46cqw)',
-                  WebkitMaskPosition: '0 0, 50% 0',
-                  WebkitMaskRepeat: 'no-repeat',
-                }}
-              >
-                <Image
-                  src="/durjoy-portrait-3.webp"
-                  alt="Md Shoieb Hossain (Durjoy)"
-                  width={358}
-                  height={722}
-                  priority
-                  className="absolute left-[19%] top-[5%] h-auto w-[70%] max-w-none drop-shadow-[0_24px_30px_rgba(18,18,16,0.3)]"
-                />
-              </div>
-            </div>
-
-            <AnimatePresence mode="wait">
-              {mode === 'build' ? (
-                <motion.div
-                  key="build-card"
-                  initial={{ opacity: 0, y: 12, rotate: -4 }}
-                  animate={{ opacity: 1, y: 0, rotate: -4 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ duration: 0.5, ease }}
-                  style={{ translateZ: 60 }}
-                  className="absolute -left-2 bottom-10 hidden w-[210px] rounded-2xl sm:block border border-line bg-white p-4 shadow-xl sm:-left-16"
-                >
-                  <div className="mb-2 flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-                    <span className="ml-auto text-[10px] text-muted">gateway.py</span>
-                  </div>
-                  <pre className="whitespace-pre-wrap font-mono text-[11.5px] leading-[1.6] text-ink-soft">
-                    <span className="text-[#8B5CF6]">async def</span> <span className="text-accent">route</span>(query):{'\n'}
-                    {'  '}llm = pick_model(query){'\n'}
-                    {'  '}<span className="text-[#8B5CF6]">return await</span> llm.run(){'\n'}
-                    <span className="text-muted"># dispatch &lt;14ms</span>
-                    <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 animate-blink bg-ink" />
-                  </pre>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="cut-card"
-                  initial={{ opacity: 0, y: 12, rotate: 3 }}
-                  animate={{ opacity: 1, y: 0, rotate: 3 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ duration: 0.5, ease }}
-                  style={{ translateZ: 60 }}
-                  className="absolute -left-2 bottom-10 hidden w-[210px] rounded-2xl sm:block border border-line bg-white p-4 shadow-xl sm:-left-16"
-                >
-                  <div className="mb-3 flex items-center justify-between text-[10px] text-muted">
-                    <span>Timeline · Commercial_v12</span>
-                    <span>24fps</span>
-                  </div>
-                  {[['V2', 'w-[38%] ml-[18%]', 'bg-[#8B5CF6]/70'], ['V1', 'w-[72%]', 'bg-accent/80'], ['A1', 'w-[88%]', 'bg-[#3DDC84]/70']].map(([t, w, c]) => (
-                    <div key={t} className="mb-1.5 flex items-center gap-2">
-                      <span className="w-5 text-[10px] font-semibold text-muted">{t}</span>
-                      <div className="relative h-4 flex-1 rounded bg-paper">
-                        <motion.div className={`h-full rounded ${w} ${c}`} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.9, ease }} style={{ transformOrigin: 'left' }} />
-                      </div>
-                    </div>
-                  ))}
-                  <motion.div className="pointer-events-none absolute bottom-3 top-9 w-px bg-accent" initial={{ left: '30%' }} animate={{ left: ['30%', '88%', '30%'] }} transition={{ duration: 6, repeat: Infinity, ease: 'linear' }} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <button
-              onClick={() => scrollToId('#work')}
-              aria-label="Scroll to work"
-              className="[transform:translateZ(80px)] absolute right-0 -top-2 sm:-top-6 flex h-20 w-20 items-center justify-center rounded-full bg-ink sm:h-28 sm:w-28 text-white shadow-xl sm:-right-8"
-            >
-              <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full animate-[spin_14s_linear_infinite]">
-                <defs><path id="circle" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0" /></defs>
-                <text className="fill-white text-[9.5px] uppercase"><textPath href="#circle" textLength="224" lengthAdjust="spacing">Engineer ✦ Editor ✦ Engineer ✦ Editor ✦</textPath></text>
-              </svg>
-              <span className="text-2xl text-accent">↓</span>
-            </button>
+            <HeroLayers mode={mode} settle={settle} />
           </motion.div>
-          </div>
-
-          <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-full border border-line bg-white p-1" role="tablist" aria-label="Switch persona">
+          <div style={{ animationDelay: '0.65s' }} className="hero-fade-up mt-8 flex items-center gap-1 rounded-full border border-line bg-card/60 p-1 backdrop-blur-md" role="tablist" aria-label="Switch persona">
             {(['build', 'cut'] as const).map((m) => (
-              <button
-                key={m}
-                role="tab"
-                aria-selected={mode === m}
-                onClick={() => setMode(m)}
-                className="relative rounded-full px-6 py-2.5 text-[14px] font-medium"
-              >
-                {mode === m && (
-                  <motion.span layoutId="persona-pill" className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />
-                )}
-                <span className={`relative ${mode === m ? 'text-white' : 'text-muted'}`}>
-                  {m === 'build' ? '⌘ Build mode' : '● Cut mode'}
-                </span>
+              <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)} className="label relative rounded-full px-5 py-2">
+                {mode === m && <motion.span layoutId="persona-pill" className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+                <span className={`relative ${mode === m ? 'text-paper' : 'text-muted'}`}>{m === 'build' ? 'Build · code' : 'Cut · film'}</span>
               </button>
             ))}
           </div>
         </div>
       </div>
-
-      <div className="mt-20 overflow-hidden border-y border-line bg-white py-6 md:mt-28">
-        <div className="flex w-max animate-marquee items-center gap-10 whitespace-nowrap font-serif text-4xl md:text-6xl">
-          {Array.from({ length: 2 }).flatMap((_, k) =>
-            ['AI Engineering', 'Full-Stack Systems', 'Video Editing', 'Motion Design', 'Deep Learning', 'Color Grading'].map((w, i) => (
-              <span key={`${k}-${i}`} className="flex items-center gap-10" aria-hidden={k === 1}>
-                <span className={i % 2 ? 'italic text-muted' : ''}>{w}</span>
-                <span className="text-2xl text-accent">✦</span>
-              </span>
-            )),
-          )}
-        </div>
       </div>
     </section>
   );

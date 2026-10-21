@@ -23,20 +23,20 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="px-3 pb-3 md:px-4 md:pb-4">
-      <div className="relative overflow-hidden rounded-[36px] bg-ink px-6 pt-24 text-white md:px-12 md:pt-32">
+    <section id="contact" data-tone="dark" className="pb-3 pt-10 md:pb-4">
+      <div className="relative overflow-hidden px-6 pt-24 text-white md:px-12 md:pt-32">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
           style={{ background: 'radial-gradient(circle, #FF4F1A 0%, transparent 70%)' }}
         />
-        <div className="relative mx-auto max-w-6xl">
+        <div className="relative mx-auto max-w-7xl">
           <div className="flex items-center gap-3 text-[13px] font-medium uppercase tracking-[0.14em] text-white/60">
             <span className="h-2 w-2 rounded-full bg-[#3DDC84]" /> Available for roles & projects
           </div>
-          <h2 className="mt-8 font-serif text-[clamp(3.4rem,11vw,10rem)] leading-[0.9] tracking-[-0.03em]">
+          <h2 className="font-serif mt-8 text-[clamp(3.4rem,11vw,10rem)] leading-[0.9]">
             <LineReveal text="Let’s make" />
-            <LineReveal text="something good." delay={0.08} className="italic text-accent" />
+            <LineReveal text="something good." delay={0.08} className="font-accent text-accent" />
           </h2>
 
           <Reveal className="mt-14 flex flex-col gap-4 md:flex-row md:items-center">
@@ -46,7 +46,7 @@ export default function ContactSection() {
               className="group flex min-w-0 items-center justify-between gap-3 rounded-full border border-white/15 bg-white/5 py-2 pl-5 pr-2 text-left transition-colors hover:border-white/40 md:gap-6 md:pl-7"
             >
               <span className="truncate text-[15px] font-medium md:text-xl">{profile.email}</span>
-              <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-3 text-[13px] font-semibold transition-colors md:px-5 md:text-[14px] ${copied ? 'bg-[#3DDC84] text-ink' : 'bg-white text-ink group-hover:bg-accent group-hover:text-white'}`}>
+              <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-3 text-[13px] font-semibold transition-colors md:px-5 md:text-[14px] ${copied ? 'bg-[#3DDC84] text-[#121210]' : 'bg-white text-[#121210] group-hover:bg-accent group-hover:text-white'}`}>
                 {copied ? 'Copied ✓' : 'Copy email'}
               </span>
             </button>

@@ -7,10 +7,10 @@ export function Reveal({ children, delay = 0, className = '' }: { children: Reac
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
@@ -38,11 +38,10 @@ export function LineReveal({ text, className = '', delay = 0 }: { text: string; 
 
 export function SectionLabel({ index, children }: { index: string; children: ReactNode }) {
   return (
-    <div className="flex items-center gap-3 text-[13px] font-medium text-muted">
-      <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full border border-line px-2 text-[11px] text-ink">
-        {index}
-      </span>
-      <span className="uppercase tracking-[0.14em]">{children}</span>
+    <div className="label flex items-center gap-3 text-muted">
+      <span className="text-accent">{index}</span>
+      <span className="h-px w-8 bg-line" />
+      <span>{children}</span>
     </div>
   );
 }

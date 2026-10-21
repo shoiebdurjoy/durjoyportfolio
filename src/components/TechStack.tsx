@@ -1,101 +1,104 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
-import { stackGroups } from '@/src/data/content';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { stackGroups, type StackGroup } from '@/src/data/content';
 import { LineReveal, SectionLabel } from '@/src/components/ui/Reveal';
 
+const swatch: Record<string, string> = { eng: '#121210', ai: '#FF4F1A', cut: '#8B5CF6' };
+
+function GroupPanel({ group, index }: { group: StackGroup; index: number }) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <article className="flex w-full shrink-0 flex-col self-center rounded-[28px] border border-line bg-card p-7 shadow-[0_30px_60px_-40px_rgba(18,18,16,0.35)] md:w-[500px] md:p-9">
+      <div className="flex items-start justify-between">
+        <span className="label text-muted">{String(index + 1).padStart(2, '0')} / {String(stackGroups.length).padStart(2, '0')}</span>
+        <span className="h-3 w-3 rounded-full" style={{ background: swatch[group.key] }} />
+      </div>
+      <h3 className="mt-6 text-[40px] font-semibold leading-none tracking-[-0.045em]">{group.title}</h3>
+      <p className="mt-3 text-[15px] text-muted">{group.blurb}</p>
+      <ul className="mt-6 border-t border-line">
+        {group.items.map((item) => (
+          <li key={item.name} className="border-b border-line">
+            <button
+              onMouseEnter={() => setOpen(item.name)}
+              onMouseLeave={() => setOpen(null)}
+              onFocus={() => setOpen(item.name)}
+              onBlur={() => setOpen(null)}
+              onClick={() => setOpen((o) => (o === item.name ? null : item.name))}
+              aria-expanded={open === item.name}
+              className="group flex w-full flex-col py-2.5 text-left"
+            >
+              <span className="flex items-center justify-between text-[16px] font-medium">
+                {item.name}
+                <span className={`text-muted transition-transform duration-300 ${open === item.name ? 'rotate-45 text-accent' : ''}`}>+</span>
+              </span>
+              <span className={`grid transition-all duration-300 ${open === item.name ? 'mt-1 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <span className="overflow-hidden text-[14px] leading-snug text-muted">{item.context}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+function Intro() {
+  return (
+    <div className="flex shrink-0 flex-col justify-center md:w-[440px]">
+      <SectionLabel index="04">Toolkit</SectionLabel>
+      <h2 className="font-serif mt-6 text-[clamp(2.6rem,5vw,5rem)] leading-[0.95]">
+        <LineReveal text="Tools I actually" />
+        <LineReveal text="use, daily." delay={0.08} className="font-accent text-accent" />
+      </h2>
+      <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-soft">
+        Engineering, AI and the edit suite. Hover any tool to see where it earned its place.
+      </p>
+    </div>
+  );
+}
+
 export default function TechStack() {
-  const [active, setActive] = useState(0);
-  const [hovered, setHovered] = useState<string | null>(null);
-  const group = stackGroups[active];
-  const current = group.items.find((i) => i.name === hovered);
+  const section = useRef<HTMLElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const [travel, setTravel] = useState(0);
+  const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] });
+  const x = useTransform(scrollYProgress, [0.05, 0.95], [0, -travel], { clamp: true });
+
+  useEffect(() => {
+    const measure = () => setTravel(Math.max(0, (track.current?.scrollWidth ?? 0) - window.innerWidth + 80));
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (track.current) ro.observe(track.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
 
   return (
-    <section id="stack" className="border-y border-line bg-white">
-      <div className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
-        <SectionLabel index="03">Toolkit</SectionLabel>
-        <h2 className="mt-6 font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[0.95] tracking-[-0.02em]">
-          <LineReveal text="Tools I actually" />
-          <LineReveal text="use, daily." delay={0.08} className="italic text-muted" />
-        </h2>
-
-        <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-12">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar lg:col-span-4 lg:flex-col lg:gap-0" role="tablist" aria-label="Tool categories">
+    <div id="stack">
+      {/* Desktop: the rail scrubs sideways as the page scrolls down. */}
+      <section ref={section} className="relative hidden md:block" style={{ height: `calc(100vh + ${travel}px)` }}>
+        <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+          <motion.div ref={track} style={{ x }} className="flex items-center gap-6 pl-10 pr-10 lg:pl-[max(2.5rem,calc((100vw-80rem)/2+2.5rem))]">
+            <Intro />
             {stackGroups.map((g, i) => (
-              <button
-                key={g.key}
-                role="tab"
-                aria-selected={active === i}
-                onClick={() => { setActive(i); setHovered(null); }}
-                className={`group flex shrink-0 items-baseline justify-between gap-6 rounded-full border px-5 py-3 text-left transition-colors lg:rounded-none lg:border-0 lg:border-b lg:border-line lg:px-0 lg:py-6 ${
-                  active === i ? 'border-ink bg-ink text-white lg:bg-transparent lg:text-ink' : 'border-line text-muted hover:text-ink'
-                }`}
-              >
-                <span className="font-serif text-2xl lg:text-5xl">
-                  {active === i && <span className="mr-3 hidden text-accent lg:inline">→</span>}
-                  {g.title}
-                </span>
-                <span className="text-[13px] tabular-nums">{String(g.items.length).padStart(2, '0')}</span>
-              </button>
+              <GroupPanel key={g.key} group={g} index={i} />
             ))}
-            <p className="mt-6 hidden text-[15px] text-muted lg:block">{group.blurb}</p>
-          </div>
-
-          <div className="lg:col-span-8">
-            <AnimatePresence mode="wait">
-              <motion.ul
-                key={group.key}
-                className="grid grid-cols-2 gap-3 sm:grid-cols-3"
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-                variants={{ show: { transition: { staggerChildren: 0.03 } }, hidden: {} }}
-              >
-                {group.items.map((item) => (
-                  <motion.li
-                    key={item.name}
-                    variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <button
-                      onMouseEnter={() => setHovered(item.name)}
-                      onFocus={() => setHovered(item.name)}
-                      onClick={() => setHovered(item.name)}
-                      className={`flex w-full items-center justify-between rounded-2xl border px-5 py-5 text-left text-[16px] font-medium transition-all duration-300 ${
-                        hovered === item.name ? 'border-accent bg-accent-soft' : 'border-line bg-paper hover:border-ink/30'
-                      }`}
-                    >
-                      {item.name}
-                      <span className={`h-2 w-2 rounded-full transition-colors ${hovered === item.name ? 'bg-accent' : 'bg-ink/15'}`} />
-                    </button>
-                  </motion.li>
-                ))}
-              </motion.ul>
-            </AnimatePresence>
-
-            <div className="mt-6 flex min-h-[72px] items-center gap-4 rounded-2xl bg-ink px-6 py-5 text-white" aria-live="polite">
-              <span className="text-accent">✦</span>
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={current?.name ?? 'hint'}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.25 }}
-                  className="text-[15px] leading-snug"
-                >
-                  {current ? (
-                    <><strong className="font-semibold">{current.name}</strong> <span className="text-white/70">— {current.context}</span></>
-                  ) : (
-                    <span className="text-white/60">Hover or tap any tool to see where I&apos;ve used it in real work.</span>
-                  )}
-                </motion.p>
-              </AnimatePresence>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Mobile: stacked panels. */}
+      <section className="flex flex-col gap-5 px-5 py-24 md:hidden">
+        <Intro />
+        {stackGroups.map((g, i) => (
+          <GroupPanel key={g.key} group={g} index={i} />
+        ))}
+      </section>
+    </div>
   );
 }

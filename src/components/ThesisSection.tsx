@@ -13,20 +13,20 @@ export default function ThesisSection() {
   const { scrollYProgress } = useScroll({ target: listRef, offset: ['start 60%', 'end 60%'] });
 
   return (
-    <section id="thesis" className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
+    <section id="thesis" className="mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-36">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
-            <SectionLabel index="04">Research</SectionLabel>
-            <h2 className="mt-6 font-serif text-[clamp(2.6rem,5.5vw,4.6rem)] leading-[0.98] tracking-[-0.02em]">
-              Teaching machines to read <em className="text-accent">Bangla</em> emotion.
+            <SectionLabel index="05">Research</SectionLabel>
+            <h2 className="font-serif mt-6 text-[clamp(2.6rem,5.5vw,4.8rem)] leading-[0.98]">
+              Teaching machines to read <em className="font-accent text-accent">Bangla</em> emotion.
             </h2>
             <p className="mt-6 max-w-md text-[16px] leading-relaxed text-ink-soft">
               Bachelor&apos;s thesis at BRAC University: a multimodal deep learning pipeline that fuses voice and facial
               signals to classify emotion in conversational Bangla.
             </p>
 
-            <div className="mt-10 rounded-3xl border border-line bg-white p-6">
+            <div className="mt-10 rounded-3xl border border-line bg-card p-6">
               <div className="flex items-baseline justify-between">
                 <span className="text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">Pipeline stage</span>
                 <span className="font-serif text-5xl tabular-nums">
@@ -59,7 +59,7 @@ export default function ThesisSection() {
               onViewportEnter={() => setActive(i)}
               viewport={{ margin: '-45% 0px -45% 0px' }}
               className={`rounded-[28px] border p-7 transition-all duration-500 md:p-9 ${
-                active === i ? 'border-ink bg-white shadow-[0_30px_60px_-30px_rgba(18,18,16,0.3)]' : 'border-line bg-transparent opacity-60'
+                active === i ? 'border-ink bg-card shadow-[0_30px_60px_-30px_rgba(18,18,16,0.3)]' : 'border-line bg-transparent opacity-60'
               }`}
             >
               <div className="flex items-center justify-between">

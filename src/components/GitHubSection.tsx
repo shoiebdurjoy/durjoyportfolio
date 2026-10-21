@@ -21,20 +21,20 @@ export default function GitHubSection() {
   }, []);
 
   return (
-    <section id="github" className="mx-auto max-w-6xl px-5 pb-28 md:px-8 md:pb-36">
-      <div className="rounded-[32px] border border-line bg-white p-6 md:p-10">
+    <section id="github" className="mx-auto max-w-7xl px-5 pb-28 pt-28 md:px-10 md:pb-36 md:pt-36">
+      <div className="rounded-[32px] border border-line bg-card p-6 md:p-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <SectionLabel index="06">Open source</SectionLabel>
-            <h2 className="mt-5 font-serif text-5xl leading-none md:text-6xl">
-              Building <span className="italic text-muted">in public.</span>
+            <SectionLabel index="07">Open source</SectionLabel>
+            <h2 className="font-serif mt-5 text-5xl leading-none md:text-6xl">
+              Building <span className="font-accent text-accent">in public.</span>
             </h2>
           </div>
           <a
             href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-white transition-colors hover:bg-accent"
+            className="inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-paper transition-colors hover:bg-accent hover:text-white"
           >
             @{profile.githubHandle} ↗
           </a>

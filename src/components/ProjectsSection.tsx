@@ -1,18 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { projects, type Project } from '@/src/data/content';
 import { LineReveal, Reveal, SectionLabel } from '@/src/components/ui/Reveal';
 
 const ProjectModal = dynamic(() => import('./ProjectModal'), { ssr: false });
 
 const toneBg: Record<Project['tone'], string> = {
-  ink: 'bg-ink text-white',
-  clay: 'bg-clay',
-  sage: 'bg-sage',
-  sky: 'bg-sky',
+  ink: 'bg-[#121210] text-white',
+  clay: 'bg-clay text-[#121210]',
+  sage: 'bg-sage text-[#121210]',
+  sky: 'bg-sky text-[#121210]',
 };
 
 function VoiceVisual() {
@@ -44,15 +44,15 @@ function PlatformVisual() {
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="absolute inset-x-6 h-24 rounded-2xl border border-ink/10 bg-white p-3 shadow-sm"
+          className="absolute inset-x-6 h-24 rounded-2xl border border-[#121210]/10 bg-white p-3 shadow-sm"
           style={{ top: i * 14, scale: 1 - (2 - i) * 0.05, zIndex: i }}
           whileHover={{ y: -6 }}
         >
-          <div className="h-2 w-16 rounded-full bg-ink/80" />
-          <div className="mt-2 h-2 w-28 rounded-full bg-ink/15" />
+          <div className="h-2 w-16 rounded-full bg-[#121210]/80" />
+          <div className="mt-2 h-2 w-28 rounded-full bg-[#121210]/15" />
           <div className="mt-3 flex gap-1.5">
             <div className="h-8 flex-1 rounded-lg bg-clay" />
-            <div className="h-8 flex-1 rounded-lg bg-paper" />
+            <div className="h-8 flex-1 rounded-lg bg-[#F5F3EE]" />
           </div>
         </motion.div>
       ))}
@@ -66,7 +66,7 @@ function RadarVisual() {
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className="absolute h-full w-full rounded-full border border-ink/30"
+          className="absolute h-full w-full rounded-full border border-[#121210]/30"
           initial={{ scale: 0.2, opacity: 1 }}
           animate={{ scale: 1, opacity: 0 }}
           transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.8, ease: 'easeOut' }}
@@ -83,10 +83,10 @@ function RatingVisual() {
     <div className="w-full max-w-xs space-y-2">
       {[92, 74, 58, 31].map((w, i) => (
         <div key={i} className="flex items-center gap-3 text-[12px] font-medium">
-          <span className="w-6 text-muted">{5 - i}★</span>
+          <span className="w-6 text-[#77756D]">{5 - i}★</span>
           <div className="h-3 flex-1 overflow-hidden rounded-full bg-white">
             <motion.div
-              className="h-full rounded-full bg-ink"
+              className="h-full rounded-full bg-[#121210]"
               initial={{ width: 0 }}
               whileInView={{ width: `${w}%` }}
               viewport={{ once: true }}
@@ -106,70 +106,156 @@ const visuals: Record<string, () => React.ReactElement> = {
   gamecritic: RatingVisual,
 };
 
-const layout: Record<string, string> = {
-  durjoyai: 'md:col-span-2 md:row-span-2 min-h-[520px]',
-  lowkeybd: 'min-h-[300px]',
-  emergon: 'min-h-[300px]',
-  gamecritic: 'md:col-span-3 md:flex-row md:items-center min-h-[260px]',
-};
+// Gentle 3D tilt toward the cursor while hovering a card.
+const STEP = 30; // degrees between cards on the arc
+const RADIUS = 860;
+
+// Signed distance from the front slot, wrapped so the carousel loops endlessly.
+function wrapOffset(i: number, pos: number, n: number) {
+  return ((((i - pos + n / 2) % n) + n) % n) - n / 2;
+}
+
+function ArcCard({ project: p, index, pos, total, onPick }: {
+  project: Project;
+  index: number;
+  pos: MotionValue<number>;
+  total: number;
+  onPick: (index: number, k: number) => void;
+}) {
+  // Concave arc: neighbours swing toward the viewer and turn to face the centre.
+  const transform = useTransform(pos, (v) => {
+    const k = wrapOffset(index, v, total);
+    const a = (k * STEP * Math.PI) / 180;
+    return `translate3d(${RADIUS * Math.sin(a)}px, 0, ${RADIUS * (1 - Math.cos(a)) * 0.55}px) rotateY(${-k * STEP}deg)`;
+  });
+  const opacity = useTransform(pos, (v) => Math.max(0, 1 - Math.max(0, Math.abs(wrapOffset(index, v, total)) - 1.1) * 1.6));
+  const zIndex = useTransform(pos, (v) => 100 - Math.round(Math.abs(wrapOffset(index, v, total)) * 10));
+  const Visual = visuals[p.id];
+  const dark = p.tone === 'ink';
+
+  return (
+    <motion.button
+      type="button"
+      onClick={() => onPick(index, wrapOffset(index, pos.get(), total))}
+      aria-label={`${p.title}: ${p.short}`}
+      className={`absolute left-1/2 top-0 -ml-[170px] flex h-[440px] w-[340px] flex-col justify-between overflow-hidden rounded-[28px] p-6 text-left shadow-[0_40px_80px_-40px_rgba(18,18,16,0.5)] will-change-transform sm:-ml-[190px] sm:w-[380px] ${toneBg[p.tone]}`}
+      style={{ transform, opacity, zIndex }}
+    >
+      <div className={`flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] ${dark ? 'text-white/60' : 'text-[#121210]/60'}`}>
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <span>{p.year}</span>
+      </div>
+      <div className="pointer-events-none flex flex-1 items-center">{Visual && <div className="w-full"><Visual /></div>}</div>
+      <div>
+        <div className="text-[30px] font-semibold leading-none tracking-[-0.04em]">{p.title}</div>
+        <div className={`mt-2 text-[14px] ${dark ? 'text-white/60' : 'text-[#121210]/60'}`}>{p.short}</div>
+      </div>
+    </motion.button>
+  );
+}
 
 export default function ProjectsSection() {
   const [selected, setSelected] = useState<Project | null>(null);
+  const n = projects.length;
+  const pos = useMotionValue(0);
+  const [active, setActive] = useState(0);
+  const drag = useRef({ x: 0, start: 0, moved: false, down: false, lastX: 0, lastT: 0, v: 0 });
+  useMotionValueEvent(pos, 'change', (v) => setActive(((Math.round(v) % n) + n) % n));
+
+  const snapTo = useCallback((target: number) => animate(pos, target, { type: 'spring', stiffness: 170, damping: 26 }), [pos]);
+  const step = (dir: 1 | -1) => snapTo(Math.round(pos.get()) + dir);
+
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      const d = drag.current;
+      if (!d.down) return;
+      if (Math.abs(e.clientX - d.x) > 6) d.moved = true;
+      const now = performance.now();
+      d.v = (e.clientX - d.lastX) / Math.max(1, now - d.lastT);
+      d.lastX = e.clientX;
+      d.lastT = now;
+      pos.set(d.start - (e.clientX - d.x) / 360);
+    };
+    const up = () => {
+      const d = drag.current;
+      if (!d.down) return;
+      d.down = false;
+      snapTo(Math.round(pos.get() - d.v * 1.2));
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+  }, [pos, snapTo]);
+
+  const onPick = (index: number, k: number) => {
+    if (drag.current.moved) return;
+    if (Math.abs(k) < 0.5) setSelected(projects[index]);
+    else snapTo(pos.get() + k);
+  };
+
+  const current = projects[active];
 
   return (
-    <section id="work" className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
-      <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+    <section id="work" className="overflow-x-clip py-28 md:py-36">
+      <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 px-5 md:flex-row md:items-end md:px-10">
         <div>
-          <SectionLabel index="02">Selected work</SectionLabel>
-          <h2 className="mt-6 font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[0.95] tracking-[-0.02em]">
+          <SectionLabel index="03">Selected work</SectionLabel>
+          <h2 className="font-serif mt-6 text-[clamp(2.6rem,6vw,5.5rem)] leading-[0.95]">
             <LineReveal text="Systems I’ve" />
-            <LineReveal text="designed & shipped." delay={0.08} className="italic text-muted" />
+            <LineReveal text="designed & shipped." delay={0.08} className="font-accent text-accent" />
           </h2>
         </div>
         <Reveal>
-          <p className="max-w-xs text-[16px] leading-relaxed text-ink-soft">
-            From voice-driven AI to real-time dispatch. Open any project for the architecture and the decisions behind it.
+          <p className="max-w-xs text-[15px] leading-relaxed text-ink-soft">
+            Drag, swipe or use the arrows. Open the front card for the architecture and the decisions behind it.
           </p>
         </Reveal>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {projects.map((p, i) => {
-          const Visual = visuals[p.id];
-          const dark = p.tone === 'ink';
-          return (
-            <Reveal key={p.id} delay={i * 0.06} className={`${layout[p.id].includes('col-span-2') ? 'md:col-span-2 md:row-span-2' : ''} ${p.id === 'gamecritic' ? 'md:col-span-3' : ''}`}>
-              <button
-                onClick={() => setSelected(p)}
-                data-cursor="Open"
-                className={`group relative flex h-full w-full flex-col justify-between gap-8 overflow-hidden rounded-[28px] p-7 text-left transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] md:p-9 ${toneBg[p.tone]} ${layout[p.id]}`}
-              >
-                <div className="flex w-full items-center justify-between text-[13px] font-medium">
-                  <span className={dark ? 'text-white/60' : 'text-ink/60'}>{p.category}</span>
-                  <span className={`rounded-full px-3 py-1 ${dark ? 'bg-accent text-white' : 'bg-white/70'}`}>{p.year}</span>
-                </div>
+      <Reveal>
+        <div
+          className="relative mx-auto mt-16 h-[460px] cursor-grab select-none outline-none active:cursor-grabbing"
+          style={{ perspective: 1400, touchAction: 'pan-y' }}
+          onPointerDown={(e) => {
+            drag.current = { x: e.clientX, lastX: e.clientX, lastT: performance.now(), start: pos.get(), moved: false, down: true, v: 0 };
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') step(1);
+            if (e.key === 'ArrowLeft') step(-1);
+          }}
+          tabIndex={0}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Projects"
+        >
+          <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
+            {projects.map((p, i) => (
+              <ArcCard key={p.id} project={p} index={i} pos={pos} total={n} onPick={onPick} />
+            ))}
+          </div>
+        </div>
+      </Reveal>
 
-                <div className={`flex flex-1 items-center ${p.id === 'gamecritic' ? 'md:order-2 md:justify-end' : 'justify-center'} w-full`}>
-                  <div className="w-full">{Visual && <Visual />}</div>
-                </div>
-
-                <div className={`flex w-full items-end justify-between gap-6 ${p.id === 'gamecritic' ? 'md:order-1 md:max-w-md md:flex-col md:items-start' : ''}`}>
-                  <div>
-                    <h3 className={`font-serif leading-none ${p.id === 'durjoyai' ? 'text-6xl md:text-7xl' : 'text-4xl md:text-5xl'}`}>{p.title}</h3>
-                    <p className={`mt-3 max-w-md text-[15px] leading-snug ${dark ? 'text-white/70' : 'text-ink-soft'}`}>{p.tagline}</p>
-                  </div>
-                  <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg transition-all duration-500 group-hover:rotate-[-45deg] ${
-                      dark ? 'bg-white text-ink group-hover:bg-accent group-hover:text-white' : 'bg-ink text-white group-hover:bg-accent'
-                    }`}
-                  >
-                    →
-                  </span>
-                </div>
-              </button>
-            </Reveal>
-          );
-        })}
+      <div className="mx-auto mt-12 grid max-w-7xl grid-cols-1 items-end gap-6 px-5 md:grid-cols-12 md:px-10">
+        <div className="md:col-span-8" aria-live="polite">
+          <div className="label text-muted">{String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')} · {current.category}</div>
+          <motion.p key={current.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-3 max-w-2xl text-[18px] leading-relaxed text-ink-soft">
+            {current.tagline}
+          </motion.p>
+        </div>
+        <div className="flex items-center gap-3 md:col-span-4 md:justify-end">
+          <div className="mr-2 flex gap-1.5">
+            {projects.map((p, i) => (
+              <button key={p.id} aria-label={`Go to ${p.title}`} onClick={() => snapTo(pos.get() + wrapOffset(i, pos.get(), n))} className={`h-1.5 rounded-full transition-all duration-500 ${i === active ? 'w-8 bg-accent' : 'w-1.5 bg-line'}`} />
+            ))}
+          </div>
+          <button onClick={() => step(-1)} aria-label="Previous project" className="flex h-12 w-12 items-center justify-center rounded-full border border-line transition-colors hover:border-ink">←</button>
+          <button onClick={() => step(1)} aria-label="Next project" className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper transition-colors hover:bg-accent hover:text-white">→</button>
+          <button onClick={() => setSelected(current)} className="hidden h-12 items-center rounded-full border border-line px-5 text-[14px] font-medium transition-colors hover:border-ink sm:inline-flex">Case study</button>
+        </div>
       </div>
 
       {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}

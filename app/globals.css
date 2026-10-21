@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument), Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* `font-serif` is the display face for headings (tight Inter); `font-accent` is the italic serif accent. */
+  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-playfair), Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --color-paper: #F5F3EE;
   --color-card: #FFFFFF;
@@ -27,9 +30,46 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--color-paper);
-  overflow-x: hidden;
+}
+
+/* Palette tokens are re-written on :root while scrolling (see ScrollTone), fading the
+   whole page between its light and dark moments. These are the light defaults. */
+:root {
+  --tone: 1;
+  /* The page opens on the dark hero, so start dark to avoid a light flash before ScrollTone runs. */
+  --color-paper: rgb(12 12 11);
+  --color-card: rgb(24 24 22);
+  --color-ink: rgb(243 241 236);
+  --color-ink-soft: rgb(198 195 187);
+  --color-muted: rgb(140 138 131);
+  --color-line: rgb(40 39 36);
+  --color-accent-soft: rgb(58 28 18);
+}
+
+.font-serif {
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+
+.font-accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
 ::selection {
@@ -62,6 +102,11 @@ html.lenis, html.lenis body { height: auto; }
 .hero-fade-up { animation: hero-fade-up 0.9s var(--ease-out-expo) both; }
 .hero-fade-in { animation: hero-fade-in 1s ease-out both; }
 .hero-pop-in { animation: hero-pop-in 1.2s var(--ease-out-expo) both; }
+
+@keyframes scrollcue {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
 
 @keyframes blink { 50% { opacity: 0; } }
 .animate-blink { animation: blink 1s step-end infinite; }

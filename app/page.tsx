@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import Navigation from '@/src/components/Navigation';
+import ScrollTone from '@/src/components/ui/ScrollTone';
+import Timeline from '@/src/components/Timeline';
 import Hero from '@/src/components/Hero';
 import AboutSection from '@/src/components/AboutSection';
 import ProjectsSection from '@/src/components/ProjectsSection';
@@ -14,7 +16,6 @@ import GitHubSection from '@/src/components/GitHubSection';
 import ContactSection from '@/src/components/ContactSection';
 
 const CommandPalette = dynamic(() => import('@/src/components/CommandPalette'), { ssr: false });
-const Cursor = dynamic(() => import('@/src/components/ui/Cursor'), { ssr: false });
 
 export default function Home() {
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -33,11 +34,12 @@ export default function Home() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <Cursor />
+      <ScrollTone />
       <Navigation onCommandPaletteOpen={() => setPaletteOpen(true)} />
       <main>
         <Hero />
         <AboutSection />
+        <Timeline />
         <ProjectsSection />
         <TechStack />
         <ThesisSection />

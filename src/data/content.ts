@@ -14,6 +14,7 @@ export const profile = {
 
 export const navLinks = [
   { label: 'About', href: '#about' },
+  { label: 'Timeline', href: '#experience' },
   { label: 'Work', href: '#work' },
   { label: 'Stack', href: '#stack' },
   { label: 'Research', href: '#thesis' },

@@ -1,20 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Inter_Tight } from "next/font/google";
+import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
 import { profile, siteUrl } from "@/src/data/content";
 
-const instrument = Instrument_Serif({
+const inter = Inter({
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
+  variable: "--font-inter",
   display: "swap",
 });
 
-const interTight = Inter_Tight({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter-tight",
+  style: ["italic"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -52,7 +57,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F5F3EE",
+  themeColor: "#0C0C0B",
 };
 
 const jsonLd = {
@@ -75,7 +80,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${instrument.variable} ${interTight.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geistMono.variable} antialiased`}>
       <body className="min-h-screen font-sans bg-paper text-ink">
         <script
           type="application/ld+json"
