@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
-import { profile } from "@/src/data/content";
+import { profile, siteUrl } from "@/src/data/content";
 
 const instrument = Instrument_Serif({
   subsets: ["latin"],
@@ -18,7 +18,6 @@ const interTight = Inter_Tight({
   display: "swap",
 });
 
-const siteUrl = "https://durjoyportfolio.onrender.com";
 const title = "Md Shoieb Hossain (Durjoy) — Software Engineer & Video Editor";
 const description =
   "Portfolio of Md Shoieb Hossain (Durjoy): AI and full-stack engineer studying Computer Science at BRAC University, and a professional video editor with 3+ years of agency experience.";

@@ -47,18 +47,13 @@ export default function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-12 px-5 md:px-8 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-7 lg:pt-6">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease }}
-            className="inline-flex items-center gap-2.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] text-ink-soft"
-          >
+          <div className="hero-fade-up inline-flex items-center gap-2.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] text-ink-soft">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3DDC84] opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#3DDC84]" />
             </span>
             Open to roles &amp; projects · Dhaka <DhakaTime />
-          </motion.div>
+          </div>
 
           <h1 className="mt-8 font-serif text-[clamp(3.1rem,5.3vw,5.4rem)] leading-[0.95] tracking-[-0.02em]">
             <span className="sr-only">Md Shoieb Hossain (Durjoy), software engineer and video editor. </span>
@@ -67,39 +62,32 @@ export default function Hero() {
               { text: '& cut', italic: 'cinematic', rest: 'stories.', m: 'cut' as Mode },
             ].map((line, i) => (
               <span key={line.m} className="block overflow-hidden pb-[0.06em]" aria-hidden>
-                <motion.span
-                  className="block cursor-pointer transition-colors duration-500"
-                  style={{ color: mode === line.m ? 'var(--color-ink)' : '#B9B6AD' }}
-                  initial={{ y: '110%' }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 1.1, delay: 0.1 + i * 0.12, ease }}
+                <span
+                  className="hero-rise block cursor-pointer transition-colors duration-500"
+                  style={{ color: mode === line.m ? 'var(--color-ink)' : '#B9B6AD', animationDelay: `${0.1 + i * 0.12}s` }}
                   onMouseEnter={() => setMode(line.m)}
                   onClick={() => setMode(line.m)}
                 >
                   {line.text}{' '}
                   <em className={`transition-colors duration-500 ${mode === line.m ? 'text-accent' : ''}`}>{line.italic}</em>
                   <br className="sm:hidden" /> {line.rest}
-                </motion.span>
+                </span>
               </span>
             ))}
           </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.45, ease }}
-            className="mt-8 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[18px]"
+          <p
+            style={{ animationDelay: '0.45s' }}
+            className="hero-fade-up mt-8 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[18px]"
           >
             I&apos;m <strong className="font-semibold text-ink">Md Shoieb Hossain</strong>, a Computer Science student at BRAC University
             building AI systems and full-stack platforms, and a video editor with 3+ years crafting commercials for an
             international agency.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.55, ease }}
-            className="mt-9 flex flex-wrap items-center gap-3"
+          <div
+            style={{ animationDelay: '0.55s' }}
+            className="hero-fade-up mt-9 flex flex-wrap items-center gap-3"
           >
             <button
               onClick={() => scrollToId('#work')}
@@ -118,28 +106,25 @@ export default function Hero() {
             >
               Download résumé
             </a>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-6 text-[14px] text-muted"
+          <div
+            style={{ animationDelay: '0.8s' }}
+            className="hero-fade-in mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-6 text-[14px] text-muted"
           >
             <span><strong className="font-semibold text-ink">BRAC</strong> CS ’27</span>
             <span><strong className="font-semibold text-ink">3+ yrs</strong> at Think Big Brand</span>
             <span><strong className="font-semibold text-ink">2nd</strong> BSEC national</span>
-          </motion.div>
+          </div>
         </div>
 
-        <div className="relative lg:col-span-5" style={{ perspective: 1200 }}>
+        <div className="relative lg:col-span-5">
+          {/* Entrance runs in CSS so the portrait paints before hydration; perspective sits here for the tilt below. */}
+          <div className="hero-pop-in" style={{ perspective: 1200, animationDelay: '0.2s' }}>
           <motion.div
             onMouseMove={onMove}
             onMouseLeave={() => { mx.set(0); my.set(0); }}
             style={{ rotateX: rx, rotateY: ry, transformStyle: 'preserve-3d' }}
-            initial={{ opacity: 0, scale: 0.94, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.2, ease }}
             className="relative mx-auto max-w-[440px]"
           >
             <div className="relative aspect-[5/6] [container-type:inline-size]">
@@ -254,6 +239,7 @@ export default function Hero() {
               <span className="text-2xl text-accent">↓</span>
             </button>
           </motion.div>
+          </div>
 
           <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-full border border-line bg-white p-1" role="tablist" aria-label="Switch persona">
             {(['build', 'cut'] as const).map((m) => (

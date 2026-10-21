@@ -53,6 +53,16 @@ html.lenis, html.lenis body { height: auto; }
 }
 .animate-marquee { animation: marquee 40s linear infinite; }
 
+/* Hero entrance: plain CSS so it plays on first paint, before React hydrates. */
+@keyframes hero-rise { from { transform: translateY(110%); } }
+@keyframes hero-fade-up { from { opacity: 0; transform: translateY(16px); } }
+@keyframes hero-fade-in { from { opacity: 0; } }
+@keyframes hero-pop-in { from { opacity: 0; transform: translateY(30px) scale(0.94); } }
+.hero-rise { animation: hero-rise 1.1s var(--ease-out-expo) both; }
+.hero-fade-up { animation: hero-fade-up 0.9s var(--ease-out-expo) both; }
+.hero-fade-in { animation: hero-fade-in 1s ease-out both; }
+.hero-pop-in { animation: hero-pop-in 1.2s var(--ease-out-expo) both; }
+
 @keyframes blink { 50% { opacity: 0; } }
 .animate-blink { animation: blink 1s step-end infinite; }
 
@@ -62,6 +72,7 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }

@@ -1,3 +1,5 @@
+export const siteUrl = 'https://durjoyportfolio.onrender.com';
+
 export const profile = {
   name: 'Md Shoieb Hossain',
   nickname: 'Durjoy',
