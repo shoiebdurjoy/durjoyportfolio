@@ -1,10 +1,11 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { useRef, useState } from 'react';
 import { projects, type Project } from '@/src/data/content';
 import { LineReveal, Reveal, SectionLabel } from '@/src/components/ui/Reveal';
+import Section from '@/src/components/ui/Section';
 
 const ProjectModal = dynamic(() => import('./ProjectModal'), { ssr: false });
 
@@ -106,73 +107,99 @@ const visuals: Record<string, () => React.ReactElement> = {
   gamecritic: RatingVisual,
 };
 
-const layout: Record<string, string> = {
-  durjoyai: 'md:col-span-2 md:row-span-2 min-h-[520px]',
-  lowkeybd: 'min-h-[300px]',
-  emergon: 'min-h-[300px]',
-  gamecritic: 'md:col-span-3 md:flex-row md:items-center min-h-[260px]',
-};
+// Cards pin one over another; each buried card shrinks, tips back and darkens as the stack grows.
+function StackCard({ project: p, index: i, total: n, progress, onOpen }: {
+  project: Project;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+  onOpen: (p: Project) => void;
+}) {
+  const start = i / n;
+  const last = i === n - 1;
+  const scale = useTransform(progress, [start, 1], [1, 1 - (n - 1 - i) * 0.05]);
+  const rotateX = useTransform(progress, [start, Math.min(start + 1 / n, 1)], [0, last ? 0 : 7]);
+  const shade = useTransform(progress, [start, 1], [0, last ? 0 : 0.4]);
+  const Visual = visuals[p.id];
+  const dark = p.tone === 'ink';
+
+  return (
+    <div className="sticky" style={{ top: `calc(5.5rem + ${i * 18}px)` }}>
+      <motion.div style={{ scale, rotateX, transformPerspective: 1400, transformOrigin: '50% 0%' }} className="relative">
+        <button
+          onClick={() => onOpen(p)}
+          data-cursor="Open"
+          className={`group relative grid min-h-[540px] w-full grid-cols-1 gap-8 overflow-hidden rounded-[32px] p-7 text-left shadow-[0_40px_80px_-40px_rgba(18,18,16,0.45)] md:h-[68vh] md:max-h-[640px] md:grid-cols-2 md:p-12 ${toneBg[p.tone]}`}
+        >
+          <div className="flex flex-col justify-between gap-8">
+            <div className="flex items-center gap-3 text-[13px] font-medium">
+              <span className={`rounded-full px-3 py-1 ${dark ? 'bg-accent text-white' : 'bg-white/70'}`}>{p.year}</span>
+              <span className={dark ? 'text-white/60' : 'text-ink/60'}>{String(i + 1).padStart(2, '0')} / {String(n).padStart(2, '0')} · {p.category}</span>
+            </div>
+            <div>
+              <h3 className="font-serif text-6xl leading-[0.9] md:text-8xl">{p.title}</h3>
+              <p className={`mt-5 max-w-md text-[16px] leading-relaxed ${dark ? 'text-white/70' : 'text-ink-soft'}`}>{p.tagline}</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {p.stack.slice(0, 4).map((t) => (
+                  <span key={t} className={`rounded-full border px-3 py-1 text-[12px] font-medium ${dark ? 'border-white/15 text-white/80' : 'border-ink/15 text-ink/80'}`}>{t}</span>
+                ))}
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-3 text-[15px] font-medium">
+              <span
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg transition-all duration-500 group-hover:rotate-[-45deg] ${
+                  dark ? 'bg-white text-ink group-hover:bg-accent group-hover:text-white' : 'bg-ink text-white group-hover:bg-accent'
+                }`}
+              >
+                →
+              </span>
+              Open case study
+            </span>
+          </div>
+          <div className={`flex items-center justify-center rounded-[24px] p-6 ${dark ? 'bg-white/[0.04]' : 'bg-white/40'}`}>
+            <div className="w-full">{Visual && <Visual />}</div>
+          </div>
+        </button>
+        <motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[32px] bg-[#0A0B0F]" style={{ opacity: shade }} />
+      </motion.div>
+    </div>
+  );
+}
 
 export default function ProjectsSection() {
   const [selected, setSelected] = useState<Project | null>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: stackRef, offset: ['start 20%', 'end end'] });
 
   return (
-    <section id="work" className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
-      <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-        <div>
-          <SectionLabel index="02">Selected work</SectionLabel>
-          <h2 className="mt-6 font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[0.95] tracking-[-0.02em]">
-            <LineReveal text="Systems I’ve" />
-            <LineReveal text="designed & shipped." delay={0.08} className="italic text-muted" />
-          </h2>
+    <Section id="work" theme="light">
+      <div className="relative mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
+        <div data-core aria-hidden className="pointer-events-none absolute -left-[20vw] -top-6 aspect-square w-[34vw] max-w-[400px] md:-left-[12vw] md:top-0 md:w-[22vw]" />
+
+        <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+          <div>
+            <SectionLabel index="02">Selected work</SectionLabel>
+            <h2 className="mt-6 font-serif text-[clamp(2.8rem,7vw,6rem)] leading-[0.95] tracking-[-0.02em]">
+              <LineReveal text="Systems I’ve" />
+              <LineReveal text="designed & shipped." delay={0.08} className="italic text-muted" />
+            </h2>
+          </div>
+          <Reveal>
+            <p className="max-w-xs text-[16px] leading-relaxed text-ink-soft">
+              From voice-driven AI to real-time dispatch. Open any project for the architecture and the decisions behind it.
+            </p>
+          </Reveal>
         </div>
-        <Reveal>
-          <p className="max-w-xs text-[16px] leading-relaxed text-ink-soft">
-            From voice-driven AI to real-time dispatch. Open any project for the architecture and the decisions behind it.
-          </p>
-        </Reveal>
-      </div>
 
-      <div className="mt-16 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {projects.map((p, i) => {
-          const Visual = visuals[p.id];
-          const dark = p.tone === 'ink';
-          return (
-            <Reveal key={p.id} delay={i * 0.06} className={`${layout[p.id].includes('col-span-2') ? 'md:col-span-2 md:row-span-2' : ''} ${p.id === 'gamecritic' ? 'md:col-span-3' : ''}`}>
-              <button
-                onClick={() => setSelected(p)}
-                data-cursor="Open"
-                className={`group relative flex h-full w-full flex-col justify-between gap-8 overflow-hidden rounded-[28px] p-7 text-left transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[0.985] md:p-9 ${toneBg[p.tone]} ${layout[p.id]}`}
-              >
-                <div className="flex w-full items-center justify-between text-[13px] font-medium">
-                  <span className={dark ? 'text-white/60' : 'text-ink/60'}>{p.category}</span>
-                  <span className={`rounded-full px-3 py-1 ${dark ? 'bg-accent text-white' : 'bg-white/70'}`}>{p.year}</span>
-                </div>
-
-                <div className={`flex flex-1 items-center ${p.id === 'gamecritic' ? 'md:order-2 md:justify-end' : 'justify-center'} w-full`}>
-                  <div className="w-full">{Visual && <Visual />}</div>
-                </div>
-
-                <div className={`flex w-full items-end justify-between gap-6 ${p.id === 'gamecritic' ? 'md:order-1 md:max-w-md md:flex-col md:items-start' : ''}`}>
-                  <div>
-                    <h3 className={`font-serif leading-none ${p.id === 'durjoyai' ? 'text-6xl md:text-7xl' : 'text-4xl md:text-5xl'}`}>{p.title}</h3>
-                    <p className={`mt-3 max-w-md text-[15px] leading-snug ${dark ? 'text-white/70' : 'text-ink-soft'}`}>{p.tagline}</p>
-                  </div>
-                  <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg transition-all duration-500 group-hover:rotate-[-45deg] ${
-                      dark ? 'bg-white text-ink group-hover:bg-accent group-hover:text-white' : 'bg-ink text-white group-hover:bg-accent'
-                    }`}
-                  >
-                    →
-                  </span>
-                </div>
-              </button>
-            </Reveal>
-          );
-        })}
+        <div ref={stackRef} className="relative mt-16 flex flex-col gap-[16vh]">
+          <div data-core="hide" aria-hidden className="pointer-events-none absolute left-1/2 top-[35%]" />
+          {projects.map((p, i) => (
+            <StackCard key={p.id} project={p} index={i} total={projects.length} progress={scrollYProgress} onOpen={setSelected} />
+          ))}
+        </div>
       </div>
 
       {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}
-    </section>
+    </Section>
   );
 }

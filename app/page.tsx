@@ -15,6 +15,7 @@ import ContactSection from '@/src/components/ContactSection';
 
 const CommandPalette = dynamic(() => import('@/src/components/CommandPalette'), { ssr: false });
 const Cursor = dynamic(() => import('@/src/components/ui/Cursor'), { ssr: false });
+const CoreScene = dynamic(() => import('@/src/components/three/CoreScene'), { ssr: false });
 
 export default function Home() {
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function Home() {
 
   return (
     <MotionConfig reducedMotion="user">
+      <CoreScene />
       <Cursor />
       <Navigation onCommandPaletteOpen={() => setPaletteOpen(true)} />
       <main>

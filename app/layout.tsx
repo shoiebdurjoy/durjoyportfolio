@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F5F3EE",
+  themeColor: "#0A0B0F",
 };
 
 const jsonLd = {

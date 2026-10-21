@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { featuredRepos, profile } from '@/src/data/content';
 import { Reveal, SectionLabel } from '@/src/components/ui/Reveal';
+import Section from '@/src/components/ui/Section';
 
 type Day = { date: string; level: number };
 type Week = { week: number; days: Day[] };
@@ -12,6 +14,10 @@ const levels = ['bg-paper', 'bg-[#FFD3C2]', 'bg-[#FFA27F]', 'bg-[#FF7444]', 'bg-
 export default function GitHubSection() {
   const [weeks, setWeeks] = useState<Week[] | null>(null);
   const [hover, setHover] = useState<Day | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: gridRef, offset: ['start end', 'center 55%'] });
+  const tilt = useTransform(scrollYProgress, [0, 1], [48, 0]);
+  const lift = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
 
   useEffect(() => {
     fetch('/api/github')
@@ -21,8 +27,9 @@ export default function GitHubSection() {
   }, []);
 
   return (
-    <section id="github" className="mx-auto max-w-6xl px-5 pb-28 md:px-8 md:pb-36">
-      <div className="rounded-[32px] border border-line bg-white p-6 md:p-10">
+    <Section id="github" theme="light">
+      <div className="mx-auto max-w-6xl px-5 py-28 md:px-8 md:py-36">
+      <div className="rounded-[32px] border border-line bg-card p-6 shadow-[0_40px_80px_-50px_rgba(18,18,16,0.35)] md:p-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <SectionLabel index="06">Open source</SectionLabel>
@@ -40,7 +47,12 @@ export default function GitHubSection() {
           </a>
         </div>
 
-        <div className="mt-10 overflow-x-auto pb-2 no-scrollbar" data-lenis-prevent-horizontal>
+        <motion.div
+          ref={gridRef}
+          style={{ rotateX: tilt, scale: lift, transformPerspective: 1100, transformOrigin: '50% 100%' }}
+          className="mt-10 overflow-x-auto pb-2 no-scrollbar"
+          data-lenis-prevent-horizontal
+        >
           <div className="flex min-w-[740px] gap-[4px]" aria-label="GitHub contribution calendar" role="img">
             {(weeks && weeks.length ? weeks : Array.from({ length: 53 }, (_, i) => ({ week: i, days: [] as Day[] }))).map((w) => (
               <div key={w.week} className="flex flex-1 flex-col gap-[4px]">
@@ -58,7 +70,7 @@ export default function GitHubSection() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
         <div className="mt-3 flex items-center justify-between text-[13px] text-muted">
           <span>{hover ? `${hover.date} · level ${hover.level}` : 'Last 12 months'}</span>
           <span className="flex items-center gap-1.5">
@@ -90,6 +102,7 @@ export default function GitHubSection() {
           ))}
         </div>
       </div>
-    </section>
+      </div>
+    </Section>
   );
 }
