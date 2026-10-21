@@ -13,6 +13,7 @@ const toneBg: Record<Project['tone'], string> = {
   clay: 'bg-clay text-[#121210]',
   sage: 'bg-sage text-[#121210]',
   sky: 'bg-sky text-[#121210]',
+  violet: 'bg-[#E3DEFF] text-[#121210]',
 };
 
 function VoiceVisual() {
@@ -99,7 +100,41 @@ function RatingVisual() {
   );
 }
 
+function TbbVisual() {
+  const rows = [
+    ['Ad cut · Client 25', 'QC · first approval', '#8B5CF6'],
+    ['Talking head · Client 50', 'In edit', '#FF5A24'],
+    ['Short · Client 12', 'Sent to client', '#22C55E'],
+  ];
+  return (
+    <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-xl border border-[#121210]/10 bg-white shadow-[0_20px_40px_-24px_rgba(18,18,16,0.45)]">
+      <div className="flex items-center gap-1.5 border-b border-[#121210]/10 px-3 py-2">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#FF5F57]" />
+        <span className="h-1.5 w-1.5 rounded-full bg-[#FEBC2E]" />
+        <span className="h-1.5 w-1.5 rounded-full bg-[#28C840]" />
+        <span className="ml-2 text-[10px] font-semibold text-[#121210]/60">Content pipeline</span>
+      </div>
+      <div className="space-y-1.5 p-3">
+        {rows.map(([name, status, c]) => (
+          <div key={name} className="flex items-center gap-2 rounded-lg bg-[#F5F3EE] px-2.5 py-2">
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: c }} />
+            <span className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#121210]">{name}</span>
+            <span className="shrink-0 rounded-full px-2 py-0.5 text-[9px] font-semibold text-white" style={{ background: c }}>{status}</span>
+          </div>
+        ))}
+        <div className="flex gap-1 pt-1.5">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <span key={i} className="h-1 flex-1 rounded-full" style={{ background: i < 7 ? '#8B5CF6' : '#E3E0D8' }} />
+          ))}
+        </div>
+        <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#121210]/50">10-stage QC workflow</div>
+      </div>
+    </div>
+  );
+}
+
 const visuals: Record<string, () => React.ReactElement> = {
+  tbb: TbbVisual,
   durjoyai: VoiceVisual,
   lowkeybd: PlatformVisual,
   emergon: RadarVisual,

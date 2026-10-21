@@ -31,6 +31,12 @@ const clips: Clip[] = [
     tags: ['TypeScript', 'Docker', 'OpenRouter', 'Alexa'],
   },
   {
+    id: 'tbb-workspace', layer: 'TBB Workspace', title: 'TBB Workspace — production platform', from: 2026.2, to: TODAY,
+    when: 'Mar 2026 — present', color: '#F472B6',
+    detail: 'Internal workspace for Think Big Brand: a 10-stage QC workflow, role-based access enforced by Postgres row-level security, and a built-in plain-English assistant.',
+    tags: ['React', 'TypeScript', 'Supabase', 'PostgreSQL'],
+  },
+  {
     id: 'emergon', layer: 'EMERGON', title: 'EMERGON — smart emergency system', from: 2026.05, to: 2026.45,
     when: 'Spring 2026', color: '#F5B841',
     detail: 'Four-person team. Real-time Socket.IO coordination, Twilio SMS alerts and Google Maps request mapping; backend on Render, frontend on Vercel.',

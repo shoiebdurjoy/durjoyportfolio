@@ -42,17 +42,45 @@ export type Project = {
   stack: string[];
   github?: string;
   liveDemo?: string;
-  tone: 'ink' | 'clay' | 'sage' | 'sky';
+  tone: 'ink' | 'clay' | 'sage' | 'sky' | 'violet';
 };
 
 export const projects: Project[] = [
+  {
+    id: 'tbb',
+    title: 'TBB Workspace',
+    short: 'Video production workflow platform',
+    tagline: 'A ClickUp-style workspace for video production, with a 10-stage QC pipeline, roles and a built-in assistant.',
+    category: 'Full-Stack Platform',
+    year: 'Flagship',
+    overview:
+      "TBB Workspace is the internal production workspace for Think Big Brand, built around how a video agency really works: client pipelines, editors, QC reviewers and revision rounds. It models Workspace → Space → Folder → List → Task → Subtask, runs every video through a 10-stage workflow with QC gating, and is backed by Supabase Postgres with row-level security so each role only sees and changes what it should. Built in 15 gated phases, with a documented roadmap, permission model and test strategy.",
+    architecture: {
+      title: 'Workspace, Workflow & Permissions Architecture',
+      flow: ['React + Vite Client', 'Supabase Auth (roles)', 'PostgreSQL + Row-Level Security', 'Workflow & QC Engine', 'Comments, Activity & Notifications', 'Built-in Assistant'],
+      details:
+        'The typed React client talks to Supabase through TanStack Query. Roles (Owner, Admin, Manager, QC, Editor) are enforced in the database with RLS, not only in the UI, and every migration is exercised by an offline in-process Postgres test suite plus live checks. The workflow engine moves each video through the production stages, auto-assigning QC reviewers and counting revisions.',
+    },
+    features: [
+      'Six-level hierarchy (Workspace to Subtask) that mirrors real client pipelines',
+      '10-stage production workflow with QC gating, revision counters and role-based status rules',
+      'List, board and table views, filters, and a global Ctrl+K command palette',
+      'Threaded @mentions, timestamped video notes, activity log and notification centre',
+      'Row-level security verified by an in-process Postgres suite and live tests',
+      'Built-in assistant that understands plain English and runs changes with the manager’s own permissions, after confirmation, with no external AI service',
+    ],
+    stack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'TanStack Query', 'Vitest'],
+    github: 'https://github.com/shoiebdurjoy/workspace-manager',
+    liveDemo: 'https://workspace-manager-five.vercel.app/login',
+    tone: 'violet',
+  },
   {
     id: 'durjoyai',
     title: 'DurjoyAI',
     short: 'Multi-LLM voice assistant',
     tagline: 'Amazon Alexa voice integration and multi-provider LLM orchestration with persistent Brain-0 memory.',
     category: 'Artificial Intelligence',
-    year: 'Flagship',
+    year: 'AI',
     overview:
       'DurjoyAI is an intelligent personal AI assistant engineered with custom Amazon Alexa voice command integration, multi-model failover (OpenAI, Google Gemini, OpenRouter), and a persistent context architecture ("Brain 0"). Designed to execute automated PC scripts, process multimodal queries, and maintain long-term memory across voice sessions.',
     architecture: {
@@ -162,6 +190,7 @@ export const stackGroups: StackGroup[] = [
       { name: 'FastAPI', context: 'High-throughput async Python APIs for AI model serving' },
       { name: 'React', context: 'Component-driven UI across multiple platforms' },
       { name: 'Flask', context: 'REST API and Socket.IO engine for EMERGON' },
+      { name: 'Supabase', context: 'Auth, Postgres and row-level security behind TBB Workspace' },
       { name: 'PostgreSQL', context: 'Primary relational database for EMERGON and LowKeyBD' },
       { name: 'Redis', context: 'In-memory caching and session store for LowKeyBD' },
       { name: 'Docker', context: 'Containerization across DurjoyAI and full-stack environments' },
