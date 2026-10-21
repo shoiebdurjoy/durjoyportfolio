@@ -73,11 +73,13 @@ export default function Timeline() {
   const { scrollYProgress } = useScroll({ target: panel, offset: ['start 85%', 'end 35%'] });
   const head = useTransform(scrollYProgress, [0, 1], [START, TODAY]);
   const left = useTransform(head, (y) => pct(y));
-  const [time, setTime] = useState(START);
-  useMotionValueEvent(head, 'change', setTime);
+  // Re-render only when the playhead crosses into a new month, not on every scroll frame.
+  const [monthIndex, setMonthIndex] = useState(START * 12);
+  useMotionValueEvent(head, 'change', (y) => setMonthIndex(Math.floor(y * 12)));
+  const time = monthIndex / 12;
 
-  const year = Math.floor(time);
-  const month = Math.min(12, Math.floor((time - year) * 12) + 1);
+  const year = Math.floor(monthIndex / 12);
+  const month = (monthIndex % 12) + 1;
   const shown = hover ?? clips.find((c) => time >= c.from && time <= c.to) ?? null;
 
   return (

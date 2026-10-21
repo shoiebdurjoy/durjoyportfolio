@@ -157,7 +157,7 @@ export default function HeroLayers({ mode, settle }: { mode: Persona; settle: Mo
   const zEditor = useTransform(spread, (s) => (build ? 90 : -10) * s);
   const zTimeline = useTransform(spread, (s) => (build ? 10 : 110) * s);
   const zMonitor = useTransform(spread, (s) => -110 * s);
-  const panel = 'absolute overflow-hidden rounded-xl border border-white/10 bg-[#121214]/85 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] backdrop-blur-xl';
+  const panel = 'absolute overflow-hidden rounded-xl border border-white/10 bg-[#141416]/95 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)]';
 
   return (
     <div className="relative h-full w-full" style={{ perspective: 1600 }}>

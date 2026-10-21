@@ -1,16 +1,12 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { navLinks, profile } from '@/src/data/content';
 import { scrollToId } from '@/src/components/Navigation';
 import { LineReveal, Reveal } from '@/src/components/ui/Reveal';
 
 export default function ContactSection() {
   const [copied, setCopied] = useState(false);
-  const footerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: footerRef, offset: ['start end', 'end end'] });
-  const wordY = useTransform(scrollYProgress, [0, 1], ['40%', '0%']);
 
   const copy = async () => {
     try {
@@ -27,8 +23,8 @@ export default function ContactSection() {
       <div className="relative overflow-hidden px-6 pt-24 text-white md:px-12 md:pt-32">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #FF4F1A 0%, transparent 70%)' }}
+          className="pointer-events-none absolute -right-48 -top-48 h-[760px] w-[760px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,79,26,0.32) 0%, rgba(255,79,26,0) 62%)' }}
         />
         <div className="relative mx-auto max-w-7xl">
           <div className="flex items-center gap-3 text-[13px] font-medium uppercase tracking-[0.14em] text-white/60">
@@ -89,18 +85,9 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <div ref={footerRef} className="relative mt-16 overflow-hidden">
-          <motion.div
-            style={{ y: wordY }}
-            aria-hidden
-            className="select-none text-center font-serif text-[27vw] leading-[0.75] tracking-[-0.04em] text-white/[0.07]"
-          >
-            Durjoy
-          </motion.div>
-          <div className="absolute inset-x-0 bottom-6 flex flex-col justify-between gap-2 text-[13px] text-white/40 md:flex-row">
-            <span>© {new Date().getFullYear()} {profile.name}</span>
-            <span>Designed & built in Dhaka with Next.js</span>
-          </div>
+        <div className="relative mt-16 flex flex-col justify-between gap-2 border-t border-white/10 py-8 text-[13px] text-white/40 md:flex-row">
+          <span>© {new Date().getFullYear()} {profile.name}</span>
+          <span>Designed &amp; built in Dhaka with Next.js</span>
         </div>
       </div>
     </section>

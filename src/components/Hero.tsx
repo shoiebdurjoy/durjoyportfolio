@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { motion, useMotionValue, useScroll, useTransform } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { animate, motion, useMotionValue, useScroll, useTransform } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { profile } from '@/src/data/content';
 import { scrollToId } from '@/src/components/Navigation';
 import HeroLayers from '@/src/components/HeroLayers';
@@ -27,30 +27,29 @@ function DhakaTime() {
 
 export default function Hero() {
   const [mode, setMode] = useState<Persona>('build');
-  const section = useRef<HTMLElement>(null);
-  const [desk, setDesk] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const sync = () => setDesk(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
 
-  // Desktop intro: the hero pins while the tool stack settles from centre stage to the right and
-  // the copy slides in. On smaller screens everything is simply laid out.
-  const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] });
-  const settled = useMotionValue(1);
-  const progress = useTransform(scrollYProgress, [0, 0.6], [0, 1], { clamp: true });
-  const settle = desk ? progress : settled;
+  // The tool stack plays its entrance on load (tipped back and spread → upright), so the first
+  // scroll goes straight into the story instead of scrubbing a pinned intro.
+  const settle = useMotionValue(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      settle.set(1);
+      return;
+    }
+    const controls = animate(settle, 1, { duration: 1.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] });
+    return () => controls.stop();
+  }, [settle]);
   const stageX = useTransform(settle, [0, 1], ['3vw', '0vw']);
   const stageScale = useTransform(settle, [0, 1], [1.06, 1]);
-  const stageY = useTransform(settle, [0, 1], ['2vh', '0vh']);
-  const hintOpacity = useTransform(settle, [0, 0.2], [1, 0]);
+
+  // Leaving the hero: the stack drifts a touch slower than the page, and the cue fades.
+  const { scrollY } = useScroll();
+  const stageY = useTransform(scrollY, [0, 900], [0, 120]);
+  const hintOpacity = useTransform(scrollY, [0, 160], [1, 0]);
 
   return (
-    <section ref={section} id="top" data-tone="dark" className="relative lg:h-[240vh]">
-      <div className="relative min-h-[100svh] overflow-hidden lg:sticky lg:top-0 lg:h-screen">
+    <section id="top" data-tone="dark" className="relative">
+      <div className="relative min-h-[100svh] overflow-hidden">
       {/* Faint grid + glow behind the drop. */}
       <div
         aria-hidden
@@ -62,10 +61,16 @@ export default function Hero() {
           WebkitMaskImage: 'radial-gradient(70% 60% at 65% 45%, #000 0%, transparent 75%)',
         }}
       />
+      {/* Soft glows as plain gradients: a CSS blur filter this large is costly while scrolling. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-10%] top-[5%] h-[80vh] w-[80vh] rounded-full blur-[120px] transition-colors duration-1000"
-        style={{ background: mode === 'build' ? 'rgba(255,79,26,0.16)' : 'rgba(143,168,255,0.16)' }}
+        className="pointer-events-none absolute right-[-15%] top-[-5%] h-[110vh] w-[110vh] rounded-full transition-opacity duration-1000"
+        style={{ background: 'radial-gradient(circle, rgba(255,79,26,0.16) 0%, rgba(255,79,26,0) 62%)', opacity: mode === 'build' ? 1 : 0 }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-[-15%] top-[-5%] h-[110vh] w-[110vh] rounded-full transition-opacity duration-1000"
+        style={{ background: 'radial-gradient(circle, rgba(143,168,255,0.14) 0%, rgba(143,168,255,0) 62%)', opacity: mode === 'cut' ? 1 : 0 }}
       />
 
       <motion.div style={{ opacity: hintOpacity }} className="label pointer-events-none absolute inset-x-0 bottom-6 z-10 hidden flex-col items-center gap-3 text-muted lg:flex">

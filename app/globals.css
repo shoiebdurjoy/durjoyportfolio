@@ -24,7 +24,7 @@
 }
 
 html {
-  background: var(--color-paper);
+  background: #F5F3EE;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -35,22 +35,33 @@ html, body {
 }
 
 body {
-  background: var(--color-paper);
+  background: transparent;
 }
 
-/* Palette tokens are re-written on :root while scrolling (see ScrollTone), fading the
-   whole page between its light and dark moments. These are the light defaults. */
-:root {
-  --tone: 1;
-  /* The page opens on the dark hero, so start dark to avoid a light flash before ScrollTone runs. */
-  --color-paper: rgb(12 12 11);
-  --color-card: rgb(24 24 22);
-  --color-ink: rgb(243 241 236);
-  --color-ink-soft: rgb(198 195 187);
-  --color-muted: rgb(140 138 131);
-  --color-line: rgb(40 39 36);
-  --color-accent-soft: rgb(58 28 18);
+/* Scroll-driven tone (see ScrollTone). The dark backdrop is one fixed layer whose opacity
+   follows the scroll — compositor-only, so it never restyles the page. Text and surface tokens
+   flip once when the tone crosses the midpoint, where the backdrop is mid-grey and the swap
+   reads as part of the fade. (Transitioning colours here would restyle every element per frame.) */
+.tone-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #0C0C0B;
+  will-change: opacity;
 }
+
+html.tone-dark {
+  --color-paper: #0C0C0B;
+  --color-card: #181816;
+  --color-ink: #F3F1EC;
+  --color-ink-soft: #C6C3BB;
+  --color-muted: #8C8A83;
+  --color-line: #282724;
+  --color-accent-soft: #3A1C12;
+}
+
+
 
 .font-serif {
   font-weight: 600;

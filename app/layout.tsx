@@ -80,8 +80,9 @@ const jsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geistMono.variable} antialiased`}>
-      <body className="min-h-screen font-sans bg-paper text-ink">
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geistMono.variable} tone-dark antialiased`}>
+      <body className="min-h-screen font-sans text-ink">
+        <div id="tone-layer" aria-hidden className="tone-layer" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
