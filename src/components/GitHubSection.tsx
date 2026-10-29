@@ -25,7 +25,7 @@ export default function GitHubSection() {
       <div className="rounded-[32px] border border-line bg-card p-6 md:p-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <SectionLabel index="07">Open source</SectionLabel>
+            <SectionLabel index="09">Open source</SectionLabel>
             <h2 className="font-serif mt-5 text-5xl leading-none md:text-6xl">
               Building <span className="font-accent text-accent">in public.</span>
             </h2>

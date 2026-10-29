@@ -25,7 +25,7 @@ export const navLinks = [
 export const stats = [
   { value: 3, suffix: '+', label: 'Years editing', detail: 'Think Big Brand, an international content agency: ads, shorts and talking-head videos for businesses.' },
   { value: 7, suffix: '+', label: 'Shipped repos', detail: 'Production AI (DurjoyAI), full-stack platforms (LowKeyBD) and deep learning research.' },
-  { value: 2, suffix: 'nd', label: 'National place', detail: 'Runner-up in the Bangladesh Securities & Exchange Commission (BSEC) national competition.' },
+  { value: 2, suffix: 'nd', label: 'National place', detail: 'Second Prize in the Bangladesh Securities & Exchange Commission (BSEC) national financial-literacy short-video competition.' },
   { value: 27, prefix: "'", label: 'BRAC CS', detail: 'B.S. in Computer Science, focused on backend architecture and machine learning.' },
 ];
 
@@ -43,6 +43,10 @@ export type Project = {
   github?: string;
   liveDemo?: string;
   tone: 'ink' | 'clay' | 'sage' | 'sky' | 'violet' | 'mint';
+  // Recruiter-facing summary: the problem, what was built, and checkable proof.
+  problem?: string;
+  built?: string;
+  proof?: string[];
 };
 
 export const projects: Project[] = [
@@ -73,6 +77,9 @@ export const projects: Project[] = [
     github: 'https://github.com/shoiebdurjoy/workspace-manager',
     liveDemo: 'https://workspace-manager-five.vercel.app/login',
     tone: 'violet',
+    problem: 'A video agency moves every edit from raw footage to client delivery through QC sign-off, revisions and many hands. Generic task tools don’t know that workflow.',
+    built: 'A full-stack production workspace modelled on Think Big Brand’s real pipeline, built from the editor’s chair: 10-stage QC workflow, roles enforced by the database, and a plain-English assistant.',
+    proof: ['Live on Vercel', 'Public repo, 60+ commits', '15-phase gated roadmap', 'RLS-tested permissions'],
   },
   {
     id: 'baeky',
@@ -99,6 +106,9 @@ export const projects: Project[] = [
     ],
     stack: ['Flutter', 'Dart', 'Riverpod', 'FastAPI', 'Python', 'PostgreSQL', 'Redis', 'Firebase'],
     tone: 'mint',
+    problem: 'Money lent between friends lives in chats, screenshots and memory, so repayments get missed and conversations get awkward.',
+    built: 'A Flutter + FastAPI app where both people agree on a Gig with amount, due date, payment method and proof, then get reminders until it’s repaid and confirmed.',
+    proof: ['201 backend tests', '114 mobile tests', 'Android build verified', 'Exact-decimal money math'],
   },
   {
     id: 'durjoyai',
@@ -108,22 +118,25 @@ export const projects: Project[] = [
     category: 'Artificial Intelligence',
     year: 'AI',
     overview:
-      'DurjoyAI is an intelligent personal AI assistant engineered with custom Amazon Alexa voice command integration, multi-model failover (OpenAI, Google Gemini, OpenRouter), and a persistent context architecture ("Brain 0"). Designed to execute automated PC scripts, process multimodal queries, and maintain long-term memory across voice sessions.',
+      'DurjoyAI is a personal AI assistant with an Amazon Alexa voice front end. A TypeScript / Express backend verifies every Alexa request, keeps a persistent "Brain 0" profile and memory so the assistant remembers who it is talking to, and routes questions through a provider layer that supports OpenAI, Gemini and OpenRouter — with automatic model failover through OpenRouter.',
     architecture: {
-      title: 'Distributed Voice & LLM Architecture',
-      flow: ['User Voice Command', 'Alexa Skill / Webhook', 'FastAPI Gateway', 'Multi-LLM Engine', 'Brain-0 Memory Context', 'PC Execution'],
+      title: 'Voice → LLM Architecture',
+      flow: ['Alexa Voice Command', 'Signed Alexa Webhook', 'Express API (TypeScript)', 'Brain 0 Memory (SQLite)', 'LLM Provider Layer', 'Spoken Answer'],
       details:
-        'Voice queries received via Amazon Alexa custom skills are dispatched through an authenticated webhook into a containerized FastAPI gateway. The gateway queries the Brain 0 profile database, routes to the optimal LLM dynamically, and triggers local script executions.',
+        'Alexa requests hit a signature-verified webhook on an Express server. The service loads the user’s Brain 0 context, picks the configured LLM provider (OpenAI, Gemini or OpenRouter), and falls back across models via OpenRouter if one fails. Containerised with Docker. PC control lives in the companion Alexa-PC-Control project.',
     },
     features: [
-      'Custom Amazon Alexa voice skill for hands-free command dispatch',
-      'Multi-provider LLM failover (OpenAI, Google Gemini, OpenRouter)',
-      'Persistent "Brain 0" memory context for long-term profile state',
-      'Containerized deployment using Docker for reproducible environments',
+      'Custom Amazon Alexa skill with request-signature verification',
+      'Provider layer over OpenAI, Gemini and OpenRouter, with model failover',
+      'Persistent "Brain 0" memory for long-term user context',
+      'Containerised with Docker for reproducible deploys',
     ],
-    stack: ['TypeScript', 'Python', 'Docker', 'FastAPI', 'OpenAI API', 'Alexa Skills Kit'],
+    stack: ['TypeScript', 'Node.js', 'Express', 'SQLite', 'Docker', 'OpenRouter', 'Alexa Skills Kit'],
     github: 'https://github.com/shoiebdurjoy/DurjoyAI',
     tone: 'ink',
+    problem: 'Everyday AI help is split across apps and forgets who you are between conversations.',
+    built: 'A voice assistant with a provider layer over OpenAI, Gemini and OpenRouter, a persistent “Brain 0” memory, and a signature-verified Alexa webhook as its voice front end.',
+    proof: ['Public repo', 'Multi-LLM failover', 'Signed Alexa webhook', 'Dockerised'],
   },
   {
     id: 'lowkeybd',
@@ -173,6 +186,9 @@ export const projects: Project[] = [
     ],
     stack: ['Flask', 'React', 'PostgreSQL', 'Socket.IO', 'Python', 'Tailwind CSS'],
     tone: 'sage',
+    problem: 'In an emergency, requests, responders and locations end up scattered across calls and messages.',
+    built: 'With a four-person team: real-time Socket.IO coordination, automated Twilio SMS alerts and live Google Maps locations for each request.',
+    proof: ['Team of 4', 'Backend on Render', 'Frontend on Vercel', 'Real-time WebSockets'],
   },
   {
     id: 'gamecritic',
@@ -213,7 +229,7 @@ export const stackGroups: StackGroup[] = [
       { name: 'Python', context: 'AI pipelines, thesis research and FastAPI/Flask backends' },
       { name: 'Next.js', context: 'Full-stack framework for LowKeyBD and this portfolio' },
       { name: 'NestJS', context: 'Enterprise backend for LowKeyBD REST & WebSocket APIs' },
-      { name: 'FastAPI', context: 'High-throughput async Python APIs for AI model serving' },
+      { name: 'FastAPI', context: 'Async Python backend for Baeky' },
       { name: 'Flutter', context: 'Cross-platform mobile client for Baeky (Android first, iOS ready)' },
       { name: 'React', context: 'Component-driven UI across multiple platforms' },
       { name: 'Flask', context: 'REST API and Socket.IO engine for EMERGON' },
@@ -290,9 +306,112 @@ export const thesisStages = [
 
 export const behanceProjects = ['254329919', '246267417', '208647901', '237032839', '254329497'];
 
+// Covers live in /public/videos/<id>.webp (the shorts are vertical, letterboxed in a 4:3 frame).
+export const videos = [
+  { id: '246267417', title: 'Talking Head', kind: 'Talking head' },
+  { id: '208647901', title: 'Fitness', kind: 'Brand short' },
+  { id: '254329919', title: 'Piercing', kind: 'Ad' },
+  { id: '237032839', title: 'Promotional Music Video', kind: 'Promo' },
+  { id: '254329497', title: 'Tattoo', kind: 'Brand short' },
+];
+
+// The 30-second recruiter view. Every line is checkable against the résumé or a repo.
+export const quickView = {
+  role: 'Software engineer (full-stack & AI) who also edits brand video',
+  lookingFor: 'Software engineering roles (full-stack, AI) and brand video projects',
+  location: 'Dhaka, Bangladesh · open to remote',
+  education: 'B.S. Computer Science, BRAC University · expected 2027',
+  experience: 'Video Editor (part-time), Think Big Brand · 2023 – present',
+  highlight: '2nd place, BSEC national financial-literacy short-video competition (Apr 2026) · IBM Introduction to DevOps certificate (Jun 2026)',
+  skills: [
+    ['Languages', 'TypeScript, Python, JavaScript, SQL, Dart'],
+    ['Engineering', 'React, Next.js, Flutter, FastAPI, Flask, NestJS, Supabase, PostgreSQL, Redis, Docker'],
+    ['AI', 'PyTorch, CUDA, OpenAI / Gemini / OpenRouter APIs, Alexa Skills'],
+    ['Video', 'Premiere Pro, After Effects, DaVinci Resolve, CapCut'],
+  ] as const,
+  topWork: ['tbb', 'baeky', 'durjoyai'],
+};
+
 export const featuredRepos = [
   { name: 'DurjoyAI', desc: 'Alexa-powered modular assistant with Brain-0 memory context', lang: 'TypeScript' },
   { name: 'lowkeybd', desc: 'Full-stack platform on Next.js and NestJS microservices', lang: 'TypeScript' },
   { name: 'Game-Critic', desc: 'Community game review and aggregation platform', lang: 'JavaScript' },
-  { name: 'Alexa-PC-Control', desc: 'Voice-controlled PC execution scripts and skill handler', lang: 'Python' },
+  { name: 'Alexa-PC-Control', desc: 'Windows agent that lets Alexa control a PC', lang: 'C#' },
+];
+
+// Certificates shown as real documents. Proof says honestly what the evidence on screen is.
+export type CertificateProof = 'verifiable' | 'photo' | 'pending';
+
+export type Certificate = {
+  id: 'bsec' | 'ibm-devops' | 'brac-webdev';
+  index: string;
+  track: 'Video' | 'Engineering';
+  kind: string;
+  title: string;
+  issuer: string;
+  context: string;
+  issued?: { label: string; iso: string };
+  proof: CertificateProof;
+  verifyUrl?: string;
+  credentialId?: string;
+  note?: string;
+  provenance?: string;
+  listedOn?: { label: string; href: string };
+  image?: { src: string; width: number; height: number; alt: string; optimize: boolean };
+};
+
+export const certificates: Certificate[] = [
+  {
+    id: 'bsec',
+    index: '01',
+    track: 'Video',
+    kind: 'Certificate of Achievement',
+    title: 'Second Prize Award',
+    issuer: 'Bangladesh Securities and Exchange Commission (BSEC)',
+    context: 'National financial-literacy short-video competition · Category 3 · Team Akatsuki, BRAC University',
+    issued: { label: '12 Apr 2026', iso: '2026-04-12' },
+    proof: 'photo',
+    note: 'A national award for a short video, where the editing side of my work met a cause.',
+    provenance: 'Photo of the original printed certificate, shown at its full resolution (569 × 426). No online verification is available for this award.',
+    image: {
+      src: '/certificates/bsec-second-prize.webp',
+      width: 569,
+      height: 426,
+      alt: 'Photo of the BSEC Certificate of Achievement, Second Prize Award, Team Akatsuki from BRAC University, dated 12 April 2026',
+      optimize: false,
+    },
+  },
+  {
+    id: 'ibm-devops',
+    index: '02',
+    track: 'Engineering',
+    kind: 'Course certificate',
+    title: 'Introduction to DevOps',
+    issuer: 'IBM · offered through Coursera',
+    context: 'DevOps fundamentals, CI/CD, automation, agile and collaboration',
+    issued: { label: '26 Jun 2026', iso: '2026-06-26' },
+    proof: 'verifiable',
+    verifyUrl: 'https://coursera.org/verify/JXZIU8WIU3AX',
+    credentialId: 'JXZIU8WIU3AX',
+    note: 'Taken alongside my CS degree: the pipeline side of shipping software.',
+    provenance: 'Coursera hosts the official record. The same verification link is printed on the certificate, bottom right.',
+    image: {
+      src: '/certificates/ibm-devops.webp',
+      width: 1600,
+      height: 1228,
+      alt: 'Coursera course certificate for Introduction to DevOps, an online course authorized by IBM, dated 26 June 2026',
+      optimize: true,
+    },
+  },
+  {
+    id: 'brac-webdev',
+    index: '03',
+    track: 'Engineering',
+    kind: 'Certification',
+    title: 'Web Development (Advanced Level)',
+    issuer: 'BRAC University',
+    context: 'The certificate scan will be added here.',
+    proof: 'pending',
+    listedOn: { label: 'Résumé', href: profile.resume },
+  },
 ];

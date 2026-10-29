@@ -21,7 +21,7 @@ export default function ProjectModal({ project, onClose }: { project: Project; o
   }, [lenis]);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center md:items-center md:p-6">
+    <div className="tone-light fixed inset-0 z-[70] flex items-end justify-center md:items-center md:p-6">
       <motion.div
         className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
         initial={{ opacity: 0 }}
@@ -50,6 +50,25 @@ export default function ProjectModal({ project, onClose }: { project: Project; o
         <div className="px-6 pb-10 pt-8 md:px-10">
           <h2 id="project-title" className="font-serif text-6xl leading-none md:text-7xl">{project.title}</h2>
           <p className="mt-3 text-[18px] text-ink-soft">{project.short}</p>
+          {project.problem && (
+            <div className="mt-8 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl bg-white p-5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">The problem</div>
+                <p className="mt-2 text-[15px] leading-relaxed">{project.problem}</p>
+              </div>
+              <div className="rounded-2xl bg-white p-5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">What I built</div>
+                <p className="mt-2 text-[15px] leading-relaxed">{project.built}</p>
+              </div>
+            </div>
+          )}
+          {project.proof && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {project.proof.map((x) => (
+                <span key={x} className="rounded-full bg-accent-soft px-3 py-1.5 text-[13px] font-medium">✓ {x}</span>
+              ))}
+            </div>
+          )}
           <p className="mt-8 text-[17px] leading-relaxed text-ink-soft">{project.overview}</p>
 
           <h3 className="mt-12 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">{project.architecture.title}</h3>

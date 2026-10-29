@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 // Sections opt in with data-tone="dark". The target tone is how much of the middle of the
-// viewport dark sections cover; the applied tone eases toward it.
+// viewport dark sections cover; the applied tone eases toward it every frame while scrolling.
 function toneAtCentre() {
   const h = window.innerHeight;
   const top = h * 0.2;
@@ -17,8 +17,8 @@ function toneAtCentre() {
   return t * t * (3 - 2 * t);
 }
 
-// Fades the fixed dark backdrop (opacity only — no page restyle) and flips the text/surface
-// palette once per crossing, with hysteresis so it can't flicker at the midpoint.
+// Fades the fixed dark backdrop (opacity only, no restyle) so the page colour moves with the
+// scroll, and flips the palette once per crossing (animated in CSS), with hysteresis.
 export default function ScrollTone() {
   useEffect(() => {
     const root = document.documentElement;
@@ -31,9 +31,9 @@ export default function ScrollTone() {
 
     const apply = () => {
       if (layer) layer.style.opacity = current.toFixed(3);
-      const nextDark = dark ? current > 0.42 : current > 0.58;
-      if (nextDark !== dark) {
-        dark = nextDark;
+      const next = dark ? current > 0.4 : current > 0.6;
+      if (next !== dark) {
+        dark = next;
         root.classList.toggle('tone-dark', dark);
         meta?.setAttribute('content', dark ? '#0C0C0B' : '#F5F3EE');
       }

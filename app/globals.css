@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant pointer-fine (@media (hover: hover) and (pointer: fine));
+
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   /* `font-serif` is the heading face (Geist, medium weight); `font-accent` is the italic serif accent. */
@@ -38,10 +40,23 @@ body {
   background: transparent;
 }
 
-/* Scroll-driven tone (see ScrollTone). The dark backdrop is one fixed layer whose opacity
-   follows the scroll — compositor-only, so it never restyles the page. Text and surface tokens
-   flip once when the tone crosses the midpoint, where the backdrop is mid-grey and the swap
-   reads as part of the fade. (Transitioning colours here would restyle every element per frame.) */
+/* Scroll-driven colour (see ScrollTone). A fixed dark layer fades with the scroll, so the whole
+   page shifts colour as you move. When it passes the midpoint, html.tone-dark swaps the palette;
+   the tokens are registered as colours so the swap animates instead of snapping. */
+@property --color-paper { syntax: "<color>"; inherits: true; initial-value: #F5F3EE; }
+@property --color-card { syntax: "<color>"; inherits: true; initial-value: #FFFFFF; }
+@property --color-ink { syntax: "<color>"; inherits: true; initial-value: #121210; }
+@property --color-ink-soft { syntax: "<color>"; inherits: true; initial-value: #3A3934; }
+@property --color-muted { syntax: "<color>"; inherits: true; initial-value: #77756D; }
+@property --color-line { syntax: "<color>"; inherits: true; initial-value: #E3E0D8; }
+@property --color-accent-soft { syntax: "<color>"; inherits: true; initial-value: #FFE6DB; }
+
+:root {
+  transition-property: --color-paper, --color-card, --color-ink, --color-ink-soft, --color-muted, --color-line, --color-accent-soft;
+  transition-duration: 0.35s;
+  transition-timing-function: ease-out;
+}
+
 .tone-layer {
   position: fixed;
   inset: 0;
@@ -60,8 +75,6 @@ html.tone-dark {
   --color-line: #282724;
   --color-accent-soft: #3A1C12;
 }
-
-
 
 .font-serif {
   font-weight: 500;
@@ -100,6 +113,36 @@ html.lenis, html.lenis body { height: auto; }
 
 /* Apple-style "liquid glass" for the floating nav: frosted + saturated backdrop, a bright
    specular top edge and a soft sheen. Light and dark variants follow the page tone. */
+/* Pins the light palette inside overlays that can open over a dark section. */
+.tone-light {
+  --color-paper: #F5F3EE;
+  --color-card: #FFFFFF;
+  --color-ink: #121210;
+  --color-ink-soft: #3A3934;
+  --color-muted: #77756D;
+  --color-line: #E3E0D8;
+  --color-accent-soft: #FFE6DB;
+  color: var(--color-ink);
+}
+
+/* Certificates: lift on hover (fine pointers), dim siblings while one is inspected. */
+.cert {
+  transition: translate 450ms var(--ease-out-expo), transform 450ms var(--ease-out-expo), opacity 350ms var(--ease-out-expo);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cert-grid:has(.cert[data-interactive="true"]:hover) .cert:not(:hover) {
+    opacity: 0.6;
+  }
+}
+.cert-grid:has(.cert :focus-visible) .cert:not(:focus-within) {
+  opacity: 0.6;
+}
+/* The global :focus-visible radius would otherwise override the frame's 12px corners. */
+.cert-frame:focus-visible {
+  border-radius: 12px;
+  outline-offset: 4px;
+}
+
 .liquid-glass {
   position: relative;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.38));

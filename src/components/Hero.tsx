@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { profile } from '@/src/data/content';
 import { scrollToId } from '@/src/components/Navigation';
 import HeroLayers from '@/src/components/HeroLayers';
+import { openCertificate, openQuickView } from '@/src/lib/events';
 import type { Persona } from '@/src/lib/persona';
 
 
@@ -44,7 +45,8 @@ export default function Hero() {
 
   // Leaving the hero: the stack drifts a touch slower than the page, and the cue fades.
   const { scrollY } = useScroll();
-  const stageY = useTransform(scrollY, [0, 900], [0, 120]);
+  // Desktop only: on phones the stack sits right above the proof strip and must not drift into it.
+  const stageY = useTransform(scrollY, (v) => (typeof window !== 'undefined' && window.innerWidth >= 1024 ? (Math.min(v, 900) / 900) * 120 : 0));
   const hintOpacity = useTransform(scrollY, [0, 160], [1, 0]);
 
   return (
@@ -137,14 +139,20 @@ export default function Hero() {
             >
               Résumé
             </a>
+            <button
+              onClick={openQuickView}
+              className="inline-flex h-12 items-center gap-2 px-2 text-[14px] font-medium text-ink-soft underline decoration-line underline-offset-[6px] transition-colors hover:text-ink hover:decoration-accent"
+            >
+              In a hurry? The 30-second version
+            </button>
           </div>
         </div>
 
         {/* 3D tool stack with its persona switch */}
-        <div className="flex flex-col items-center lg:col-span-5">
+        <motion.div style={{ y: stageY }} className="flex flex-col items-center lg:col-span-5">
           <motion.div
             className="hero-fade-in relative aspect-[6/5] w-full max-w-[560px]"
-            style={{ animationDelay: '0.2s', x: stageX, y: stageY, scale: stageScale }}
+            style={{ animationDelay: '0.2s', x: stageX, scale: stageScale }}
           >
             <HeroLayers mode={mode} settle={settle} />
           </motion.div>
@@ -156,7 +164,35 @@ export default function Hero() {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
+      </div>
+
+      {/* Proof strip: the checkable facts a recruiter looks for first. */}
+      <div className="relative z-20 border-t border-line bg-paper">
+        <dl className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-5 md:px-10 lg:grid-cols-5">
+          {(
+            [
+              ['3+ yrs', 'Client video editing at Think Big Brand'],
+              ['Live', 'TBB Workspace — production platform'],
+              ['315', 'Automated tests on Baeky'],
+              ['2nd', 'BSEC national short-video award', 'bsec'],
+              ["CS ’27", 'BRAC University'],
+            ] as [string, string, string?][]
+          ).map(([value, label, cert], i) => (
+            <div key={label} className={`py-6 ${i > 0 ? 'lg:border-l lg:border-line lg:pl-6' : ''} ${i % 2 ? 'pl-4 lg:pl-6' : ''}`}>
+              <dt className="sr-only">{label}</dt>
+              <dd className="font-serif text-[30px] leading-none tracking-[-0.04em] md:text-[36px]">{value}</dd>
+              <dd className="mt-2 text-[13px] leading-snug text-muted">
+                {label}
+                {cert && (
+                  <button onClick={() => openCertificate(cert)} className="ml-1.5 whitespace-nowrap text-ink underline decoration-line underline-offset-4 transition-colors hover:decoration-accent">
+                    See certificate
+                  </button>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
       </div>
     </section>

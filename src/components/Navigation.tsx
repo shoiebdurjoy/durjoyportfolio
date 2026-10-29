@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { navLinks, profile } from '@/src/data/content';
 import { useFocusTrap } from '@/src/components/ui/useFocusTrap';
+import { openQuickView } from '@/src/lib/events';
 
 export function scrollToId(href: string) {
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
@@ -61,6 +62,13 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
           </ul>
 
           <div className="relative flex items-center gap-2">
+            <button
+              onClick={openQuickView}
+              className="liquid-pill relative hidden h-10 items-center gap-2 rounded-full px-4 text-[13px] font-medium text-ink transition-colors hover:text-accent lg:flex"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              30-sec view
+            </button>
             <button
               onClick={onCommandPaletteOpen}
               aria-label="Open command palette"
@@ -134,6 +142,9 @@ export default function Navigation({ onCommandPaletteOpen }: { onCommandPaletteO
               <a href={`mailto:${profile.email}`} className="rounded-full bg-accent py-4 text-center font-medium text-white">
                 {profile.email}
               </a>
+              <button onClick={() => { close(); setTimeout(openQuickView, 200); }} className="rounded-full bg-ink py-4 text-center font-medium text-paper">
+                The 30-second version
+              </button>
               <a href={profile.resume} target="_blank" rel="noopener noreferrer" className="rounded-full border border-ink py-4 text-center font-medium">
                 Download résumé
               </a>

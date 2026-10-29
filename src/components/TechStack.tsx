@@ -47,7 +47,7 @@ function GroupPanel({ group, index }: { group: StackGroup; index: number }) {
 function Intro() {
   return (
     <div className="flex shrink-0 flex-col justify-center md:w-[440px]">
-      <SectionLabel index="04">Toolkit</SectionLabel>
+      <SectionLabel index="06">Toolkit</SectionLabel>
       <h2 className="font-serif mt-6 text-[clamp(2.6rem,5vw,5rem)] leading-[0.95]">
         <LineReveal text="Tools I actually" />
         <LineReveal text="use, daily." delay={0.08} className="font-accent text-accent" />

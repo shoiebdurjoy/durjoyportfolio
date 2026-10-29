@@ -17,7 +17,7 @@ export default function ThesisSection() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
-            <SectionLabel index="05">Research</SectionLabel>
+            <SectionLabel index="07">Research</SectionLabel>
             <h2 className="font-serif mt-6 text-[clamp(2.6rem,5.5vw,4.8rem)] leading-[0.98]">
               Teaching machines to read <em className="font-accent text-accent">Bangla</em> emotion.
             </h2>

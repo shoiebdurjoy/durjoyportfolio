@@ -3,6 +3,7 @@
 import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { LineReveal, Reveal, SectionLabel } from '@/src/components/ui/Reveal';
+import { openCertificate } from '@/src/lib/events';
 
 // Axis runs Jan 2022 → Jan 2027; positions are fractional years.
 const START = 2022;
@@ -68,9 +69,11 @@ const clips: Clip[] = [
   },
 ];
 
-const keys = [
+const keys: { at: number; label: string; layer: string; cert?: string }[] = [
   { at: 2022.45, label: 'HSC · GPA 5.00', layer: 'BRAC University' },
   { at: 2026.0, label: 'DurjoyAI kicks off', layer: 'DurjoyAI' },
+  { at: 2026.28, label: 'BSEC 2nd prize · 12 Apr 2026', layer: 'BRAC University', cert: 'bsec' },
+  { at: 2026.49, label: 'IBM DevOps certificate · 26 Jun 2026', layer: 'BRAC University', cert: 'ibm-devops' },
 ];
 
 function Eye() {
@@ -171,9 +174,20 @@ export default function Timeline() {
                         <span className="absolute inset-y-0 left-0 w-1" style={{ background: c.color }} />
                         <span className="block truncate px-3 text-[12px] font-medium leading-8 text-white">{c.title}</span>
                       </button>
-                      {keys.filter((k) => k.layer === c.layer).map((k) => (
-                        <span key={k.label} title={k.label} className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-black/40 bg-[#F5D76E]" style={{ left: pct(k.at) }} />
-                      ))}
+                      {keys.filter((k) => k.layer === c.layer).map((k) =>
+                        k.cert ? (
+                          <button
+                            key={k.label}
+                            onClick={() => openCertificate(k.cert!)}
+                            title={`${k.label} — view certificate`}
+                            aria-label={`${k.label}: view certificate`}
+                            className="absolute top-1/2 z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-black/40 bg-[#F5D76E] transition-transform hover:scale-125 focus-visible:scale-125"
+                            style={{ left: pct(k.at) }}
+                          />
+                        ) : (
+                          <span key={k.label} title={k.label} className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-black/40 bg-[#F5D76E]" style={{ left: pct(k.at) }} />
+                        ),
+                      )}
                     </div>
                   </div>
                 ))}

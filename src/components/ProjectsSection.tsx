@@ -5,6 +5,7 @@ import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, typ
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { projects, type Project } from '@/src/data/content';
 import { LineReveal, Reveal, SectionLabel } from '@/src/components/ui/Reveal';
+import { OPEN_PROJECT_EVENT } from '@/src/lib/events';
 
 const ProjectModal = dynamic(() => import('./ProjectModal'), { ssr: false });
 
@@ -253,6 +254,19 @@ export default function ProjectsSection() {
     };
   }, [pos, snapTo]);
 
+  // Story chapters and the recruiter view can ask for a case study: bring that card to the
+  // front and open it.
+  useEffect(() => {
+    const open = (e: Event) => {
+      const i = projects.findIndex((p) => p.id === (e as CustomEvent<string>).detail);
+      if (i < 0) return;
+      snapTo(pos.get() + wrapOffset(i, pos.get(), n));
+      setSelected(projects[i]);
+    };
+    window.addEventListener(OPEN_PROJECT_EVENT, open);
+    return () => window.removeEventListener(OPEN_PROJECT_EVENT, open);
+  }, [n, pos, snapTo]);
+
   const onPick = (index: number, k: number) => {
     if (drag.current.moved) return;
     if (Math.abs(k) < 0.5) setSelected(projects[index]);
@@ -302,14 +316,9 @@ export default function ProjectsSection() {
         </div>
       </Reveal>
 
-      <div className="mx-auto mt-12 grid max-w-7xl grid-cols-1 items-end gap-6 px-5 md:grid-cols-12 md:px-10">
-        <div className="md:col-span-8" aria-live="polite">
-          <div className="label text-muted">{String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')} · {current.category}</div>
-          <motion.p key={current.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-3 max-w-2xl text-[18px] leading-relaxed text-ink-soft">
-            {current.tagline}
-          </motion.p>
-        </div>
-        <div className="flex items-center gap-3 md:col-span-4 md:justify-end">
+      <div className="mx-auto mt-12 flex max-w-7xl flex-col gap-6 px-5 md:flex-row md:items-center md:justify-between md:px-10">
+        <div className="label text-muted">{String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')} · {current.title} · {current.category}</div>
+        <div className="flex items-center gap-3">
           <div className="mr-2 flex gap-1.5">
             {projects.map((p, i) => (
               <button key={p.id} aria-label={`Go to ${p.title}`} onClick={() => snapTo(pos.get() + wrapOffset(i, pos.get(), n))} className={`h-1.5 rounded-full transition-all duration-500 ${i === active ? 'w-8 bg-accent' : 'w-1.5 bg-line'}`} />
@@ -320,6 +329,43 @@ export default function ProjectsSection() {
           <button onClick={() => setSelected(current)} className="hidden h-12 items-center rounded-full border border-line px-5 text-[14px] font-medium transition-colors hover:border-ink sm:inline-flex">Case study</button>
         </div>
       </div>
+
+      {/* What a recruiter needs from each project, without opening anything. */}
+      <motion.div
+        key={current.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        aria-live="polite"
+        className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-px overflow-hidden px-5 md:grid-cols-3 md:px-10"
+      >
+        {current.problem ? (
+          <>
+            <div className="border-t border-line pt-5 md:pr-8">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">The problem</div>
+              <p className="mt-2 text-[16px] leading-relaxed text-ink-soft">{current.problem}</p>
+            </div>
+            <div className="border-t border-line pt-5 md:px-8">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">What I built</div>
+              <p className="mt-2 text-[16px] leading-relaxed text-ink-soft">{current.built}</p>
+            </div>
+            <div className="border-t border-line pt-5 md:pl-8">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">Proof</div>
+              <ul className="mt-2 space-y-1.5">
+                {current.proof?.map((x) => (
+                  <li key={x} className="flex items-center gap-2 text-[15px]"><span className="text-accent">✓</span>{x}</li>
+                ))}
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {current.liveDemo && <a href={current.liveDemo} target="_blank" rel="noopener noreferrer" className="rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-paper transition-colors hover:bg-accent hover:text-white">Live ↗</a>}
+                {current.github && <a href={current.github} target="_blank" rel="noopener noreferrer" className="rounded-full border border-line px-4 py-2 text-[13px] font-medium transition-colors hover:border-ink">Code ↗</a>}
+              </div>
+            </div>
+          </>
+        ) : (
+          <p className="max-w-2xl border-t border-line pt-5 text-[18px] leading-relaxed text-ink-soft md:col-span-3">{current.tagline}</p>
+        )}
+      </motion.div>
 
       {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}
     </section>
