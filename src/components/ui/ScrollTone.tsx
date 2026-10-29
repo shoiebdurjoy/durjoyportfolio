@@ -29,13 +29,31 @@ export default function ScrollTone() {
     let dark = current > 0.5;
     let last = performance.now();
 
+    // Swap the palette block by block. Blocks on screen fade (CSS transition); off-screen blocks
+    // switch instantly, so a swap only restyles what the visitor can actually see.
+    const setDark = (value: boolean, animate: boolean) => {
+      const h = window.innerHeight;
+      const blocks = [...document.querySelectorAll<HTMLElement>('main > *'), document.querySelector<HTMLElement>('header')];
+      const instant: HTMLElement[] = [];
+      for (const el of blocks) {
+        if (!el || el.classList.contains('tone-dark') === value) continue;
+        const r = el.getBoundingClientRect();
+        if (!animate || r.bottom < 0 || r.top > h) {
+          el.classList.add('tone-instant');
+          instant.push(el);
+        }
+        el.classList.toggle('tone-dark', value);
+      }
+      if (instant.length) requestAnimationFrame(() => instant.forEach((el) => el.classList.remove('tone-instant')));
+      meta?.setAttribute('content', value ? '#0C0C0B' : '#F5F3EE');
+    };
+
     const apply = () => {
       if (layer) layer.style.opacity = current.toFixed(3);
       const next = dark ? current > 0.4 : current > 0.6;
       if (next !== dark) {
         dark = next;
-        root.classList.toggle('tone-dark', dark);
-        meta?.setAttribute('content', dark ? '#0C0C0B' : '#F5F3EE');
+        setDark(dark, true);
       }
     };
 
@@ -55,7 +73,9 @@ export default function ScrollTone() {
       }
     };
 
-    root.classList.toggle('tone-dark', dark);
+    // Hand over from the first-paint class to per-block classes without animating.
+    setDark(dark, false);
+    root.classList.remove('tone-boot');
     apply();
     window.addEventListener('scroll', wake, { passive: true });
     window.addEventListener('resize', wake);

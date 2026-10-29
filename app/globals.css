@@ -41,7 +41,7 @@ body {
 }
 
 /* Scroll-driven colour (see ScrollTone). A fixed dark layer fades with the scroll, so the whole
-   page shifts colour as you move. When it passes the midpoint, html.tone-dark swaps the palette;
+   page shifts colour as you move. When it passes the midpoint, the palette swaps (per block, see below);
    the tokens are registered as colours so the swap animates instead of snapping. */
 @property --color-paper { syntax: "<color>"; inherits: true; initial-value: #F5F3EE; }
 @property --color-card { syntax: "<color>"; inherits: true; initial-value: #FFFFFF; }
@@ -51,10 +51,19 @@ body {
 @property --color-line { syntax: "<color>"; inherits: true; initial-value: #E3E0D8; }
 @property --color-accent-soft { syntax: "<color>"; inherits: true; initial-value: #FFE6DB; }
 
-:root {
+/* Each top-level block (main > *, the nav header) carries the palette itself, so a swap only
+   restyles the blocks it is toggled on. ScrollTone animates the ones on screen and switches the
+   off-screen ones instantly, keeping the fade cheap on any machine. */
+main > *,
+body > header,
+header {
+  color: var(--color-ink);
   transition-property: --color-paper, --color-card, --color-ink, --color-ink-soft, --color-muted, --color-line, --color-accent-soft;
   transition-duration: 0.35s;
   transition-timing-function: ease-out;
+}
+.tone-instant {
+  transition: none !important;
 }
 
 .tone-layer {
@@ -66,7 +75,10 @@ body {
   will-change: opacity;
 }
 
-html.tone-dark {
+/* `tone-boot` covers the first paint (the page opens on the dark hero) until ScrollTone runs. */
+.tone-dark,
+html.tone-boot main > *,
+html.tone-boot header {
   --color-paper: #0C0C0B;
   --color-card: #181816;
   --color-ink: #F3F1EC;
@@ -163,7 +175,8 @@ html.lenis, html.lenis body { height: auto; }
   pointer-events: none;
   background: radial-gradient(120% 140% at 20% -40%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%);
 }
-html.tone-dark .liquid-glass {
+header.tone-dark .liquid-glass,
+html.tone-boot .liquid-glass {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
   border-color: rgba(255, 255, 255, 0.16);
   box-shadow:
@@ -171,7 +184,8 @@ html.tone-dark .liquid-glass {
     inset 0 -1px 0 rgba(255, 255, 255, 0.05),
     0 12px 40px -12px rgba(0, 0, 0, 0.6);
 }
-html.tone-dark .liquid-glass::before {
+header.tone-dark .liquid-glass::before,
+html.tone-boot .liquid-glass::before {
   background: radial-gradient(120% 140% at 20% -40%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 55%);
 }
 .liquid-pill {
@@ -179,7 +193,8 @@ html.tone-dark .liquid-glass::before {
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
-html.tone-dark .liquid-pill {
+header.tone-dark .liquid-pill,
+html.tone-boot .liquid-pill {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);

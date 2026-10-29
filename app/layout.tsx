@@ -87,7 +87,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geist.variable} ${geistMono.variable} tone-dark antialiased`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${geist.variable} ${geistMono.variable} tone-boot antialiased`}>
       <body className="min-h-screen font-sans text-ink">
         <div id="tone-layer" aria-hidden className="tone-layer" />
         <script
