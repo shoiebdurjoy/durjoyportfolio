@@ -171,8 +171,14 @@ export default function VideoSection() {
       {/* Warm horizon behind the reel, in the site's accent. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%]"
-        style={{ background: 'radial-gradient(60% 55% at 50% 100%, rgba(255,90,36,0.22) 0%, rgba(255,90,36,0) 70%)' }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[75%]"
+        style={{
+          // Centred above the edge and masked to nothing at the bottom, so the glow never meets the
+          // next section as a hard line.
+          background: 'radial-gradient(60% 50% at 50% 62%, rgba(255,90,36,0.2) 0%, rgba(255,90,36,0) 72%)',
+          maskImage: 'linear-gradient(to bottom, #000 55%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, #000 55%, transparent 100%)',
+        }}
       />
 
       <div className="relative mx-auto flex max-w-7xl flex-col justify-between gap-8 px-5 md:flex-row md:items-end md:px-10">
